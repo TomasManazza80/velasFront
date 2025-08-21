@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus, faTruck } from "@fortawesome/free-solid-svg-icons";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ProductDetails() {
   const [product, setProduct] = useState({});

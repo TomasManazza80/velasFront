@@ -5,6 +5,9 @@ import { FiFilter, FiX, FiSearch, FiDollarSign } from "react-icons/fi";
 import ProductCart from "../../components/ProductCart";
 import { Outlet, Link } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -13,7 +16,6 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [category, setCategory] = useState("");
   const [showCategories, setShowCategories] = useState(false);
-  const API_URL = 'http://localhost:3000';
 
   async function fetchProducts() {
     try {

@@ -4,7 +4,7 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDollarSign, FiPackage, FiShoppingCart } from 'react-icons/fi';
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Admin = () => {
   // Estados y configuraciones
@@ -152,7 +152,7 @@ const [ventaManual, setVentaManual] = useState({
 });
 const obtenerRecaudaciones = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/recaudation/recaudations');
+    const response = await axios.get(`${API_URL}/recaudation/recaudations`);
     console.log('Datos recibidos:', response.data); // Agrega este console.log
     if (response.data && Array.isArray(response.data)) {
       setRecaudaciones(response.data);
@@ -329,7 +329,7 @@ useEffect(() => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`http://localhost:3000/products`, nuevoProducto);
+      const response = await axios.post(`${API_URL}/products`, nuevoProducto);
       setTodosMisProductos([...todosMisProductos, response.data]);
       resetearFormulario();
     } catch (err) {

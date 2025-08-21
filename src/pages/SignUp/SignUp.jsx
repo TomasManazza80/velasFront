@@ -6,7 +6,7 @@ import { FiUser, FiPhone, FiMail, FiLock, FiCheck } from "react-icons/fi";
 import authContext from "../../store/store";
 import { useContext, useEffect } from "react";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function SignUp() {
   const authCtx = useContext(authContext);

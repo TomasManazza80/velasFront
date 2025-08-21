@@ -7,7 +7,7 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import emailjs from '@emailjs/browser';
 
-const API_URL = import.meta.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Cart() {
   const cart = useSelector((state) => state.cart);

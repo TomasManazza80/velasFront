@@ -31,7 +31,7 @@ function Login() {
         password: values.password,
       };
 
-      const response = await axios.post(`http://localhost:3000/login`, data);
+      const response = await axios.post(`${API_URL}/login`, data);
       // alert(`¡Bienvenido de nuevo, ${response.data.nombre}!`);
       authCtx.setToken(response.data.token);
       localStorage.setItem("token", response.data.token);
