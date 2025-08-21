@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode"; // Cambiado aquí
 import AuthContext from '../store/store'; // Asegúrate de tener el contexto de autenticación
 
-  const API_URL ="http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 const AdminRoute = ({ children }) => {
