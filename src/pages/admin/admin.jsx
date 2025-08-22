@@ -584,7 +584,7 @@ const registrarVentaManual = async () => {
           <h3 className="text-xl font-semibold mb-4">Editar Producto</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            {['nombre', 'precio', 'marca', 'categoria', 'cantidad', 'talle'].map((field) => (
+            {['nombre', 'precio', 'marca', 'categoria', 'cantidad', 'precio por mayor'].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
                   {field.replace('_', ' ')}
@@ -600,10 +600,10 @@ const registrarVentaManual = async () => {
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
-                ) : field === 'talle' ? (
+                ) : field === 'precio por mayor' ? (
                   <input
                     type="text"
-                    name={field}
+                    name="talle"
                     value={formData[field]}
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
