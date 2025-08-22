@@ -1,36 +1,82 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faSearch, faTimes, faPlay } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import ProductCart from "../../components/ProductCart";
 import video from "../../images/fondovela.mp4";
 import { useNavigate } from 'react-router-dom';
-
 
 const Hero = () => {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const controls = useAnimation();
   const videoRef = useRef(null);
-  const API_URL = import.meta.env.VITE_API_URL 
-const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
+
+  // Detectar si es un dispositivo móvil
+  useEffect(() => {
+    const checkIsMobile = () => {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
+    setIsMobile(checkIsMobile());
+  }, []);
+
   // Configuración del video de fondo
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.addEventListener('ended', () => {
-        video.currentTime = 0;
-        video.play();
-      });
-      
+    if (!video) return;
+
+    const handleVideoPlay = () => {
+      setIsVideoPlaying(true);
+    };
+
+    const handleVideoPause = () => {
+      setIsVideoPlaying(false);
+    };
+
+    const handleVideoEnd = () => {
+      video.currentTime = 0.2;
       video.play().catch(error => {
-        console.log("Autoplay prevented:", error);
+        console.log("Video replay prevented:", error);
       });
-    }
-  }, []);
+    };
+
+    video.addEventListener('play', handleVideoPlay);
+    video.addEventListener('pause', handleVideoPause);
+    video.addEventListener('ended', handleVideoEnd);
+
+    // Intentar reproducir automáticamente
+    const playVideo = async () => {
+      try {
+        // En móviles, necesitamos esperar a que el usuario interactúe primero
+        if (isMobile && !hasUserInteracted) {
+          return;
+        }
+        
+        await video.play();
+        setIsVideoPlaying(true);
+      } catch (error) {
+        console.log("Autoplay prevented:", error);
+        // En caso de error, mostrar un botón de reproducción
+        setIsVideoPlaying(false);
+      }
+    };
+
+    playVideo();
+
+    return () => {
+      video.removeEventListener('play', handleVideoPlay);
+      video.removeEventListener('pause', handleVideoPause);
+      video.removeEventListener('ended', handleVideoEnd);
+    };
+  }, [isMobile, hasUserInteracted]);
 
   // Obtener productos al montar el componente
   useEffect(() => {
@@ -72,6 +118,27 @@ const navigate = useNavigate();
     };
     sequence();
   }, [controls]);
+
+  // Función para reproducir video manualmente (necesaria en móviles)
+  const handlePlayVideo = async () => {
+    try {
+      setHasUserInteracted(true);
+      await videoRef.current.play();
+      setIsVideoPlaying(true);
+    } catch (error) {
+      console.log("Error al reproducir video:", error);
+    }
+  };
+
+  // Función para manejar la interacción del usuario con la página
+  const handleUserInteraction = () => {
+    if (!hasUserInteracted) {
+      setHasUserInteracted(true);
+      if (videoRef.current && !isVideoPlaying) {
+        handlePlayVideo();
+      }
+    }
+  };
  
   // Variantes de animación
   const containerVariants = {
@@ -127,7 +194,10 @@ const navigate = useNavigate();
   };
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+    <div 
+      className="relative w-full h-screen flex items-center justify-center overflow-hidden"
+      onClick={handleUserInteraction}
+    >
       {/* Video de fondo */}
       <div className="absolute inset-0 z-0 w-full">
         <video
@@ -137,10 +207,30 @@ const navigate = useNavigate();
           muted
           loop
           playsInline
+          preload="auto"
         >
           <source src={video} type="video/mp4" />
           Tu navegador no soporta videos HTML5.
         </video>
+        
+        {/* Overlay para reproducir en móviles */}
+        {!isVideoPlaying && isMobile && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 cursor-pointer z-20"
+            onClick={handlePlayVideo}
+          >
+            <motion.div 
+              className="text-center p-6 bg-black bg-opacity-60 rounded-full"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <FontAwesomeIcon icon={faPlay} className="text-white text-3xl ml-1" />
+              <p className="text-white mt-2 text-sm">Toca para reproducir</p>
+            </motion.div>
+          </div>
+        )}
+        
         <div className="absolute inset-0 bg-black bg-opacity-30 w-full"></div>
       </div>
 
@@ -197,7 +287,7 @@ const navigate = useNavigate();
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 1 }}
               >
-                AR BEAUTY
+                Lifestyle Decoration 
               </motion.h2>
             </motion.div>
           )}
@@ -347,11 +437,11 @@ const navigate = useNavigate();
                       </p>
                       
                       <button
-    className="w-full py-2 text-xs font-medium uppercase border border-black text-black hover:bg-black hover:text-white transition-colors duration-300"
-    onClick={() => navigate(`/product/${product.ProductId}`)}
-  >
-    Ver producto
-  </button>
+                        className="w-full py-2 text-xs font-medium uppercase border border-black text-black hover:bg-black hover:text-white transition-colors duration-300"
+                        onClick={() => navigate(`/product/${product.ProductId}`)}
+                      >
+                        Ver producto
+                      </button>
                     </motion.div>
                   ))}
                 </div>
