@@ -122,11 +122,11 @@ function Cart() {
   const total = cart.reduce((a, c) => a + c.price * c.quantity, 0);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen ">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-12">
-          <NavLink to="/" className="flex items-center text-gray-500 hover:text-black mb-4">
+          <NavLink to="/" className="mt-16 flex items-center text-gray-500 hover:text-black mb-4">
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
             <span className="text-sm uppercase tracking-wider">Continuar comprando</span>
           </NavLink>

@@ -5,6 +5,8 @@ import { faAngleDown, faSearch, faTimes } from "@fortawesome/free-solid-svg-icon
 import axios from "axios";
 import ProductCart from "../../components/ProductCart";
 import video from "../../images/fondovela.mp4";
+import { useNavigate } from 'react-router-dom';
+
 
 const Hero = () => {
   const [search, setSearch] = useState("");
@@ -13,8 +15,8 @@ const Hero = () => {
   const [showResults, setShowResults] = useState(false);
   const controls = useAnimation();
   const videoRef = useRef(null);
-  const API_URL = 'http://localhost:3000';
-
+  const API_URL = import.meta.env.VITE_API_URL 
+const navigate = useNavigate();
   // Configuración del video de fondo
   useEffect(() => {
     const video = videoRef.current;
@@ -185,8 +187,7 @@ const Hero = () => {
             >
               <motion.h1 
                 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-[0.3em] uppercase text-white mb-2 w-full"
-                whileHover={{ letterSpacing: "0.4em" }}
-                transition={{ duration: 0.3 }}
+                variants={itemVariants}
               >
                 Luciana Petruccelli
               </motion.h1>
@@ -203,60 +204,59 @@ const Hero = () => {
         </AnimatePresence>
 
         {/* Barra de búsqueda */}
-       {/* Barra de búsqueda corregida */}
-<motion.div 
-  className="max-w-md w-full mx-auto relative mb-4"
-  variants={searchVariants}
->
-  <div className="relative w-full">
-    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-      <FontAwesomeIcon icon={faSearch} className="text-white/70" />
-    </div>
-    
-    <motion.input
-      type="text"
-      placeholder="BUSCAR PRODUCTOS..."
-      className="w-full pl-10 pr-10 py-4 text-center text-xs tracking-[0.3em] uppercase bg-transparent border-b-2 border-white/30 focus:outline-none placeholder-white/50 text-white font-medium"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      whileFocus={{
-        scale: 1.05,
-        borderBottomColor: "#ffffff",
-        backdropFilter: "blur(4px)"
-      }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 300,
-        borderBottomColor: { duration: 0.3 }
-      }}
-    />
-    
-    {search && (
-      <button 
-        onClick={resetSearch}
-        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-      >
-        <FontAwesomeIcon icon={faTimes} className="text-white/70 hover:text-white transition-colors" />
-      </button>
-    )}
-  </div>
-  
-  {/* Barra de carga animada - Versión mejorada */}
-  <motion.div
-    className="absolute bottom-0 left-0 h-1.5 bg-gradient-to-r from-transparent via-white to-transparent w-full"
-    initial={{ scaleX: 0, opacity: 0 }}
-    animate={{ 
-      scaleX: 1,
-      opacity: 1,
-      boxShadow: '0 0 15px rgba(255,255,255,0.7)'
-    }}
-    transition={{ 
-      delay: 1.2,
-      duration: 1.5,
-      ease: [0.16, 1, 0.3, 1]
-    }}
-  />
-</motion.div>
+        <motion.div 
+          className="max-w-md w-full mx-auto relative mb-4"
+          variants={searchVariants}
+        >
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FontAwesomeIcon icon={faSearch} className="text-white/70" />
+            </div>
+            
+            <motion.input
+              type="text"
+              placeholder="BUSCAR PRODUCTOS..."
+              className="w-full pl-10 pr-10 py-4 text-center text-xs tracking-[0.3em] uppercase bg-transparent border-b-2 border-white/30 focus:outline-none placeholder-white/50 text-white font-medium"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              whileFocus={{
+                scale: 1.05,
+                borderBottomColor: "#ffffff",
+                backdropFilter: "blur(4px)"
+              }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300,
+                borderBottomColor: { duration: 0.3 }
+              }}
+            />
+            
+            {search && (
+              <button 
+                onClick={resetSearch}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <FontAwesomeIcon icon={faTimes} className="text-white/70 hover:text-white transition-colors" />
+              </button>
+            )}
+          </div>
+          
+          {/* Barra de carga animada - Versión mejorada */}
+          <motion.div
+            className="absolute bottom-0 left-0 h-1.5 bg-gradient-to-r from-transparent via-white to-transparent w-full"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ 
+              scaleX: 1,
+              opacity: 1,
+              boxShadow: '0 0 15px rgba(255,255,255,0.7)'
+            }}
+            transition={{ 
+              delay: 1.2,
+              duration: 1.5,
+              ease: [0.16, 1, 0.3, 1]
+            }}
+          />
+        </motion.div>
           
 
         {/* Nombres de categorías (solo sin resultados) */}
@@ -346,9 +346,12 @@ const Hero = () => {
                         {formatPrice(product.precio)}
                       </p>
                       
-                      <button className="w-full py-2 text-xs font-medium uppercase border border-black text-black hover:bg-black hover:text-white transition-colors duration-300">
-                        Ver producto
-                      </button>
+                      <button
+    className="w-full py-2 text-xs font-medium uppercase border border-black text-black hover:bg-black hover:text-white transition-colors duration-300"
+    onClick={() => navigate(`/product/${product.ProductId}`)}
+  >
+    Ver producto
+  </button>
                     </motion.div>
                   ))}
                 </div>

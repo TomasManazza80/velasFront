@@ -11,10 +11,10 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import logo from "../../images/logo.png";
-
+import logoWhite from "../../images/logoWhite.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
-// const API_URL = import.meta.env.VITE_API_URL;
+
 function Index() {
   const [toggle, setToggle] = useState(false);
   const authCtx = useContext(authContext);
@@ -42,7 +42,16 @@ function Index() {
   const signOutHandler = () => {
     localStorage.removeItem("token");
     authCtx.setToken(null);
-    alert("Sign-out successful.");
+    
+    // Mostrar notificación de cierre de sesión
+    const notificationEvent = new CustomEvent('showNotification', {
+      detail: {
+        message: 'Sesión cerrada correctamente',
+        type: 'success'
+      }
+    });
+    window.dispatchEvent(notificationEvent);
+    
     closeNavbar();
   };
 
@@ -91,6 +100,7 @@ function Index() {
         border: "border-white",
         cartIcon: "text-white",
         cartBadge: "bg-white text-black",
+        logo: logoWhite,
       };
     } else {
       return {
@@ -100,6 +110,7 @@ function Index() {
         border: "border-black",
         cartIcon: "text-gray-800",
         cartBadge: "bg-black text-white",
+        logo: logo,
       };
     }
   };
@@ -112,14 +123,16 @@ function Index() {
         className={`fixed w-full z-50 transition-all duration-300 ${style.header}`}
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
+          {/* Logo a la izquierda */}
           <NavLink
             to="/"
             onClick={closeNavbar}
             className={`text-2xl font-light tracking-widest uppercase transition-colors ${style.text}`}
           >
-            <img src={logo} className="w-16" alt="" />
+            <img src={style.logo} className="w-16" alt="Logo" />
           </NavLink>
 
+          {/* Navegación para desktop (oculta en móviles) */}
           <nav className="hidden lg:flex items-center space-x-8">
             <NavLink
               to="/"
@@ -190,6 +203,7 @@ function Index() {
             )}
           </nav>
 
+          {/* Elementos de la derecha (carrito, login/logout) - ocultos en móviles */}
           <div className="hidden lg:flex items-center space-x-6">
             <NavLink to="/cart" className="relative" onClick={closeNavbar}>
               <FontAwesomeIcon
@@ -223,7 +237,8 @@ function Index() {
             )}
           </div>
 
-          <button onClick={toggleHandler} className="lg:hidden p-2">
+          {/* Botón de menú hamburguesa (solo visible en móviles) - colocado a la derecha */}
+          <button onClick={toggleHandler} className="lg:hidden p-2 ml-auto">
             <FontAwesomeIcon
               icon={toggle ? faXmark : faBars}
               className={`text-xl ${style.text}`}
@@ -231,6 +246,7 @@ function Index() {
           </button>
         </div>
 
+        {/* Menú desplegable para móviles */}
         {toggle && (
           <div
             className={`lg:hidden ${

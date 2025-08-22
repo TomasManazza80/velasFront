@@ -45,7 +45,7 @@ const eliminarRecaudacion = async (id) => {
     // Actualizar el estado eliminando la recaudación
     setRecaudaciones(recaudaciones.filter(rec => rec.id !== id));
     
-    alert('Recaudación eliminada correctamente');
+    
   } catch (error) {
     console.error('Error al eliminar recaudación:', error);
     setError(`Error al eliminar recaudación: ${error.response?.data?.message || error.message}`);
@@ -116,7 +116,7 @@ const handleCerrarRecaudacion = async () => {
     // No necesitamos setProductosVendidos([]) porque handleEliminarProductoVendido ya lo hace
     setRecaudado(0); // Reiniciamos el contador de recaudación
     
-    alert(`Recaudación de ${nombreMes} registrada: $${montoTotal.toFixed(2)}`);
+ 
     
   } catch (error) {
     console.error('Error completo:', {
@@ -368,7 +368,7 @@ useEffect(() => {
     setTodosMisProductos(todosMisProductos.filter(p => p.ProductId !== ProductId));
     
     // Mostrar mensaje de éxito
-    alert('Producto eliminado correctamente');
+   
   } catch (err) {
     // Mostrar mensaje de error específico
     alert(`Error al eliminar producto: ${err.response?.data?.message || err.message}`);

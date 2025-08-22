@@ -5,7 +5,7 @@ import { FiFilter } from "react-icons/fi";
 import ProductCart from "../../components/ProductCart";
 import { Outlet } from "react-router-dom";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ProductsHome = () => {
     const [products, setProducts] = useState([]);
@@ -15,13 +15,14 @@ const ProductsHome = () => {
     const [loading, setLoading] = useState(true);
 
     const categories = [
-        { id: "", name: "TODOS" },
-        { id: "remeras", name: "REMERAS" },
-        { id: "pantalones", name: "PANTALONES" },
-        { id: "abrigos", name: "ABRIGOS" },
-        { id: "calzados", name: "CALZADOS" },
-        { id: "ropa interior", name: "ROPA INTERIOR" },
-        { id: "camisas", name: "CAMISAS" }
+        { id: "", name: "Todos" },
+        { id: "velas", name: "Velas" },
+        { id: "velas premium", name: "Velas Premium" },
+        { id: "pulceras", name: "PULCERAS" },
+        { id: "collares", name: "collares" },
+        { id: "aromatizadores", name: "Aromatizadores" },
+        { id: "accesiorios", name: "Accesorios" },
+
     ];
 
     async function fetchProducts() {
