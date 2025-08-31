@@ -241,28 +241,29 @@ function ProductDetails() {
             )}
 
             {/* Selector de cantidad */}
-            <div className="mb-6">
-              <p className="text-sm font-medium mb-2">Cantidad:</p>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={decreaseQuantity}
-                  className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded active:bg-gray-100 touch-manipulation"
-                >
-                  <FontAwesomeIcon icon={faMinus} className="text-gray-600" />
-                </button>
-                <span className="text-lg font-medium w-10 text-center">{quantity}</span>
-                <button
-                  onClick={increaseQuantity}
-                  className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded active:bg-gray-100 touch-manipulation"
-                >
-                  <FontAwesomeIcon icon={faPlus} className="text-gray-600" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Stock disponible: {product.cantidad}
-              </p>
-            </div>
-
+          <div className="mb-6">
+  <p className="text-sm font-medium mb-2">Cantidad:</p>
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center gap-4 mb-2 sm:mb-0">
+      <button
+        onClick={decreaseQuantity}
+        className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded active:bg-gray-100 touch-manipulation"
+      >
+        <FontAwesomeIcon icon={faMinus} className="text-gray-600" />
+      </button>
+      <span className="text-lg font-medium w-10 text-center">{quantity}</span>
+      <button
+        onClick={increaseQuantity}
+        className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded active:bg-gray-100 touch-manipulation"
+      >
+        <FontAwesomeIcon icon={faPlus} className="text-gray-600" />
+      </button>
+    </div>
+    <p className="text-sm text-gray-500 sm:text-right">
+      Stock: {product.cantidad}
+    </p>
+  </div>
+</div>
             {/* Botones de acción */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <button

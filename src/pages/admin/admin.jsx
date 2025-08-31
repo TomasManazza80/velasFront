@@ -168,8 +168,8 @@ const obtenerRecaudaciones = async () => {
 };
 
   // Opciones para formularios
-  const categorias = ['Velas', 'Velas Premium', 'Aromatizadores', 'Collares', 'Accesorios'];
-  const talles = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Único'];
+  const categorias = ['Velas', 'Velas Premium', 'Aromatizadores', 'Collares', 'Pulseras', 'Espejos', 'otros'  ];
+
 
   // Cloudinary config
   const cloudinary = new Cloudinary({ cloud: { cloudName: 'dxvkqumpu' } });
@@ -580,7 +580,7 @@ const registrarVentaManual = async () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
           <h3 className="text-xl font-semibold mb-4">Editar Producto</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -678,7 +678,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
         <h3 className="text-xl font-semibold mb-4">Registrar Venta Manual</h3>
         
         <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-4">

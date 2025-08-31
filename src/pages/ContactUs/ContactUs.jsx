@@ -3,29 +3,29 @@ import { NavLink } from "react-router-dom";
 import { FiMail, FiPhone, FiInstagram, FiArrowLeft } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
-function ContactUs() {
+function  ContactUs() {
   const contacts = [
     {
       id: 1,
       icon: <FiMail className="w-7 h-7 text-gray-700" />,
-      text: "solcito26wp@gmail.com",
+      text: "lufpretruccelli@gmail.com",
     },
     {
       id: 2,
       icon: <FiPhone className="w-7 h-7 text-gray-700" />,
-      text: "342-5048139",
+      text: "342-5243854",
     },
     {
       id: 3,
       icon: <FiInstagram className="w-7 h-7 text-gray-700" />,
       text: (
         <a
-          href="https://instagram.com/holanam_nam"
+          href="https://www.instagram.com/lu.petruccelli/"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-black transition-colors"
         >
-          @holanam_nam
+          @lu.petruccelli
         </a>
       ),
     },
@@ -35,7 +35,7 @@ function ContactUs() {
       icon: <FaWhatsapp className="w-7 h-7 text-gray-700" />,
       text: (
         <a
-          href="https://wa.me/+543425937358?text=Hola%2C%20quisiera%20saber%20más%20sobre%20tus%20diseños."
+          href="https://wa.me/+543425243854?text=Hola%2C%20quisiera%20saber%20más%20sobre%20tus%20diseños."
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-black transition-colors"
