@@ -181,8 +181,8 @@ const Footer = () => {
 
   const socialLinks = [
     { icon: <FaFacebook size={20} />, url: "https://facebook.com" },
-    { icon: <FaInstagram size={20} />, url: "https://instagram.com" },
-    { icon: <FaTwitter size={20} />, url: "https://twitter.com" }
+    { icon: <FaInstagram size={20} />, url: "https://www.instagram.com/lu.petruccelli/" },
+    
   ];
 
   return (
@@ -353,15 +353,15 @@ const Footer = () => {
 
           {/* Contact Email */}
           <div className="flex justify-center mb-6 sm:mb-8">
-            <a href="mailto:info@thecandleshop.com" className="flex items-center text-gray-300 hover:text-white transition-colors duration-200">
+            <a href="mailto:lufpetruccelli@gmail.com" className="flex items-center text-gray-300 hover:text-white transition-colors duration-200">
               <FaEnvelope className="mr-2" />
-              info@thecandleshop.com
+              lufpetruccelli@gmail.com
             </a>
           </div>
 
           {/* Copyright */}
           <div className="text-center text-gray-400 text-xs sm:text-sm">
-            <p>© 2025 LUCIANA PETROCCELLI –  Lifestyle Decoration. TODOS LOS DERECHOS RESERVADOS.</p>
+            <p>© 2025 LUCIANA PETRUCCELLI –  Lifestyle Decoration. TODOS LOS DERECHOS RESERVADOS.</p>
             <p className="mt-1">DESIGNED & DEVELOPED BY EMPTY_DEVELOPMENT & <a className="bg-white text-black rounded hover:text-gray-300 transition-colors duration-200 m-2" href="https://www.linkedin.com/in/tomasmanazza/">Tomás Manazza  </a> | FULL STACK DEVELOPMENT EXPERTS</p>
           </div>
         </div>

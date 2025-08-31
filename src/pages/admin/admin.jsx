@@ -168,7 +168,7 @@ const obtenerRecaudaciones = async () => {
 };
 
   // Opciones para formularios
-  const categorias = ['Velas', 'Velas Premium', 'Aromatizadores', 'Collares', 'Pulseras', 'Espejos', 'otros'  ];
+  const categorias = ['Velas', 'Velas Premium', 'Aromatizadores', 'Floreros', 'Collares', 'Pulseras', 'Espejos', 'Yeso', 'Otros'  ];
 
 
   // Cloudinary config

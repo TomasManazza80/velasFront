@@ -279,7 +279,7 @@ const Hero = () => {
                 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-[0.3em] uppercase text-white mb-2 w-full"
                 variants={itemVariants}
               >
-                Luciana Petruccelli
+                Lu Petruccelli
               </motion.h1>
               <motion.h2 
                 className="text-sm md:text-base tracking-[0.3em] uppercase text-gray-300 w-full"
@@ -357,7 +357,7 @@ const Hero = () => {
               variants={containerVariants}
               exit={{ opacity: 0 }}
             >
-              {["Velas Premium", "Collares", "Pulceras", "Deco"].map((name, i) => (
+              {["Velas Premium", "Collares", "Pulceras", "Accesorios", "Floreros", "Aromatizadores", "Espejos", "Velas" ].map((name, i) => (
                 <motion.div
                   key={name}
                   className="text-xs md:text-sm tracking-[0.3em] uppercase text-gray-300 hover:text-white transition-colors cursor-pointer w-full"
