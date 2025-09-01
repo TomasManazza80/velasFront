@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ProductCard({ products }) {
   const [productsToShow, setProductsToShow] = useState([]);
@@ -33,7 +33,7 @@ function ProductCard({ products }) {
           ProductId: 1,
           nombre: "DIFUSOR LAB MANDARIN ROSE",
           precio: 48500,
-          marca: "ANI BEAUTY",
+          marca: "By Lu Pretruccelli",
           imagenes: [""],
           categoria: "aromatizadores"
         },
@@ -41,7 +41,7 @@ function ProductCard({ products }) {
           ProductId: 2,
           nombre: "DIFUSOR CLOSSY MANDARIN ROSE",
           precio: 34500,
-          marca: "ANI BEAUTY",
+          marca: "By Lu Pretruccelli",
           imagenes: [""],
           categoria: "aromatizadores"
         },
@@ -49,7 +49,7 @@ function ProductCard({ products }) {
           ProductId: 3,
           nombre: "DIFUSOR BASE: MANDARIN ROSE",
           precio: 20900,
-          marca: "ANI BEAUTY",
+          marca: "By Lu Pretruccelli",
           imagenes: [""],
           categoria: "aromatizadores"
         },
@@ -57,7 +57,7 @@ function ProductCard({ products }) {
           ProductId: 4,
           nombre: "REPUESTO PARA DIFUSOR MANDARIN ROSE",
           precio: 32500,
-          marca: "ANI BEAUTY",
+          marca: "By Lu Pretruccelli",
           imagenes: [""],
           categoria: "repuestos"
         },
@@ -145,7 +145,7 @@ function ProductCard({ products }) {
                     <div className="px-2">
                       {/* Brand */}
                       <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-                        {product.marca || 'ANI BEAUTY'}
+                        {product.marca || 'By Lu Pretruccelli'}
                       </p>
                       
                       {/* Product Name */}
