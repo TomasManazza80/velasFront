@@ -357,7 +357,7 @@ const Hero = () => {
               variants={containerVariants}
               exit={{ opacity: 0 }}
             >
-              {["Velas Premium", "Collares", "Pulceras", "Accesorios", "Floreros", "Aromatizadores", "Espejos", "Velas" ].map((name, i) => (
+              {["Velas Premium", "Collares", "Pulseras", "Accesorios", "Floreros", "Aromatizadores", "Espejos", "Velas" ].map((name, i) => (
                 <motion.div
                   key={name}
                   className="text-xs md:text-sm tracking-[0.3em] uppercase text-gray-300 hover:text-white transition-colors cursor-pointer w-full"
