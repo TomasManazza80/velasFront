@@ -125,33 +125,8 @@ body {
     }
   
     /* Otros estilos adicionales para pantallas grandes */
-    .navbar-nav {
-      display: flex;
-      justify-content: flex-end;
-      margin: 0%;
-      padding: 0%;
-      margin-top: 5px;
-     
-    }
-  
-    .navBarMain{
-      background-color: rgb(232, 0, 0);
-    }
-  
-    .navbar-brand{
-      margin: 0px;
-      margin-top: 20px;
-      padding: 0%;
-      height: 50px;
-      width: 420px;
-      
-    }
-  
-    .navbar-nav > li {
-      display: inline-block;
-      margin-left: 20px;
-    }
-  
+   
+
     #features .col-xs-6, #services .col-md-4 {
       flex: 1 1 auto; /* Permite que los elementos se ajusten automáticamente en pantallas grandes */
     }

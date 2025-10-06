@@ -202,7 +202,7 @@ function Cart() {
   const finalTotal = total + shippingCost;
   
   return (
-    <div className="bg-white min-h-screen">
+    <div className=" bg-white min-h-screen">
       {/* Notificación toast */}
       <AnimatePresence>
         {notification.show && (
@@ -230,14 +230,14 @@ function Cart() {
         )}
       </AnimatePresence>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className=" container mx-auto px-4 py-6">
         {/* Header móvil */}
         <div className="md:hidden">
           <div className="flex items-center justify-between mb-6">
             <NavLink to="/" className="text-gray-500 hover:text-black transition-colors duration-300">
               <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
             </NavLink>
-            <h1 className="text-xl font-semibold text-center flex-1 mr-4">CARRITO DE COMPRAS</h1>
+            <h1 className=" mt-[50px] text-xl font-semibold text-center flex-1 mr-4">CARRITO DE COMPRAS</h1>
           </div>
         </div>
 
@@ -382,7 +382,7 @@ function Cart() {
             
             {/* Resumen de compra - Versión móvil */}
             <div className="md:hidden">
-              <div className="bg-white border-t border-b border-gray-200 py-4 px-4">
+              <div className=" bg-white border-t border-b border-gray-200 py-4 px-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-semibold">{formatPrice(total)}</span>
@@ -403,11 +403,14 @@ function Cart() {
                   El costo de envío se calculará en el siguiente paso
                 </div>
                 
-                <div className="space-y-3">
+                <div className=" space-y-3">
                   <NavLink 
                     to="/products"
-                    className="block w-full py-3 text-center border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                    className=" block w-full py-3 text-center border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                   >
+
+
+    
                     Seguir comprando
                   </NavLink>
                   

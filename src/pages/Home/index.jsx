@@ -11,8 +11,8 @@ const HOME = () => {
         <Hero />
       </div>
       
-      <div className="w-full px-4 md:px-8 lg:px-16">
         <ProductsHome />
+      <div className="w-full px-4 md:px-8 lg:px-16">
         
         <button 
           onClick={() => window.location.href = '/products'}
