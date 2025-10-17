@@ -117,6 +117,9 @@ const ProductsHome = () => {
                             <FiFilter className="mr-2 mb-0.5" />
                             FILTRAR POR CATEGORÍA
                         </motion.button>
+                        <p className="text-sm md:text-base text-white mb-6">
+            velas santa fe
+          </p>
                         
                         {showCategories && (
                             <motion.div 

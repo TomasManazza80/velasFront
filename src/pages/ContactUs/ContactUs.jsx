@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { FiMail, FiPhone, FiInstagram, FiArrowLeft } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
-function  ContactUs() {
+function ContactUs() {
   const contacts = [
     {
       id: 1,
@@ -52,15 +52,23 @@ function  ContactUs() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#fafafa_1px,transparent_1px)] bg-[length:22px_22px]" />
 
       <div className="relative container mx-auto px-6 py-24">
-        {/* Encabezado */}
-        <div className="text-center mb-20">
+        
+        {/* Encabezado SEO - Cambiado de "FASHION DESIGNER" */}
+        <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-light tracking-[0.2em] text-gray-900 mb-4">
-            FASHION DESIGNER
+            CONTACTO | VELAS ARTESANALES SANTA FE
           </h1>
           <p className="text-sm tracking-widest text-gray-500 uppercase">
-            Contacto
+            Comunícate con Lu Petruccelli
           </p>
           <div className="w-16 h-px bg-gray-300 mx-auto mt-6"></div>
+        </div>
+
+        {/* Bloque de Contenido SEO - Nuevo Texto Descriptivo */}
+        <div className="text-center mb-20 max-w-4xl mx-auto">
+          <p className="text-lg text-gray-600 leading-relaxed">
+            ¿Tienes alguna consulta sobre nuestros productos, quieres realizar un pedido mayorista o personalizar tus **velas de cera de soja en Santa Fe**? Estamos aquí para ayudarte. Ponte en contacto directamente con **Lu Petruccelli**, la creadora de tus **velas artesanales favoritas en la ciudad de Santa Fe**. Utiliza cualquiera de los canales a continuación para resolver tus dudas sobre aromas, envíos o diseños especiales.
+          </p>
         </div>
 
         {/* Tarjetas de contacto */}
@@ -95,7 +103,7 @@ function  ContactUs() {
         {/* Footer */}
         <div className="text-center mt-20 pt-10 border-t border-gray-200">
           <p className="text-xs text-gray-500 tracking-wide">
-            &copy; {new Date().getFullYear()} Fashion Designer. Todos los
+            &copy; {new Date().getFullYear()} Lu Petruccelli Velas. Todos los
             derechos reservados.
           </p>
         </div>

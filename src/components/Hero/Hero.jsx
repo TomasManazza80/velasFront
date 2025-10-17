@@ -202,8 +202,10 @@ const Hero = () => {
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.8, duration: 1 }}
                             >
-                                Lifestyle Decoration Designer
+                                Lifestyle Decoration Designer -
+                                velas santa fe
                             </motion.h2>
+
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -80,7 +80,10 @@ const BuySteps = () => {
            Lifestyle Decoration
           </h2>
           <p className="text-sm md:text-base text-gray-600 mb-6">
-            Envíos a todo el país
+            Envíos a todo el país 
+          </p>
+          <p className="text-sm md:text-base text-white mb-6">
+            velas santa fe
           </p>
           <div className="w-16 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent mx-auto"></div>
         </motion.div>
@@ -131,6 +134,9 @@ const BuySteps = () => {
           <button className="px-8 py-3 bg-black text-white font-light text-sm tracking-wider rounded-none hover:bg-gray-800 transition-colors duration-300">
             COMPRAR AHORA
           </button>
+          <p className="text-sm md:text-base text-white mb-6">
+            velas santa fe
+          </p>
           <p className="mt-4 text-xs text-gray-500">
             Descubre nuestra colección exclusiva
           </p>

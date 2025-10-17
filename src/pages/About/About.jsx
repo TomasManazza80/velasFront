@@ -10,29 +10,32 @@ const About = () => {
   const features = [
     {
       id: 1,
-      title: "Descubre tu Estilo",
+      // Título optimizado
+      title: "Velas Artesanales en Santa Fe",
+      // Descripción optimizada
       description:
-        "Explora nuestra colección exclusiva de velas aromáticas artesanales.",
+        "Explora nuestra colección exclusiva de velas aromáticas artesanales, hechas con cera de soja premium en el corazón de Santa Fe.",
       icon: <SparklesIcon className="h-10 w-10 text-gray-700" />,
     },
     {
       id: 2,
-      title: "Personalización",
-      description: "Combina fragancias y tamaños para crear tu vela perfecta.",
+      title: "Personalización Única",
+      description: "Combina fragancias y tamaños para crear tu vela perfecta. Ideal para regalos o eventos especiales en la ciudad.",
       icon: <CheckCircleIcon className="h-10 w-10 text-gray-700" />,
     },
     {
       id: 3,
-      title: "Compra Segura",
+      title: "Compra Segura y Local",
       description:
-        "Proceso de pago encriptado con múltiples métodos de pago.",
+        "Proceso de pago encriptado con múltiples métodos de pago. ¡Soporta el comercio local de velas en Santa Fe!",
       icon: <LockClosedIcon className="h-10 w-10 text-gray-700" />,
     },
     {
       id: 4,
-      title: "Envío Rápido",
+      title: "Envío Rápido y Protegido",
+      // Descripción optimizada
       description:
-        "Recibe tus velas en 24-48h con embalaje protector especial.",
+        "Recibe tus velas en 24-48h dentro de Santa Fe y alrededores con embalaje protector especial.",
       icon: <TruckIcon className="h-10 w-10 text-gray-700" />,
     },
   ];
@@ -43,11 +46,23 @@ const About = () => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#fafafa_1px,transparent_1px)] bg-[length:22px_22px]" />
 
       <div className="relative max-w-7xl mx-auto">
-        {/* Encabezado */}
-        <div className="text-center mb-20">
+        
+        {/* Encabezado y Bloque SEO: El texto clave */}
+        <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-light tracking-[0.2em] text-gray-900 mb-6">
-            EXPERIENCIA PREMIUM
+            VELAS AROMÁTICAS EN SANTA FE
           </h2>
+          {/* Este párrafo es el "Artículo" que Google necesita leer */}
+          <p className="text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed tracking-wide mb-12">
+            Si estás buscando **velas artesanales en Santa Fe**, has llegado al lugar indicado. En nuestra tienda, nos especializamos en la creación de **velas de cera de soja** premium, perfumadas con esencias importadas para garantizar una experiencia olfativa superior. Apoyamos la producción local en la provincia de Santa Fe, ofreciendo no solo productos de alta calidad sino también un servicio de **envío express** directo a tu hogar en la ciudad. Descubre la calidez y el estilo que solo nuestras velas pueden aportar a tus espacios.
+          </p>
+        </div>
+
+        {/* Bloque de características ajustado */}
+        <div className="text-center mb-20">
+          <h3 className="text-3xl font-light tracking-[0.2em] text-gray-900 mb-6 border-t pt-10">
+            NUESTRA PROMESA DE CALIDAD
+          </h3>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed tracking-wide">
             Cada vela está creada con ingredientes naturales y esencias de alta calidad para transformar tus espacios.
           </p>
@@ -64,9 +79,9 @@ const About = () => {
               <div className="mb-6 p-4 bg-gray-50 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-500">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-medium tracking-wider text-gray-900 mb-3 group-hover:text-gray-700 transition-colors duration-300 uppercase">
+              <h4 className="text-lg font-medium tracking-wider text-gray-900 mb-3 group-hover:text-gray-700 transition-colors duration-300 uppercase">
                 {feature.title}
-              </h3>
+              </h4>
               <p className="text-gray-500 text-sm leading-relaxed tracking-wide">
                 {feature.description}
               </p>
