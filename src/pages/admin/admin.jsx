@@ -27,7 +27,7 @@ const Admin = () => {
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre: '',
     precio: '',
-    marca: '',
+    descripcion: '',
     categoria: '',
     cantidad: '',
     talle: '',
@@ -143,7 +143,7 @@ const toggleExpandirRecaudacion = (id) => {
 const [ventaManual, setVentaManual] = useState({
   nombre: '',
   precio: '',
-  marca: '',
+  descripcionrca: '',
   categoria: '',
   cantidad: 1,
   talle: '',
@@ -177,7 +177,7 @@ const obtenerRecaudaciones = async () => {
   // Filtrar productos
   const productosFiltrados = todosMisProductos.filter(producto =>
     producto.nombre.toLowerCase().includes(busquedaProducto.toLowerCase()) ||
-    producto.marca.toLowerCase().includes(busquedaProducto.toLowerCase())
+    producto.descripcion.toLowerCase().includes(busquedaProducto.toLowerCase())
   );
 
   // Efectos para cargar datos
@@ -391,7 +391,7 @@ useEffect(() => {
       const productoVendido = {
         nombre: producto.nombre,
         precio: producto.precio,
-        marca: producto.marca,
+        descripcion: producto.descripcion,
         categoria: producto.categoria,
         cantidad: producto.cantidad,
         talle: producto.talle,
@@ -477,7 +477,7 @@ const registrarVentaManual = async () => {
     const productoVendido = {
       nombre: ventaManual.nombre,
       precio: parseFloat(ventaManual.precio),
-      marca: ventaManual.marca || producto?.marca || 'Varios',
+      descripcion: ventaManual.descripcion || producto?.descripcion || 'Varios',
       categoria: ventaManual.categoria || producto?.categoria || 'Varios',
       cantidad: parseInt(ventaManual.cantidad),
       talle: ventaManual.talle || producto?.talle || 'Único',
@@ -508,7 +508,7 @@ const registrarVentaManual = async () => {
     setVentaManual({
       nombre: '',
       precio: '',
-      marca: '',
+      descripcion: '',
       categoria: '',
       cantidad: 1,
       talle: '',
@@ -552,7 +552,7 @@ const registrarVentaManual = async () => {
     setNuevoProducto({
       nombre: '',
       precio: '',
-      marca: '',
+      descripcion: '',
       categoria: '',
       cantidad: '',
       talle: '',
@@ -584,7 +584,7 @@ const registrarVentaManual = async () => {
           <h3 className="text-xl font-semibold mb-4">Editar Producto</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            {['nombre', 'precio', 'marca', 'categoria', 'cantidad', 'precio por mayor'].map((field) => (
+            {['nombre', 'precio', 'Descripción', 'categoria', 'cantidad', 'precio por mayor'].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
                   {field.replace('_', ' ')}
@@ -668,7 +668,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
     setVentaManual({
       nombre: producto.nombre,
       precio: producto.precio,
-      marca: producto.marca,
+      descripcion: producto.descripcion,
       categoria: producto.categoria,
       cantidad: 1,
       talle: producto.talle,
@@ -925,7 +925,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                       <h3 className="text-lg font-medium text-gray-900">{producto.nombre}</h3>
                       <div className="mt-1 text-sm text-gray-500 grid grid-cols-2 md:grid-cols-4 gap-2">
                         <div><span className="font-medium">Precio:</span> ${producto.precio}</div>
-                        <div><span className="font-medium">Marca:</span> {producto.marca}</div>
+                        <div><span className="font-medium">descripcion:</span> {producto.descripcion}</div>
                         <div><span className="font-medium">Categoría:</span> {producto.categoria}</div>
                         <div><span className="font-medium">Stock:</span> {producto.cantidad}</div>
                         <div><span className="font-medium">Precio por mayor:</span> {producto.talle}</div>
@@ -1069,7 +1069,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                             <span className="font-medium">Fecha:</span>{' '}
                             {producto.fechaCompra}
                           </div>
-                          <div><span className="font-medium">Marca:</span> {producto.marca || 'N/A'}</div>
+                          <div><span className="font-medium">descripcion:</span> {producto.descripcion || 'N/A'}</div>
                           <div><span className="font-medium">Categoría:</span> {producto.categoria || 'N/A'}</div>
                         </div>
                       </div>
@@ -1158,14 +1158,14 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="marca" className="block text-sm font-medium text-gray-700">
-                      Marca
+                    <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
+                      descripción
                     </label>
                     <input
                       type="text"
-                      name="marca"
-                      id="marca"
-                      value={nuevoProducto.marca}
+                      name="descripcion"
+                      id="descripcion"
+                      value={nuevoProducto.descripcion}
                       onChange={handleInputChange}
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       required
