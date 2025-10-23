@@ -33,6 +33,7 @@ const Admin = () => {
     talle: '',
     imagenes: []
   });
+
 const eliminarRecaudacion = async (id) => {
   if (!window.confirm('¿Estás seguro de eliminar esta recaudación? Esta acción no se puede deshacer.')) {
     return;
@@ -561,7 +562,7 @@ const registrarVentaManual = async () => {
     setError(null);
   };
 
-  // Componente de Edición
+  // Componente de Edición CORREGIDO
   const EditarProducto = ({ producto, onGuardarCambios, onCancelar }) => {
     const [formData, setFormData] = useState({ ...producto });
 
@@ -574,7 +575,10 @@ const registrarVentaManual = async () => {
       e.preventDefault();
       onGuardarCambios({
         ...formData,
+        // Aseguramos que talle (precio por mayor) y cantidad sean números si es necesario
         talle: formData.talle,
+        precio: parseFloat(formData.precio),
+        cantidad: parseInt(formData.cantidad, 10),
       });
     };
 
@@ -584,45 +588,80 @@ const registrarVentaManual = async () => {
           <h3 className="text-xl font-semibold mb-4">Editar Producto</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            {['nombre', 'precio', 'Descripción', 'categoria', 'cantidad', 'precio por mayor'].map((field) => (
-              <div key={field}>
+            
+            {/* Campos de texto y número simples (nombre, precio, cantidad) */}
+            {[
+              { label: 'Nombre', name: 'nombre', type: 'text' },
+              { label: 'Precio', name: 'precio', type: 'number', step: '0.01' },
+              { label: 'Cantidad', name: 'cantidad', type: 'number', min: '0' },
+            ].map((field) => (
+              <div key={field.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                  {field.replace('_', ' ')}
+                  {field.label}
                 </label>
-                {field === 'categoria' ? (
-                  <select
-                    name={field}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                  >
-                    {categorias.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                ) : field === 'precio por mayor' ? (
-                  <input
-                    type="text"
-                    name="talle"
-                    value={formData[field]}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    placeholder="Ej: $50 (x10 unidades)"
-                  />
-                ) : (
-                  <input
-                    type={field === 'precio' || field === 'cantidad' ? 'number' : 'text'}
-                    name={field}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    min={field === 'precio' || field === 'cantidad' ? '0' : undefined}
-                    step={field === 'precio' ? '0.01' : undefined}
-                  />
-                )}
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  min={field.min}
+                  step={field.step}
+                  required
+                />
               </div>
             ))}
 
+            {/* Campo CATEGORÍA (select) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                Categoría
+              </label>
+              <select
+                name="categoria"
+                value={formData.categoria}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                {categorias.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Campo DESCRIPCIÓN (textarea para edición más fácil) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                Descripción
+              </label>
+              <textarea
+                name="descripcion" // ¡Nombre correcto: descripcion!
+                value={formData.descripcion}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                rows="3"
+                required
+              />
+            </div>
+
+            {/* Campo PRECIO POR MAYOR (mapeado a 'talle') */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                Precio por mayor
+              </label>
+              <input
+                type="number" // Es un precio, debe ser tipo number
+                name="talle" // Nombre correcto: talle
+                value={formData.talle}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                placeholder="Ej: 50 (x10 unidades)"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
@@ -925,7 +964,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                       <h3 className="text-lg font-medium text-gray-900">{producto.nombre}</h3>
                       <div className="mt-1 text-sm text-gray-500 grid grid-cols-2 md:grid-cols-4 gap-2">
                         <div><span className="font-medium">Precio:</span> ${producto.precio}</div>
-                        <div><span className="font-medium">descripcion:</span> {producto.descripcion}</div>
+                        <div><span className="font-medium">Descripción:</span> {producto.descripcion}</div>
                         <div><span className="font-medium">Categoría:</span> {producto.categoria}</div>
                         <div><span className="font-medium">Stock:</span> {producto.cantidad}</div>
                         <div><span className="font-medium">Precio por mayor:</span> {producto.talle}</div>
@@ -1069,7 +1108,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                             <span className="font-medium">Fecha:</span>{' '}
                             {producto.fechaCompra}
                           </div>
-                          <div><span className="font-medium">descripcion:</span> {producto.descripcion || 'N/A'}</div>
+                          <div><span className="font-medium">Descripción:</span> {producto.descripcion || 'N/A'}</div>
                           <div><span className="font-medium">Categoría:</span> {producto.categoria || 'N/A'}</div>
                         </div>
                       </div>
@@ -1153,25 +1192,9 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                         step="0.01"
                         className="focus:ring-blue-500 focus:border-blue-500 block w/full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2 px-3"
                         placeholder="0.00"
-                        required
                       />
                     </div>
                   </div>
-                  <div>
-                    <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-                      descripción
-                    </label>
-                    <input
-                      type="text"
-                      name="descripcion"
-                      id="descripcion"
-                      value={nuevoProducto.descripcion}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-
                   <div>
                     <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">
                       Categoría
@@ -1207,7 +1230,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                     />
                   </div>
 
-                  <div>
+                  <div className="sm:col-span-2">
                     <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
                       Descripción
                     </label>
@@ -1216,6 +1239,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                       id="descripcion"
                       value={nuevoProducto.descripcion}
                       onChange={handleInputChange}
+                      rows="3"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
