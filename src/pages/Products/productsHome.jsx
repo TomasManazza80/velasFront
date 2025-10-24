@@ -1,32 +1,97 @@
 import axios from "axios";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiFilter } from "react-icons/fi";
-import ProductCart from "../../components/ProductCart"; 
 import { Outlet } from "react-router-dom";
+import ProductCart from "../../components/ProductCart"; 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Definición del color Bordo oscuro para acentuar
+const ACCENT_COLOR_BORDO = "#B22222"; 
+
+// 💡 Estilos de profundidad del fondo MODIFICADOS (Priorizando el BLANCO)
+const depthStyle = {
+    // Gradiente elíptico: La "luz" brillante (rgba(255, 255, 255, 1)) se concentra en el centro superior (50% 0%).
+    // Se desvanece suavemente a un gris muy claro (rgba(240, 240, 240, 1)) para un efecto de profundidad suave.
+    background: 'radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%)',
+    backgroundAttachment: 'fixed', // Mantiene el foco de luz fijo al hacer scroll.
+};
+
+// =================================================================
+// 🍷 ESTILOS CSS PUROS PARA EL CARRUSEL INFINITO (VELOCIDAD: 15s)
+// ... (El CSS del carrusel se mantiene igual)
+// =================================================================
+const carouselStyles = `
+/* Contenedor principal para ocultar el contenido extra */
+.carousel-container {
+    overflow: hidden;
+    width: 100%;
+    /* Desvanecimiento sutil en los bordes para el efecto infinito (adaptado a fondo claro) */
+    mask-image: linear-gradient(to right, 
+        rgba(0, 0, 0, 0) 0%, 
+        rgba(0, 0, 0, 1) 10%, 
+        rgba(0, 0, 0, 1) 90%, 
+        rgba(0, 0, 0, 0) 100%
+    );
+}
+
+/* Pista de todos los elementos (originales + duplicados) */
+.carousel-track {
+    display: flex;
+    width: fit-content; /* Asegura que la pista sea lo suficientemente ancha */
+    /* Velocidad rápida: 15 segundos */
+    animation: scroll-left 15s linear infinite; 
+    padding: 20px 0; /* Espacio vertical para estética */
+}
+
+/* Detener la animación al hacer hover (opcional, pero mejora la UX) */
+.carousel-track:hover {
+    animation-play-state: paused;
+}
+
+/* Definición de la animación de movimiento */
+@keyframes scroll-left {
+    from {
+        transform: translateX(0);
+    }
+    /* Mueve exactamente el ancho de la lista original para un reinicio sin salto */
+    to {
+        transform: translateX(calc(-100% / 2)); 
+    }
+}
+.carousel-item-wrapper {
+    /* Define el ancho de cada producto en el carrusel */
+    min-width: 250px; /* Ancho fijo para cada tarjeta de producto */
+    padding: 0 15px; /* Espacio entre productos */
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .carousel-item-wrapper {
+        min-width: 180px;
+        padding: 0 10px;
+    }
+}
+`;
+
+
 const ProductsHome = () => {
-    // --- Lógica y estados (sin cambios) ---
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [category, setCategory] = useState("");
     const [showCategories, setShowCategories] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const carouselRef = useRef(null);
-    const [carouselWidth, setCarouselWidth] = useState(0);
-
-    const MAX_CAROUSEL_ITEMS = 12;
+    // Categorías adaptadas para una Vinoteca
     const categories = [
-        { id: "", name: "Todos" },
-        { id: "velas", name: "Velas" },
-        { id: "velas premium", name: "Velas Premium" },
-        { id: "pulceras", name: "PULCERAS" },
-        { id: "collares", name: "collares" },
-        { id: "aromatizadores", name: "Aromatizadores" },
-        { id: "accesiorios", name: "Accesorios" },
+        { id: "", name: "Todos los Vinos" },
+        { id: "tintos", name: "Tintos" },
+        { id: "blancos", name: "Blancos" },
+        { id: "espumantes", name: "Espumantes" },
+        { id: "rosados", name: "Rosados" },
+        { id: "cosecha-tardia", name: "Cosecha Tardía" },
+        { id: "accesorios", name: "Accesorios de Vino" },
     ];
 
     async function fetchProducts() {
@@ -35,9 +100,9 @@ const ProductsHome = () => {
             const { data } = await axios.get(`${API_URL}/products`);
             const sortedData = data.sort(compareName);
             setProducts(sortedData);
-            setFilteredProducts(sortedData.slice(0, MAX_CAROUSEL_ITEMS)); 
+            setFilteredProducts(sortedData);
         } catch (error) {
-            console.error("Error fetching products:", error);
+            console.error("Error al obtener los productos:", error);
         } finally {
             setLoading(false);
         }
@@ -51,148 +116,168 @@ const ProductsHome = () => {
         const filtered = category === "" 
             ? products 
             : products.filter(item => item.categoria === category);
-        
-        setFilteredProducts(filtered.slice(0, MAX_CAROUSEL_ITEMS));
+        setFilteredProducts(filtered);
     }, [category, products]);
 
     function compareName(a, b) {
         return a.nombre.localeCompare(b.nombre);
     }
+
+    // Productos para el carrusel (excluimos accesorios si es necesario)
+    const carouselProducts = products.filter(p => p.categoria !== 'accesorios');
     
-    // --- EFECTO PARA CALCULAR EL ANCHO DEL CARRUSEL (Mantenido) ---
-    useEffect(() => {
-        if (carouselRef.current) {
-            const updateWidth = () => {
-                const currentScrollWidth = carouselRef.current.scrollWidth;
-                const currentOffsetWidth = carouselRef.current.offsetWidth;
-                // Ajustamos el cálculo para que el límite izquierdo sea el padding (pl-4)
-                // Usamos un offset fijo para evitar problemas de cálculo con el padding
-                const paddingOffset = 16; // 'pl-4' en Tailwind es 1rem = 16px
-                const width = currentScrollWidth > currentOffsetWidth 
-                    ? currentScrollWidth - currentOffsetWidth + paddingOffset // Añadimos el offset para el arrastre
-                    : 0; 
+    // *** CLAVE PARA EL MOVIMIENTO INFINITO: DUPLICAR LA LISTA. ***
+    const duplicatedCarouselProducts = [...carouselProducts, ...carouselProducts];
 
-                setCarouselWidth(width);
-            };
-
-            updateWidth();
-            const timeout = setTimeout(updateWidth, 50); 
-            window.addEventListener('resize', updateWidth);
-            return () => {
-                clearTimeout(timeout);
-                window.removeEventListener('resize', updateWidth);
-            }
-        }
-    }, [filteredProducts, loading]); 
-
-    // --- Configuración de transición (Mantenido) ---
-    const dragTransitionConfig = {
-        bounceStiffness: 600, 
-        bounceDamping: 20, 
-        power: 0.3, 
-        timeConstant: 300, 
-    };
-
-    const cardVariants = {
-        hidden: { opacity: 0, scale: 0.9 },
-        visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
-    };
 
     return (
         <>
+            {/* INYECTAMOS LOS ESTILOS CSS DEL CARRUSEL */}
+            <style dangerouslySetInnerHTML={{ __html: carouselStyles }} /> 
             <Outlet />
             
-            <div className="min-h-screen bg-gradient-to-br from-neutral-200 via-white to-white"> 
-                {/* Contenedor para filtros: Mantiene el margen central y padding horizontal */}
-                <div className="container mx-auto px-4 sm:px-4 pt-4 pb-8 sm:pt-6 sm:pb-4">
+            {/* Contenedor principal con estilo de profundidad. Clase de texto cambiada a 'text-black' */}
+            {/* El color de fondo se define por 'depthStyle' */}
+            <div className="min-h-screen text-black" style={depthStyle}> 
+                <div className="container mx-auto px-0 py-10 sm:px-6 sm:py-16">
                     
-                    {/* Filtro de categorías */}
-                    <div className="flex flex-col items-center mb-4 sm:mb-6">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setShowCategories(!showCategories)}
-                            className="flex items-center px-4 py-2 border border-gray-400 text-xs sm:text-sm tracking-widest uppercase hover:bg-gray-100 transition-colors duration-300 text-black"
-                        >
-                            <FiFilter className="mr-2 mb-0.5" />
-                            FILTRAR POR CATEGORÍA
-                        </motion.button>
-                        <p className="text-sm md:text-base text-white mb-6">
-            velas santa fe
-          </p>
-                        
-                        {showCategories && (
-                            <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="flex flex-wrap justify-center mt-4 gap-2 max-w-2xl overflow-hidden" 
-                            >
-                                {categories.map((cat) => (
-                                    <motion.button
-                                        key={cat.id}
-                                        whileHover={{ scale: 1.05 }}
-                                        onClick={() => {
-                                            setCategory(cat.id);
-                                            setShowCategories(false);
-                                        }}
-                                        className={`px-2 py-1 text-xs tracking-widest uppercase ${category === cat.id ? "bg-black text-white font-semibold" : "bg-transparent text-gray-700 border border-gray-400"} hover:bg-gray-100 hover:text-black transition-colors duration-300`}
-                                    >
-                                        {cat.name}
-                                    </motion.button>
+                  
+
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20 sm:py-24">
+                            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-gray-900"></div>
+                        </div>
+                    ) : (
+                        // CÓDIGO DEL CARRUSEL INFINITO INTEGRADO AQUÍ
+                        <div className="carousel-container">
+                            <div className="carousel-track">
+                                {duplicatedCarouselProducts.map((item, index) => (
+                                    <div key={index} className="carousel-item-wrapper">
+                                        <motion.div 
+                                            whileHover={{ scale: 1.05 }} 
+                                            transition={{ type: "spring", stiffness: 300 }}
+                                            className="h-full w-full flex justify-center"
+                                        >
+                                            <ProductCart
+                                                id={item.ProductId}
+                                                name={item.nombre}
+                                                price={item.precio}
+                                                image={item.imagenes[0]}
+                                                category={item.categoria}
+                                                showCategory={false}
+                                                showDiscount={false}
+                                                imageClass="h-72 object-cover rounded-sm shadow-xl transition-shadow duration-300 hover:shadow-2xl"
+                                            />
+                                        </motion.div>
+                                    </div>
                                 ))}
-                            </motion.div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="pt-20 px-3 sm:px-6"> {/* Padding superior para separar del carrusel */}
+                        
+                        {/* SECCIÓN 2: LISTADO COMPLETO CON FILTROS */}
+                        <div className="text-center mb-10 sm:mb-16">
+                            <h2 className="text-3xl sm:text-4xl font-serif tracking-widest uppercase text-black mb-2">
+                                TODA NUESTRA CARTA DE VINOS 🍇
+                            </h2>
+                            <p className="text-sm tracking-widest uppercase text-gray-700">
+                                Explora todas nuestras variedades y categorías.
+                            </p>
+                            <div className="w-20 h-0.5 bg-gray-400 mx-auto mt-4"></div> 
+                        </div>
+
+                        {/* Filtro de categorías */}
+                        <div className="flex flex-col items-center mb-10 sm:mb-16">
+                            <motion.button
+                                // Botón principal: Borde negro, texto negro. Hover en Bordo.
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setShowCategories(!showCategories)}
+                                className="flex items-center px-6 py-3 border border-gray-800 text-xs tracking-widest uppercase text-gray-800
+                                    hover:bg-bordo hover:text-white transition-colors duration-300 font-medium" 
+                                style={{'--bordo': ACCENT_COLOR_BORDO, borderColor: 'gray', backgroundColor: 'transparent', color: 'black'}}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = ACCENT_COLOR_BORDO; e.currentTarget.style.borderColor = ACCENT_COLOR_BORDO; e.currentTarget.style.color = 'white'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'gray'; e.currentTarget.style.color = 'black'; }}
+                            >
+                                <FiFilter className="mr-2" />
+                                FILTRAR POR CATEGORÍA
+                            </motion.button>
+                            
+                            {showCategories && (
+                                <motion.div 
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    transition={{ duration: 0.2 }}
+                                    className="flex flex-wrap justify-center mt-6 gap-3 max-w-3xl"
+                                >
+                                    {categories.map((cat) => (
+                                        <motion.button
+                                            key={cat.id}
+                                            whileHover={{ scale: 1.03 }}
+                                            onClick={() => {
+                                                setCategory(cat.id);
+                                                setShowCategories(false);
+                                            }}
+                                            // Categorías: Inactivo en tono de blanco/gris, Activo en Bordo.
+                                            className={`px-4 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wider uppercase border transition-all duration-300 
+                                                ${category === cat.id 
+                                                    ? "bg-bordo text-white border-bordo" // Estado Activo: Bordo
+                                                    : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100" // Estado Inactivo: Tonalidad clara
+                                                }`}
+                                            style={category === cat.id ? { backgroundColor: ACCENT_COLOR_BORDO, borderColor: ACCENT_COLOR_BORDO } : {}}
+                                        >
+                                            {cat.name}
+                                        </motion.button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </div>
+
+                        {/* Listado de productos filtrados */}
+                        {loading ? (
+                            // Spinner (adaptado a fondo blanco)
+                            <div className="flex justify-center items-center py-20 sm:py-24">
+                                <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-gray-900"></div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8">
+                                {filteredProducts.length === 0 ? (
+                                    // Mensaje de no productos (adaptado a fondo blanco)
+                                    <div className="col-span-2 sm:col-span-full text-center py-20">
+                                        <p className="text-gray-600 tracking-widest uppercase text-base font-light">
+                                            LO SENTIMOS, NO SE ENCONTRARON VINOS EN ESTA SELECCIÓN.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    filteredProducts.map((item, index) => (
+                                        <motion.div 
+                                            key={item.ProductId}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.4, delay: index * 0.05 }} 
+                                            className="flex justify-center"
+                                        >
+                                            <div className="w-full max-w-[200px] sm:max-w-none">
+                                                <ProductCart
+                                                    id={item.ProductId}
+                                                    name={item.nombre}
+                                                    price={item.precio}
+                                                    image={item.imagenes[0]}
+                                                    category={item.categoria}
+                                                    showCategory={false}
+                                                    showDiscount={false}
+                                                    imageClass="h-48 sm:h-60 md:h-72 lg:h-80 object-cover rounded-sm shadow-xl transition-shadow duration-300 hover:shadow-2xl"
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
                         )}
                     </div>
-                </div> 
-                
-                {/* --- CARRUSEL de Productos (Contenedor Crítico) --- */}
-                {/* **¡CORRECCIÓN CRÍTICA!** Sacamos este div del 'container mx-auto' para que ocupe todo el ancho del viewport (w-full). */}
-                {loading ? (
-                    <div className="flex justify-center items-center py-16 sm:py-20">
-                        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-black"></div>
-                    </div>
-                ) : filteredProducts.length === 0 ? (
-                    <div className="text-center py-12 px-4">
-                        <p className="text-gray-700 tracking-widest uppercase text-sm">NO SE ENCONTRARON PRODUCTOS EN ESTA CATEGORÍA</p>
-                    </div>
-                ) : (
-                    // El contenedor principal del carrusel: `w-full overflow-hidden`
-                    <motion.div className="w-full overflow-hidden cursor-grab py-4"> 
-                        <motion.div
-                            ref={carouselRef}
-                            drag="x" 
-                            // El límite izquierdo ahora es 0 (para el arrastre)
-                            dragConstraints={{ right: 0, left: -carouselWidth }}
-                            dragTransition={dragTransitionConfig} 
-                            // `flex` para horizontalidad, `pl-4` para el margen inicial en móvil
-                            className="flex pl-4 sm:pl-0 sm:container sm:mx-auto" 
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            {filteredProducts.map((item) => (
-                                <motion.div 
-                                    key={item.ProductId}
-                                    variants={cardVariants}
-                                    // **CLAVE DE VISUALIZACIÓN:** `min-w-[50%]` fuerza 2 tarjetas por pantalla en móvil.
-                                    // El padding horizontal es manejado por esta clase.
-                                    className="min-w-[50%] sm:min-w-[33.333%] md:min-w-[25%] lg:min-w-[20%] xl:min-w-[16.666%] pr-4 pb-2 sm:p-3 md:p-4"
-                                >
-                                    <ProductCart
-                                        id={item.ProductId}
-                                        name={item.nombre}
-                                        price={item.precio}
-                                        image={item.imagenes[0]}
-                                        category={item.categoria}
-                                        showCategory={false}
-                                        showDiscount={false}
-                                        imageClass="h-40 sm:h-56 md:h-64 rounded-md shadow-lg" 
-                                    />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </motion.div>
-                )}
+                </div>
             </div>
         </>
     );
