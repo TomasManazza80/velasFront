@@ -19,8 +19,7 @@ const depthStyle = {
 };
 
 // =================================================================
-// 🍷 ESTILOS CSS PUROS PARA EL CARRUSEL INFINITO (VELOCIDAD: 15s)
-// ... (El CSS del carrusel se mantiene igual)
+// 🍷 ESTILOS CSS PUROS PARA EL CARRUSEL INFINITO
 // =================================================================
 const carouselStyles = `
 /* Contenedor principal para ocultar el contenido extra */
@@ -43,11 +42,6 @@ const carouselStyles = `
     /* Velocidad rápida: 15 segundos */
     animation: scroll-left 15s linear infinite; 
     padding: 20px 0; /* Espacio vertical para estética */
-}
-
-/* Detener la animación al hacer hover (opcional, pero mejora la UX) */
-.carousel-track:hover {
-    animation-play-state: paused;
 }
 
 /* Definición de la animación de movimiento */
@@ -137,12 +131,9 @@ const ProductsHome = () => {
             <Outlet />
             
             {/* Contenedor principal con estilo de profundidad. Clase de texto cambiada a 'text-black' */}
-            {/* El color de fondo se define por 'depthStyle' */}
             <div className="min-h-screen text-black" style={depthStyle}> 
                 <div className="container mx-auto px-0 py-10 sm:px-6 sm:py-16">
                     
-                  
-
                     {loading ? (
                         <div className="flex justify-center items-center py-20 sm:py-24">
                             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-gray-900"></div>
@@ -180,10 +171,10 @@ const ProductsHome = () => {
                         {/* SECCIÓN 2: LISTADO COMPLETO CON FILTROS */}
                         <div className="text-center mb-10 sm:mb-16">
                             <h2 className="text-3xl sm:text-4xl font-serif tracking-widest uppercase text-black mb-2">
-                                TODA NUESTRA CARTA DE VINOS 🍇
+                                algunos de nuestros productos destacados
                             </h2>
                             <p className="text-sm tracking-widest uppercase text-gray-700">
-                                Explora todas nuestras variedades y categorías.
+                                Explora todo nuestro catálogo.
                             </p>
                             <div className="w-20 h-0.5 bg-gray-400 mx-auto mt-4"></div> 
                         </div>
@@ -257,9 +248,11 @@ const ProductsHome = () => {
                                             initial={{ opacity: 0, y: 30 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.4, delay: index * 0.05 }} 
-                                            className="flex justify-center"
+                                            // 🌟 CAMBIO CLAVE: Se añade 'h-full'
+                                            className="flex justify-center h-full"
                                         >
-                                            <div className="w-full max-w-[200px] sm:max-w-none">
+                                            {/* 🌟 CAMBIO CLAVE: Se añade 'h-full' y se elimina 'max-w-[200px]' */}
+                                            <div className="w-full h-full"> 
                                                 <ProductCart
                                                     id={item.ProductId}
                                                     name={item.nombre}
