@@ -23,7 +23,7 @@ const Admin = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [recaudacionesExpandidas, setRecaudacionesExpandidas] = useState({});
 
-  // Datos del nuevo producto
+  // Datos del nuevo producto (MODIFICADO: Se agregó 'marca')
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre: '',
     precio: '',
@@ -31,6 +31,7 @@ const Admin = () => {
     categoria: '',
     cantidad: '',
     talle: '',
+    marca: '', // NUEVO CAMPO: Marca
     imagenes: []
   });
 
@@ -140,7 +141,7 @@ const toggleExpandirRecaudacion = (id) => {
   }));
 };
 
-  // Datos para venta manual
+  // Datos para venta manual (MODIFICADO: Se agregó 'marca')
 const [ventaManual, setVentaManual] = useState({
   nombre: '',
   precio: '',
@@ -148,6 +149,7 @@ const [ventaManual, setVentaManual] = useState({
   categoria: '',
   cantidad: 1,
   talle: '',
+  marca: '', // NUEVO CAMPO: Marca
   imagenes: [],
   fechaVenta: new Date().toISOString().split('T')[0] // Fecha actual por defecto
 });
@@ -396,6 +398,7 @@ useEffect(() => {
         categoria: producto.categoria,
         cantidad: producto.cantidad,
         talle: producto.talle,
+        marca: producto.marca, // Añadido marca
         imagenes: producto.imagenes,
         fechaCompra: producto.fechaCompra || new Date()
       };
@@ -474,7 +477,7 @@ const registrarVentaManual = async () => {
   try {
     setLoading(true);
     
-    // Preparar objeto para enviar al backend
+    // Preparar objeto para enviar al backend (MODIFICADO: Se agregó 'marca')
     const productoVendido = {
       nombre: ventaManual.nombre,
       precio: parseFloat(ventaManual.precio),
@@ -482,6 +485,7 @@ const registrarVentaManual = async () => {
       categoria: ventaManual.categoria || producto?.categoria || 'Varios',
       cantidad: parseInt(ventaManual.cantidad),
       talle: ventaManual.talle || producto?.talle || 'Único',
+      marca: ventaManual.marca || producto?.marca || 'N/A', // NUEVO CAMPO: Marca
       imagenes: ventaManual.imagenes || producto?.imagenes || [],
       fechaCompra: new Date(ventaManual.fechaVenta).toISOString() // Formato ISO para el backend
     };
@@ -504,7 +508,7 @@ const registrarVentaManual = async () => {
     const total = response.data.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
     setRecaudado(total);
     
-    // Cerrar formulario y resetear
+    // Cerrar formulario y resetear (MODIFICADO: Se agregó 'marca' al reset)
     setMostrarFormVentaManual(false);
     setVentaManual({
       nombre: '',
@@ -513,6 +517,7 @@ const registrarVentaManual = async () => {
       categoria: '',
       cantidad: 1,
       talle: '',
+      marca: '', // NUEVO CAMPO: Marca
       imagenes: [],
       fechaVenta: new Date().toISOString().split('T')[0] // Resetear con fecha actual
     });
@@ -557,12 +562,13 @@ const registrarVentaManual = async () => {
       categoria: '',
       cantidad: '',
       talle: '',
+      marca: '', // NUEVO CAMPO: Marca
       imagenes: []
     });
     setError(null);
   };
 
-  // Componente de Edición CORREGIDO
+  // Componente de Edición CORREGIDO (MODIFICADO: Se agregó 'marca' al formulario)
   const EditarProducto = ({ producto, onGuardarCambios, onCancelar }) => {
     const [formData, setFormData] = useState({ ...producto });
 
@@ -589,9 +595,10 @@ const registrarVentaManual = async () => {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Campos de texto y número simples (nombre, precio, cantidad) */}
+            {/* Campos de texto y número simples (nombre, marca, precio, cantidad) */}
             {[
               { label: 'Nombre', name: 'nombre', type: 'text' },
+              { label: 'Marca', name: 'marca', type: 'text' }, // NUEVO CAMPO: Marca
               { label: 'Precio', name: 'precio', type: 'number', step: '0.01' },
               { label: 'Cantidad', name: 'cantidad', type: 'number', min: '0' },
             ].map((field) => (
@@ -607,7 +614,7 @@ const registrarVentaManual = async () => {
                   className="w-full p-2 border rounded"
                   min={field.min}
                   step={field.step}
-                  required
+                  required={field.name === 'nombre' || field.name === 'precio' || field.name === 'cantidad'}
                 />
               </div>
             ))}
@@ -684,7 +691,6 @@ const registrarVentaManual = async () => {
   };
 
   // Componente de Formulario para Venta Manual
-// Componente de Formulario para Venta Manual
 const FormularioVentaManual = ({ onClose, onSubmit }) => {
   const [busquedaLocal, setBusquedaLocal] = useState(busquedaProducto); // Inicializamos con el valor global
   const inputRef = React.useRef(null);
@@ -702,6 +708,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
     setBusquedaProducto(value); // Actualizamos ambos estados juntos
   };
 
+ // MODIFICADO: Se pasa 'marca' al estado ventaManual
  const handleSeleccionProducto = (producto) => {
     setProductoSeleccionado(producto);
     setVentaManual({
@@ -711,6 +718,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
       categoria: producto.categoria,
       cantidad: 1,
       talle: producto.talle,
+      marca: producto.marca, // NUEVO CAMPO: Marca
       imagenes: producto.imagenes,
       fechaVenta: new Date().toISOString().split('T')[0] // Fecha actual por defecto
     });
@@ -756,7 +764,10 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                     )}
                     <div>
                       <p className="font-medium">{producto.nombre}</p>
-                      <p className="text-sm text-gray-500">${producto.precio} | Stock: {producto.cantidad}</p>
+                      <p className="text-sm text-gray-500">
+                        {producto.marca ? `Marca: ${producto.marca} | ` : ''} 
+                        ${producto.precio} | Stock: {producto.cantidad}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -934,7 +945,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
           </div>
         )}
 
-        {/* Sección de Productos */}
+        {/* Sección de Productos (MODIFICADO: Se muestra 'marca') */}
         {seccionActiva === 'productos' && (
           <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -966,6 +977,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                         <div><span className="font-medium">Precio:</span> ${producto.precio}</div>
                         <div><span className="font-medium">Descripción:</span> {producto.descripcion}</div>
                         <div><span className="font-medium">Categoría:</span> {producto.categoria}</div>
+                        <div><span className="font-medium">Marca:</span> {producto.marca || 'N/A'}</div> {/* NUEVO CAMPO */}
                         <div><span className="font-medium">Stock:</span> {producto.cantidad}</div>
                         <div><span className="font-medium">Precio por mayor:</span> {producto.talle}</div>
                       </div>
@@ -1049,7 +1061,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                 <div className="space-y-3">
                   {recaudacion.productosVendidos.map((producto, index) => (
                     <div key={index} className="pl-4 border-l-2 border-gray-200">
-                      <p className="text-sm font-medium">{producto.nombre}</p>
+                      <p className="text-sm font-medium">{producto.nombre} {producto.marca ? `(${producto.marca})` : ''}</p>
                       <p className="text-xs text-gray-500">
                         Cantidad: {producto.cantidad} - Total: ${(producto.precio * producto.cantidad).toFixed(2)} - fecha: {new Date(producto.fechaCompra).toLocaleDateString('es-AR')}
                       </p>
@@ -1103,6 +1115,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                         <div className="mt-1 text-sm text-gray-500 grid grid-cols-2 md:grid-cols-4 gap-2">
                           <div><span className="font-medium">Precio:</span> ${producto.precio}</div>
                           <div><span className="font-medium">Cantidad:</span> {producto.cantidad}</div>
+                          <div><span className="font-medium">Marca:</span> {producto.marca || 'N/A'}</div> {/* NUEVO CAMPO */}
                           <div><span className="font-medium">Total:</span> ${(producto.precio * producto.cantidad).toFixed(2)}</div>
                           <div>
                             <span className="font-medium">Fecha:</span>{' '}
@@ -1128,7 +1141,7 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
             </div>
           )}
 
-        {/* Sección para agregar productos */}
+        {/* Sección para agregar productos (MODIFICADO: Se agregó input 'marca') */}
         {seccionActiva === 'cargar' && (
           <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -1151,6 +1164,22 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
                       required
                     />
                   </div>
+
+                  {/* NUEVO CAMPO: Marca */}
+                  <div>
+                    <label htmlFor="marca" className="block text-sm font-medium text-gray-700">
+                      Marca
+                    </label>
+                    <input
+                      type="text"
+                      name="marca"
+                      id="marca"
+                      value={nuevoProducto.marca}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  {/* FIN NUEVO CAMPO */}
 
                   <div>
                     <label htmlFor="precio" className="block text-sm font-medium text-gray-700">
