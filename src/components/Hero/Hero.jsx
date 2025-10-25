@@ -4,38 +4,33 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faSearch, faTimes, faWineBottle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-// import video from "../../images/fondovela.mp4"; // Código original comentado
-import fondoProfecional from "../../images/fondoProfecional.png"; // Importación correcta de la imagen
+import fondoProfecional from "../../images/fondoProfecional.png";
 
 const Hero = () => {
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [showResults, setShowResults] = useState(false);
-    // LÓGICA DE VIDEO ELIMINADA: isVideoPlaying, isMobile, hasUserInteracted
 
     const controls = useAnimation();
     const API_URL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
 
-    // LÓGICA DE VIDEO ELIMINADA: useEffect para checkIsMobile
-
-    // LÓGICA DE VIDEO ELIMINADA: useEffect para manejar la reproducción de video (play, pause, ended)
-    // Se elimina handleVideoPlay, handleVideoPause, handleVideoEnd, playVideo, videoRef, etc.
-    
-    // Solo dejamos la obtención de productos
+    // SOLO OBTENCIÓN DE PRODUCTOS (necesario para la búsqueda en el input y los nombres)
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const { data } = await axios.get(`${API_URL}/products`);
+                // Hacemos una llamada a la ruta principal de productos: ${API_URL}/products
+                const { data } = await axios.get(`${API_URL}/products`); 
                 setProducts(data);
             } catch (error) {
-                console.log(error);
+                console.log("Error al obtener productos:", error);
             }
         }
         fetchProducts();
     }, [API_URL]);
 
+    // LÓGICA DE BÚSQUEDA EN EL INPUT (se mantiene)
     useEffect(() => {
         if (search.trim() === "") {
             setFilteredProducts([]);
@@ -47,7 +42,7 @@ const Hero = () => {
             item.nombre.toLowerCase().includes(search.toLowerCase())
         );
 
-        // Limitar a los primeros 4 resultados en el hero para mantener la estética
+        // Limitar a los primeros 4 resultados
         setFilteredProducts(filtered.slice(0, 4)); 
         setShowResults(true);
     }, [search, products]);
@@ -64,15 +59,19 @@ const Hero = () => {
         sequence();
     }, [controls]);
 
-    // LÓGICA DE VIDEO ELIMINADA: handlePlayVideo, handleUserInteraction
+    // 💡 CAMBIO CLAVE: Lógica para navegar a la página de productos con el filtro
+    const handleFilterByCategory = (categoryName) => {
+        // Asumo que la ruta a la página de productos es '/products'
+        // y que el query parameter para filtrar es 'category'.
+        
+        // 1. Ocultar los resultados si estaban activos.
+        resetSearch(); 
 
-    const handleFilterByCategory = (category) => {
-        // Al filtrar por categoría, navegamos a la página de productos con el filtro aplicado.
-        // Aquí simulamos la búsqueda en el hero.
-        const filtered = products.filter(item => item.categoria.toLowerCase() === category.toLowerCase());
-        setFilteredProducts(filtered.slice(0, 4));
-        setShowResults(true);
-        setSearch(category);
+        // 2. Crear un slug simple para la categoría si es necesario, si no, usar el nombre.
+        const categorySlug = categoryName.toLowerCase().replace(/\s+/g, '-');
+        
+        // 3. Navegar a la página de productos, enviando el filtro en la URL.
+        navigate(`/products?category=${categorySlug}`);
     };
 
     const containerVariants = {
@@ -125,24 +124,23 @@ const Hero = () => {
         setShowResults(false);
     };
 
+    // 💡 Función para manejar la navegación desde los resultados de la búsqueda
+    const handleNavigateToSearchResults = () => {
+        // Navega a la página de productos y pasa el término de búsqueda
+        navigate(`/products?search=${search}`);
+    };
+
     return (
         <div
-            // Ya no es necesario el onClick={handleUserInteraction}
-            className="relative w-full h-[400px] flex items-center justify-center overflow-hidden" // Aumenté la altura a h-[600px] para que se vea más impactante
+            className="relative w-full h-[550px] md:h-[400px] flex items-center justify-center overflow-hidden"
         >
             <div className="absolute inset-0 z-0 w-full">
-                {/* 1. REEMPLAZO DE <video> POR <img> */}
                 <img
                     src={fondoProfecional}
                     alt="Fondo profesional decorativo"
-                    // Estilos para cubrir todo el contenedor de manera profesional
                     className="w-full h-full object-cover min-w-full"
-                    // Atributos de video eliminados (autoPlay, muted, loop, etc.)
                 />
                 
-                {/* 2. ELIMINACIÓN DEL REPRODUCTOR MÓVIL */}
-                {/* Se elimina el div de {!isVideoPlaying && isMobile && ...} */}
-
                 {/* Overlay Oscuro Mantenido para Contraste */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 w-full"></div>
             </div>
@@ -225,6 +223,12 @@ const Hero = () => {
                             className="w-full pl-12 pr-12 py-4 text-center text-sm tracking-widest uppercase bg-white/10 backdrop-blur-md border border-white/20 rounded-full focus:outline-none placeholder-white/70 text-white font-medium"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            // 💡 Nuevo: Permite presionar Enter para ir a la página de resultados
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && search.trim() !== "") {
+                                    handleNavigateToSearchResults();
+                                }
+                            }}
                             whileFocus={{
                                 scale: 1.02,
                                 backgroundColor: "rgba(255,255,255,0.15)",
@@ -256,6 +260,7 @@ const Hero = () => {
                             variants={containerVariants}
                             exit={{ opacity: 0 }}
                         >
+                            {/* Los botones ahora llaman a la función de navegación */}
                             {["Velas Premium", "Collares", "Pulseras", "Accesorios"].map((name, i) => (
                                 <motion.div
                                     key={name}
@@ -267,7 +272,7 @@ const Hero = () => {
                                         transition: { type: "spring", stiffness: 300 }
                                     }}
                                     custom={i}
-                                    onClick={() => handleFilterByCategory(name)}
+                                    onClick={() => handleFilterByCategory(name)} // 💡 Usa la nueva función de navegación
                                 >
                                     {name}
                                 </motion.div>
@@ -293,7 +298,13 @@ const Hero = () => {
                                     </h3>
                                     {filteredProducts.length > 0 && (
                                         <p className="text-xs tracking-widest text-gray-300 mt-1 w-full">
-                                            {filteredProducts.length} {filteredProducts.length === 1 ? 'PRODUCTO' : 'PRODUCTOS'} ENCONTRADOS
+                                            {filteredProducts.length} {filteredProducts.length === 1 ? 'PRODUCTO' : 'PRODUCTOS'} ENCONTRADOS. 
+                                            <button 
+                                                onClick={handleNavigateToSearchResults} // 💡 Nuevo botón para ir a resultados completos
+                                                className="ml-2 underline text-white/80 hover:text-white"
+                                            >
+                                                Ver todos
+                                            </button>
                                         </p>
                                     )}
                                 </div>

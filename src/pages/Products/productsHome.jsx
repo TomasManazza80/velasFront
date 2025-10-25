@@ -39,8 +39,8 @@ const carouselStyles = `
 .carousel-track {
     display: flex;
     width: fit-content; /* Asegura que la pista sea lo suficientemente ancha */
-    /* Velocidad rápida: 15 segundos */
-    animation: scroll-left 15s linear infinite; 
+    /* Velocidad AÚN MÁS LENTA: 45 segundos (antes era 30s) */
+    animation: scroll-left 45s linear infinite; 
     padding: 20px 0; /* Espacio vertical para estética */
 }
 
