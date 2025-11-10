@@ -21,7 +21,7 @@ const Footer = () => {
     const contentMap = {
       historia: {
         title: "Nuestra Historia",
-        content: "Somos una empresa dedicada a la creación de productos únicos y de alta calidad desde 2010. Nuestra misión es llevar belleza y aromas excepcionales a cada hogar."
+        content: "Soy lu petruccelli! Artista y diseñadora de decoración enfocada en el estilo de vida. Esta marca nació desde una necesidad artistica y estética, y las ganas de crear productos que acompañen el día a día de las personas desde un lugar de bienestar y dedicación a uno mismo. Empecé con este proyecto en el 2024 y hoy somos un equipo de 5 personas creciendo cada día más!"
       },
       sustentabilidad: {
         title: "Sustentabilidad",
@@ -33,7 +33,7 @@ const Footer = () => {
       },
       trabajo: {
         title: "Trabaja con Nosotros",
-        content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a recursoshumanos@thecandleshop.com y sé parte de esta gran familia."
+        content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a lufpretruccelli@gmail.com y sé parte de esta gran familia."
       },
       cuidado: {
         title: "Cuidado del Producto",
@@ -41,11 +41,11 @@ const Footer = () => {
       },
       mayoristas: {
         title: "Mayoristas",
-        content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a mayoristas@thecandleshop.com para más información sobre nuestros descuentos por volumen."
+        content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a lufpretruccelli@gmail.com para más información sobre nuestros descuentos por volumen."
       },
       compra: {
         title: "Información para tu Compra",
-        content: "Todos nuestros productos incluyen envío gratuito para compras superiores a $50.000. Procesamos los pedidos en un plazo de 24-48 horas."
+        content: "Todos nuestros productos incluyen envío gratuito para compras superiores a $100.000. Procesamos los pedidos en un plazo de 24-48 horas."
       },
       terminos: {
         title: "Términos y Condiciones",
@@ -53,7 +53,7 @@ const Footer = () => {
       },
       arrepentimiento: {
         title: "Botón de Arrepentimiento",
-        content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a soporte@thecandleshop.com."
+        content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a lufpretruccelli@gmail.com"
       },
       aromatizadores: {
         title: "Aromatizadores Ultrasónicos",

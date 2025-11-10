@@ -330,7 +330,7 @@ function ProductDetails() {
 
                 {/* Botón secundario (Encargo por mayor - WhatsApp) */}
                 <button
-                  onClick={() => window.open('https://wa.me/+543425937358', '_blank')}
+                  onClick={() => window.open('https://wa.me/+543425243854', '_blank')}
                   className="w-full sm:flex-1 inline-flex items-center justify-center px-6 py-4 border-2 border-green-500 text-base font-bold rounded-xl text-green-700 bg-green-50 transition-all duration-300 hover:bg-green-100 focus:outline-none focus:ring-4 focus:ring-green-100 shadow-lg touch-manipulation"
                 >
                   <FontAwesomeIcon icon={faWhatsapp} className="mr-2" />

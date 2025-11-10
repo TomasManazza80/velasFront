@@ -39,8 +39,8 @@ const carouselStyles = `
 .carousel-track {
     display: flex;
     width: fit-content; /* Asegura que la pista sea lo suficientemente ancha */
-    /* Velocidad AÚN MÁS LENTA: 45 segundos (antes era 30s) */
-    animation: scroll-left 45s linear infinite; 
+    /* Velocidad rápida: 15 segundos */
+    animation: scroll-left 15s linear infinite; 
     padding: 20px 0; /* Espacio vertical para estética */
 }
 
@@ -180,51 +180,7 @@ const ProductsHome = () => {
                         </div>
 
                         {/* Filtro de categorías */}
-                        <div className="flex flex-col items-center mb-10 sm:mb-16">
-                            <motion.button
-                                // Botón principal: Borde negro, texto negro. Hover en Bordo.
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setShowCategories(!showCategories)}
-                                className="flex items-center px-6 py-3 border border-gray-800 text-xs tracking-widest uppercase text-gray-800
-                                    hover:bg-bordo hover:text-white transition-colors duration-300 font-medium" 
-                                style={{'--bordo': ACCENT_COLOR_BORDO, borderColor: 'gray', backgroundColor: 'transparent', color: 'black'}}
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = ACCENT_COLOR_BORDO; e.currentTarget.style.borderColor = ACCENT_COLOR_BORDO; e.currentTarget.style.color = 'white'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'gray'; e.currentTarget.style.color = 'black'; }}
-                            >
-                                <FiFilter className="mr-2" />
-                                FILTRAR POR CATEGORÍA
-                            </motion.button>
-                            
-                            {showCategories && (
-                                <motion.div 
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    transition={{ duration: 0.2 }}
-                                    className="flex flex-wrap justify-center mt-6 gap-3 max-w-3xl"
-                                >
-                                    {categories.map((cat) => (
-                                        <motion.button
-                                            key={cat.id}
-                                            whileHover={{ scale: 1.03 }}
-                                            onClick={() => {
-                                                setCategory(cat.id);
-                                                setShowCategories(false);
-                                            }}
-                                            // Categorías: Inactivo en tono de blanco/gris, Activo en Bordo.
-                                            className={`px-4 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wider uppercase border transition-all duration-300 
-                                                ${category === cat.id 
-                                                    ? "bg-bordo text-white border-bordo" // Estado Activo: Bordo
-                                                    : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100" // Estado Inactivo: Tonalidad clara
-                                                }`}
-                                            style={category === cat.id ? { backgroundColor: ACCENT_COLOR_BORDO, borderColor: ACCENT_COLOR_BORDO } : {}}
-                                        >
-                                            {cat.name}
-                                        </motion.button>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </div>
+                       
 
                         {/* Listado de productos filtrados */}
                         {loading ? (
