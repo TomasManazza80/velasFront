@@ -10,7 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Definición del color Bordo oscuro para acentuar
 const ACCENT_COLOR_BORDO = "#B22222"; 
 
-// 💡 Estilos de profundidad del fondo MODIFICADOS (Priorizando el BLANCO)
+// 💡 Estilos de profundidad del fondo ORIGINALES (Priorizando el BLANCO)
 const depthStyle = {
     // Gradiente elíptico: La "luz" brillante (rgba(255, 255, 255, 1)) se concentra en el centro superior (50% 0%).
     // Se desvanece suavemente a un gris muy claro (rgba(240, 240, 240, 1)) para un efecto de profundidad suave.
@@ -39,8 +39,8 @@ const carouselStyles = `
 .carousel-track {
     display: flex;
     width: fit-content; /* Asegura que la pista sea lo suficientemente ancha */
-    /* Velocidad rápida: 15 segundos */
-    animation: scroll-left 15s linear infinite; 
+    /* ✅ VELOCIDAD MODIFICADA: 40 segundos para ser más lento */
+    animation: scroll-left 40s linear infinite; 
     padding: 20px 0; /* Espacio vertical para estética */
 }
 
@@ -179,9 +179,43 @@ const ProductsHome = () => {
                             <div className="w-20 h-0.5 bg-gray-400 mx-auto mt-4"></div> 
                         </div>
 
-                        {/* Filtro de categorías */}
-                       
+                        {/* Filtro de categorías (Reutilizando el estilo original) */}
+                        <div className="flex justify-center mb-12 relative z-10">
+                            <button
+                                onClick={() => setShowCategories(!showCategories)}
+                                className="flex items-center text-sm font-medium tracking-wider uppercase bg-white text-gray-800 py-2 px-4 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-300 shadow-md"
+                            >
+                                <FiFilter className="mr-2" style={{ color: ACCENT_COLOR_BORDO }} />
+                                Filtrar por Categoría: <span className="ml-1 font-bold text-black">{categories.find(c => c.id === category)?.name || "Todos los Vinos"}</span>
+                            </button>
 
+                            {showCategories && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute top-full mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-20"
+                                >
+                                    {categories.map((cat) => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => {
+                                                setCategory(cat.id);
+                                                setShowCategories(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm transition duration-200 ${
+                                                category === cat.id
+                                                    ? `bg-gray-100 text-black font-bold` 
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {cat.name}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </div>
+                        
                         {/* Listado de productos filtrados */}
                         {loading ? (
                             // Spinner (adaptado a fondo blanco)
@@ -204,10 +238,8 @@ const ProductsHome = () => {
                                             initial={{ opacity: 0, y: 30 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.4, delay: index * 0.05 }} 
-                                            // 🌟 CAMBIO CLAVE: Se añade 'h-full'
                                             className="flex justify-center h-full"
                                         >
-                                            {/* 🌟 CAMBIO CLAVE: Se añade 'h-full' y se elimina 'max-w-[200px]' */}
                                             <div className="w-full h-full"> 
                                                 <ProductCart
                                                     id={item.ProductId}

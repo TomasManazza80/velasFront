@@ -33,7 +33,7 @@ const Footer = () => {
       },
       trabajo: {
         title: "Trabaja con Nosotros",
-        content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a lufpretruccelli@gmail.com y sé parte de esta gran familia."
+        content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a lufpetruccelli@gmail.com y sé parte de esta gran familia."
       },
       cuidado: {
         title: "Cuidado del Producto",
@@ -41,7 +41,7 @@ const Footer = () => {
       },
       mayoristas: {
         title: "Mayoristas",
-        content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a lufpretruccelli@gmail.com para más información sobre nuestros descuentos por volumen."
+        content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a lufpetruccelli@gmail.com para más información sobre nuestros descuentos por volumen."
       },
       compra: {
         title: "Información para tu Compra",
@@ -53,7 +53,7 @@ const Footer = () => {
       },
       arrepentimiento: {
         title: "Botón de Arrepentimiento",
-        content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a lufpretruccelli@gmail.com"
+        content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a lufpetruccelli@gmail.com"
       },
       aromatizadores: {
         title: "Aromatizadores Ultrasónicos",
