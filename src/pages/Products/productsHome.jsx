@@ -181,13 +181,7 @@ const ProductsHome = () => {
 
                         {/* Filtro de categorías (Reutilizando el estilo original) */}
                         <div className="flex justify-center mb-12 relative z-10">
-                            <button
-                                onClick={() => setShowCategories(!showCategories)}
-                                className="flex items-center text-sm font-medium tracking-wider uppercase bg-white text-gray-800 py-2 px-4 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-300 shadow-md"
-                            >
-                                <FiFilter className="mr-2" style={{ color: ACCENT_COLOR_BORDO }} />
-                                Filtrar por Categoría: <span className="ml-1 font-bold text-black">{categories.find(c => c.id === category)?.name || "Todos los Vinos"}</span>
-                            </button>
+                          
 
                             {showCategories && (
                                 <motion.div
