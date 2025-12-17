@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
-
-const socket = io('http://localhost:3001'); // URL de tu backend
+var URL_BACKEND = process.env.FRONT_URL
+const socket = io(URL_BACKEND); // URL de tu backend
 
 const WhatsappQR = () => {
     const [qrCode, setQrCode] = useState('');
