@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDollarSign, FiPackage, FiShoppingCart } from 'react-icons/fi';
+import WhatsappQR from './whatsappQrSection.jsx';
+
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -900,6 +903,10 @@ const FormularioVentaManual = ({ onClose, onSubmit }) => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div>
+          <WhatsappQR />
         </div>
 
         {/* Navegación */}
