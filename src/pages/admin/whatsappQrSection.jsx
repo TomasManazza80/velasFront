@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
-var URL_BACKEND = process.env.FRONT_URL
+
+const URL_BACKEND = import.meta.env.VITE_API_URL ; // Cambia esto si tu backend está en otra URL
+
 const socket = io(URL_BACKEND); // URL de tu backend
 
 const WhatsappQR = () => {

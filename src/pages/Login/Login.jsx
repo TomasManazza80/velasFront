@@ -6,8 +6,8 @@ import * as Yup from "yup";
 import authContext from "../../store/store";
 import { FiMail, FiLock, FiArrowRight } from "react-icons/fi";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
+  // const API_URL = import.meta.env.VITE_API_URL;
+ const API_URL = "http://localhost:3001";
 function Login() {
   const navigate = useNavigate();
   const authCtx = useContext(authContext);
