@@ -1,19 +1,30 @@
-// whatsappQrSection.jsx - VERSIÓN FINAL CON REINICIO
+// whatsappQrSection.jsx - VERSIÓN FINAL CON LÍMITE DE CONEXIÓN
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
 
 const URL_BACKEND = import.meta.env.VITE_API_URL;
-const socket = io(URL_BACKEND);
+
+// CONFIGURACIÓN DEL SOCKET: Limitamos a 3 intentos de reconexión
+const socket = io(URL_BACKEND, {
+    reconnectionAttempts: 3, // Máximo 3 intentos de conectar si falla
+    reconnectionDelay: 5000, // Espera 5 segundos entre intentos
+    timeout: 20000,          // Tiempo de espera por intento
+});
 
 const WhatsappQR = () => {
     const [qrCode, setQrCode] = useState('');
-    const [status, setStatus] = useState('loading'); // loading, qr, connected, timeout
+    const [status, setStatus] = useState('loading'); 
     const qrCount = useRef(0);
     const MAX_QR_ATTEMPTS = 2;
 
     useEffect(() => {
-        // Definimos la función de manejo de QR
+        // Manejador cuando Socket.io agota los 3 intentos de conexión
+        const handleConnectError = () => {
+            console.error("❌ Falló la conexión al servidor tras 3 intentos.");
+            setStatus('timeout');
+        };
+
         const handleQR = (qr) => {
             qrCount.current += 1;
             if (qrCount.current <= MAX_QR_ATTEMPTS) {
@@ -24,9 +35,7 @@ const WhatsappQR = () => {
             }
         };
 
-        socket.on('whatsapp-qr', handleQR);
-
-        socket.on('whatsapp-status', (newStatus) => {
+        const handleStatus = (newStatus) => {
             if (newStatus === 'connected') {
                 setStatus('connected');
                 setQrCode('');
@@ -38,21 +47,32 @@ const WhatsappQR = () => {
             if (newStatus === 'disconnected' && qrCount.current === 0) {
                 setStatus('loading');
             }
-        });
+        };
+
+        // Suscribirse a eventos
+        socket.on('connect_error', handleConnectError);
+        socket.on('whatsapp-qr', handleQR);
+        socket.on('whatsapp-status', handleStatus);
 
         return () => {
+            socket.off('connect_error', handleConnectError);
             socket.off('whatsapp-qr', handleQR);
-            socket.off('whatsapp-status');
+            socket.off('whatsapp-status', handleStatus);
         };
     }, []);
 
     const handleRetry = () => {
-        console.log("Solicitando reinicio de QR al servidor...");
-        qrCount.current = 0; // Reset local
+        console.log("Solicitando reinicio de conexión...");
+        
+        // Si el socket se rindió tras los 3 intentos, lo reconectamos manualmente
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        qrCount.current = 0; 
         setStatus('loading');
         setQrCode('');
         
-        // Emitir evento al backend para resetear contador y cliente
         socket.emit('whatsapp-restart'); 
     };
 
@@ -84,13 +104,13 @@ const WhatsappQR = () => {
 
             {status === 'timeout' && (
                 <div style={{ color: 'red' }}>
-                    <p>⚠️ El tiempo de espera ha expirado.</p>
-                    <p>No se generarán más códigos automáticamente.</p>
+                    <p>⚠️ No se pudo establecer conexión.</p>
+                    <p>El servidor no responde o el tiempo de espera expiró.</p>
                     <button 
                         onClick={handleRetry}
                         style={{ padding: '8px 16px', cursor: 'pointer', marginTop: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
                     >
-                        Reintentar conexión ahora
+                        Intentar conectar de nuevo
                     </button>
                 </div>
             )}
