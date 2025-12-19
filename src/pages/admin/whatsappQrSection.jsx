@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
 
 // Asegúrate de que esta URL sea exactamente la de tu servicio en Render 
-const URL_BACKEND = 'https://velasback.onrender.com'; 
+const URL_BACKEND = "https://velasback.onrender.com"; // Cambia esto por tu URL en Render;
 
 const WhatsappQR = () => {
     const [qrCode, setQrCode] = useState('');
@@ -12,14 +12,11 @@ const WhatsappQR = () => {
     const MAX_QR_ATTEMPTS = 2; // 
 
     // CAMBIO CLAVE: Permitir 'polling' primero para asegurar la conexión en Render
-    const socket = useMemo(() => io(URL_BACKEND, {
-        transports: ['polling', 'websocket'], 
-        reconnectionAttempts: 5,
-        reconnectionDelay: 3000,
-        autoConnect: true,
-        forceNew: true,
-        withCredentials: true // Necesario si manejas cookies o sesiones 
-    }), []);
+const socket = useMemo(() => io(URL_BACKEND, {
+    transports: ['websocket'], // <--- CAMBIA ESTO: Quita 'polling' y deja solo 'websocket'
+    reconnectionAttempts: 5,
+    autoConnect: true,
+}), []);
 
     useEffect(() => {
         socket.on('connect', () => {
