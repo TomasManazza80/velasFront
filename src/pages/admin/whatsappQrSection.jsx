@@ -2,31 +2,33 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
 
-const URL_BACKEND = import.meta.env.VITE_API_URL;
+// Asegúrate de que esta URL sea exactamente la de tu servicio en Render 
+const URL_BACKEND = 'https://velasback.onrender.com'; 
 
 const WhatsappQR = () => {
     const [qrCode, setQrCode] = useState('');
     const [status, setStatus] = useState('loading'); 
     const qrCount = useRef(0);
-    const MAX_QR_ATTEMPTS = 2;
+    const MAX_QR_ATTEMPTS = 2; // 
 
+    // CAMBIO CLAVE: Permitir 'polling' primero para asegurar la conexión en Render
     const socket = useMemo(() => io(URL_BACKEND, {
-        transports: ['websocket'], // OBLIGATORIO para evitar el 404 de polling en Render
+        transports: ['polling', 'websocket'], 
         reconnectionAttempts: 5,
         reconnectionDelay: 3000,
         autoConnect: true,
-        forceNew: true // Asegura una conexión limpia
+        forceNew: true,
+        withCredentials: true // Necesario si manejas cookies o sesiones 
     }), []);
 
     useEffect(() => {
-        // Eventos de conexión del Socket para depuración
         socket.on('connect', () => {
-            console.log("✅ Socket conectado al backend");
+            console.log("✅ Socket conectado al backend ID:", socket.id);
         });
 
         socket.on('connect_error', (err) => {
-            console.error("❌ Error de conexión:", err.message);
-            // Si hay error de conexión prolongado, mostramos el timeout
+            console.error("❌ Error de conexión detallado:", err.message);
+            // Si el error persiste, mostramos el estado de error en la UI 
             if (!socket.connected && status === 'loading') {
                 setStatus('timeout');
             }
@@ -43,7 +45,7 @@ const WhatsappQR = () => {
         };
 
         const handleStatus = (newStatus) => {
-            console.log("Estado recibido:", newStatus);
+            console.log("Estado recibido del servidor:", newStatus);
             setStatus(newStatus);
             if (newStatus === 'connected') {
                 setQrCode('');
@@ -63,7 +65,7 @@ const WhatsappQR = () => {
     }, [socket, status]);
 
     const handleRetry = () => {
-        console.log("Reintentando...");
+        console.log("Reiniciando cliente de WhatsApp...");
         qrCount.current = 0;
         setStatus('loading');
         setQrCode('');
@@ -72,6 +74,7 @@ const WhatsappQR = () => {
             socket.connect();
         }
         
+        // Enviamos el evento para que el backend reinicie Puppeteer 
         socket.emit('whatsapp-restart'); 
     };
 
@@ -82,14 +85,14 @@ const WhatsappQR = () => {
             {status === 'loading' && (
                 <div>
                     <p>Estableciendo comunicación...</p>
-                    <p style={{fontSize: '10px', color: '#666'}}>Verificando puerto en Render</p>
+                    <p style={{fontSize: '11px', color: '#666'}}>Conectando con el servidor en Render...</p>
                 </div>
             )}
             
-            {status === 'qr' && (
+            {status === 'qr' && qrCode && (
                 <div>
                     <p style={{ fontSize: '14px' }}>Escanea para conectar (Intento {qrCount.current} de {MAX_QR_ATTEMPTS})</p>
-                    <div style={{ background: 'white', padding: '15px', display: 'inline-block', borderRadius: '10px' }}>
+                    <div style={{ background: 'white', padding: '15px', display: 'inline-block', borderRadius: '10px', border: '1px solid #eee' }}>
                         <QRCodeSVG value={qrCode} size={200} />
                     </div>
                     <div style={{ marginTop: '15px' }}>
@@ -108,7 +111,7 @@ const WhatsappQR = () => {
 
             {(status === 'timeout' || status === 'disconnected') && (
                 <div style={{ color: '#d32f2f' }}>
-                    <p>⚠️ No se pudo conectar</p>
+                    <p>⚠️ No se pudo establecer la conexión</p>
                     <button onClick={handleRetry} style={{ padding: '10px 20px', cursor: 'pointer', marginTop: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}>
                         Reintentar ahora
                     </button>
