@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
-const URL_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000"; 
+const URL_BASE = import.meta.env.VITE_API_URL ; 
 
 const WhatsappQR = () => {
     const [qrCode, setQrCode] = useState('');
