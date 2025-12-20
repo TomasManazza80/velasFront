@@ -35,7 +35,7 @@ function Cart() {
   const [couponInput, setCouponInput] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [showCouponSuccess, setShowCouponSuccess] = useState(false);
-  const DISCOUNT_CODE = "velahermosa2839";
+  const DISCOUNT_CODE = "huellitasalcorazon";
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
