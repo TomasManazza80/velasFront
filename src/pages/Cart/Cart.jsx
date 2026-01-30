@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faPlus, faMinus, faTrashAlt, faArrowLeft, 
-  faChevronRight, faShoppingBag, faCreditCard, faTag, faCheckCircle 
+import {
+  faPlus, faMinus, faTrashAlt, faArrowLeft,
+  faChevronRight, faShoppingBag, faCreditCard, faTag, faCheckCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
@@ -95,7 +95,7 @@ function Cart() {
     };
 
     try {
-      await axios.post('https://velasback.onrender.com/enviarPedidoWhatsapp/enviar', pedidoData);
+      await axios.post(`${API_URL}/enviarPedidoWhatsapp/enviar`, pedidoData);
       const response = await axios.post(`${API_URL}/payment/create_payment`, {
         product: { title: "Pedido Web", unit_price: totalFinal, quantity: 1 }
       });
@@ -109,7 +109,7 @@ function Cart() {
 
   return (
     <div className="bg-gray-50 min-h-screen pb-10 relative">
-      
+
       {/* NOTIFICACIÓN ANIMADA DE CUPÓN */}
       <AnimatePresence>
         {showCouponSuccess && (
@@ -172,20 +172,20 @@ function Cart() {
             <div className="lg:w-1/3">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-10">
                 <h2 className="text-xl font-bold mb-6 border-b pb-4">Resumen</h2>
-                
+
                 {/* SECCIÓN DE CUPÓN */}
                 <div className="mb-6">
                   <label className="text-xs font-bold uppercase text-gray-400 mb-2 block">¿Tienes un cupón?</label>
                   <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="Código" 
+                    <input
+                      type="text"
+                      placeholder="Código"
                       value={couponInput}
                       disabled={isCouponApplied}
                       onChange={(e) => setCouponInput(e.target.value)}
                       className={`flex-1 border rounded-lg px-3 py-2 text-sm outline-none transition-all ${isCouponApplied ? 'bg-green-50 border-green-200 text-green-700 font-bold' : 'focus:border-black'}`}
                     />
-                    <button 
+                    <button
                       onClick={applyCoupon}
                       disabled={isCouponApplied}
                       className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${isCouponApplied ? 'bg-green-600 text-white' : 'bg-black text-white hover:bg-gray-800'}`}
@@ -197,7 +197,7 @@ function Cart() {
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>{formatPrice(totalProductos)}</span></div>
-                  
+
                   {isCouponApplied && (
                     <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex justify-between text-green-600 font-medium">
                       <span>Descuento 15% aplicado</span>
@@ -223,11 +223,11 @@ function Cart() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl overflow-y-auto max-h-[90vh]">
               <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center uppercase tracking-tighter">Confirmar Pedido</h2>
-              
+
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <input type="text" placeholder="Nombre Completo *" required value={nombre} onChange={(e) => setNombre(e.target.value)} className="w-full p-4 border rounded-xl outline-none focus:border-black" />
                 <input type="tel" placeholder="Celular (ej: 549342...)*" required value={cellphone} onChange={(e) => setCellphone(e.target.value)} className="w-full p-4 border rounded-xl outline-none focus:border-black" />
-                
+
                 <select value={shippingOption} onChange={handleShippingChange} required className="w-full p-4 border rounded-xl bg-white outline-none focus:border-black">
                   <option value="">Selecciona Método de Envío</option>
                   <option value="pickup">Retiro en Local - Gratis</option>

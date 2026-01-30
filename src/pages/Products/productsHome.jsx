@@ -3,15 +3,15 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { FiFilter } from "react-icons/fi";
 import { Outlet, useNavigate } from "react-router-dom"; // Importamos useNavigate
-import ProductCart from "../../components/ProductCart"; 
+import ProductCart from "../../components/ProductCart";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const ACCENT_COLOR_BORDO = "#B22222"; 
+const ACCENT_COLOR_BORDO = "#B22222";
 
 const depthStyle = {
     background: 'radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%)',
-    backgroundAttachment: 'fixed', 
+    backgroundAttachment: 'fixed',
 };
 
 const carouselStyles = `
@@ -55,7 +55,7 @@ const ProductsHome = () => {
     const [category, setCategory] = useState("");
     const [showCategories, setShowCategories] = useState(false);
     const [loading, setLoading] = useState(true);
-    
+
     const navigate = useNavigate(); // Hook para la navegación manual
     const constraintsRef = useRef(null);
 
@@ -78,8 +78,8 @@ const ProductsHome = () => {
     }, []);
 
     useEffect(() => {
-        const filtered = category === "" 
-            ? products 
+        const filtered = category === ""
+            ? products
             : products.filter(item => item.categoria === category);
         setFilteredProducts(filtered);
     }, [category, products]);
@@ -87,7 +87,7 @@ const ProductsHome = () => {
     const carouselProducts = products
         .filter(p => p.categoria !== 'accesorios')
         .slice(0, 15);
-    
+
     const duplicatedCarouselProducts = [...carouselProducts, ...carouselProducts];
 
     // Función para manejar el doble click
@@ -97,19 +97,19 @@ const ProductsHome = () => {
 
     return (
         <>
-            <style dangerouslySetInnerHTML={{ __html: carouselStyles }} /> 
+            <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
             <Outlet />
-            
-            <div className="min-h-screen text-black" style={depthStyle}> 
+
+            <div className="min-h-screen text-black" style={depthStyle}>
                 <div className="container mx-auto px-0 py-10 sm:px-6 sm:py-16">
-                    
+
                     {loading ? (
                         <div className="flex justify-center items-center py-20 sm:py-24">
                             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-gray-900"></div>
                         </div>
                     ) : (
                         <div className="carousel-container" ref={constraintsRef}>
-                            <motion.div 
+                            <motion.div
                                 className="carousel-track"
                                 drag="x"
                                 dragConstraints={constraintsRef}
@@ -124,14 +124,14 @@ const ProductsHome = () => {
                                 }}
                             >
                                 {duplicatedCarouselProducts.map((item, index) => (
-                                    <div 
-                                        key={index} 
+                                    <div
+                                        key={index}
                                         className="carousel-item-wrapper"
                                         onDoubleClick={() => handleDoubleClick(item.ProductId)} // Acción solo en doble click
                                         onClick={(e) => e.preventDefault()} // Bloquea el click simple
                                     >
-                                        <motion.div 
-                                            whileHover={{ scale: 1.05 }} 
+                                        <motion.div
+                                            whileHover={{ scale: 1.05 }}
                                             transition={{ type: "spring", stiffness: 300 }}
                                             className="h-full w-full flex justify-center pointer-events-none" // Evita que el hijo capture el click
                                         >
@@ -151,9 +151,9 @@ const ProductsHome = () => {
                             </motion.div>
                         </div>
                     )}
-                    
+
                     {/* Sección inferior se mantiene igual (con click normal para comodidad) */}
-                    <div className="pt-20 px-3 sm:px-6"> 
+                    <div className="pt-20 px-3 sm:px-6">
                         <div className="text-center mb-10 sm:mb-16">
                             <h2 className="text-3xl sm:text-4xl font-serif tracking-widest uppercase text-black mb-2">
                                 algunos de nuestros productos destacados
@@ -162,11 +162,11 @@ const ProductsHome = () => {
 
                         <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-8">
                             {filteredProducts.map((item, index) => (
-                                <motion.div 
+                                <motion.div
                                     key={item.ProductId}
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.4, delay: index * 0.05 }} 
+                                    transition={{ duration: 0.4, delay: index * 0.05 }}
                                     className="flex justify-center h-full"
                                 >
                                     <ProductCart
