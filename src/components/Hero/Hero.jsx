@@ -1,12 +1,56 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faSearch, faTimes, faHeart, faWineBottle } from "@fortawesome/free-solid-svg-icons";
+import {
+    faAngleDown, faSearch, faTimes, faHeart, faWineBottle,
+    faGem, faLeaf, faChevronLeft, faChevronRight
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import sanValentinBanner from "../../images/san-valentin-banner.png";
+import bannerMayorista from "../../images/bannerMayorista.png";
+const SLIDES = [
+
+    {
+        id: 1,
+        title: "Amor",
+        subtitle: "Eterno",
+        label: "Lu Petruccelli presenta",
+        image: sanValentinBanner,
+        color: "#B22222",
+        icon: faHeart
+    },
+    {
+        id: 0,
+        title: "Venta",
+        subtitle: "Mayorista",
+        label: "🔥 30% OFF 1RA COMPRA > $150.000 📦",
+        image: bannerMayorista,
+        color: "#000000",
+        icon: faGem
+    },
+    // {
+    //     id: 2,
+    //     title: "Esencia",
+    //     subtitle: "Natural",
+    //     label: "Colección Aromas 2026",
+    //     image: "https://images.unsplash.com/photo-1602928321679-560bb453f190?auto=format&fit=crop&q=80&w=2000",
+    //     color: "#d4a373",
+    //     icon: faLeaf
+    // },
+    // {
+    //     id: 3,
+    //     title: "Lujo",
+    //     subtitle: "Exclusivo",
+    //     label: "Curaduría Premium",
+    //     image: "https://images.unsplash.com/photo-1583549214013-03080c598007?auto=format&fit=crop&q=80&w=2000",
+    //     color: "#708090",
+    //     icon: faGem
+    // }
+];
 
 const Hero = () => {
+    const [index, setIndex] = useState(0);
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -17,21 +61,34 @@ const Hero = () => {
     const navigate = useNavigate();
     const heroRef = useRef(null);
 
-    // --- PARALLAX EFFECT ---
+    // --- LÓGICA DE NAVEGACIÓN ---
+    const nextSlide = useCallback(() => {
+        setIndex((prev) => (prev + 1) % SLIDES.length);
+    }, []);
+
+    const prevSlide = useCallback(() => {
+        setIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+    }, []);
+
+    // Timer automático con reinicio al interactuar
+    useEffect(() => {
+        const timer = setInterval(nextSlide, 6000);
+        return () => clearInterval(timer);
+    }, [nextSlide, index]); // Se reinicia el intervalo si el índice cambia manualmente
+
+    // --- PARALLAX ---
     const { scrollYProgress } = useScroll({
         target: heroRef,
         offset: ["start start", "end start"]
     });
-    const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+    const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
 
     useEffect(() => {
         async function fetchProducts() {
             try {
                 const { data } = await axios.get(`${API_URL}/products`);
                 setProducts(data);
-            } catch (error) {
-                console.log("Error al obtener productos:", error);
-            }
+            } catch (error) { console.log(error); }
         }
         fetchProducts();
     }, [API_URL]);
@@ -56,11 +113,6 @@ const Hero = () => {
         });
     }, [controls]);
 
-    const handleFilterByCategory = (categoryName) => {
-        const categorySlug = categoryName.toLowerCase().replace(/\s+/g, '-');
-        navigate(`/products?category=${categorySlug}`);
-    };
-
     const formatPrice = (price) => {
         const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
         return new Intl.NumberFormat('es-AR', {
@@ -69,134 +121,114 @@ const Hero = () => {
     };
 
     return (
-        <div ref={heroRef} className="relative w-full h-[650px] md:h-[600px] flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
+        <div ref={heroRef} className="relative w-full h-[700px] md:h-[650px] flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
 
-            {/* 1. FONDO CON PARALLAX (CORREGIDO) */}
-            <motion.div className="absolute inset-0 z-0" style={{ y: yBg }}>
-                <img
-                    src={sanValentinBanner}
-                    alt="San Valentin Collection"
-                    className="w-full h-full object-cover scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#2e0a0a]/60 to-black/80"></div>
-            </motion.div>
+            {/* 1. BACKGROUND CAROUSEL */}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={SLIDES[index].id}
+                    className="absolute inset-0 z-0"
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                    style={{ y: yBg }}
+                >
+                    <img src={SLIDES[index].image} alt={SLIDES[index].title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, ${SLIDES[index].color}22 50%, rgba(0,0,0,0.8) 100%)` }} />
+                </motion.div>
+            </AnimatePresence>
 
-            {/* 2. PARTÍCULAS LENTAS */}
-            <div className="absolute inset-0 overflow-hidden z-1 pointer-events-none">
-                {[...Array(15)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute rounded-full bg-orange-100 opacity-20 blur-[1px]"
-                        style={{
-                            width: Math.random() * 5 + 2 + "px",
-                            height: Math.random() * 5 + 2 + "px",
-                            left: Math.random() * 100 + "%",
-                            top: Math.random() * 100 + "%"
-                        }}
-                        animate={{
-                            opacity: [0, 0.3, 0],
-                            y: [0, -150],
-                            x: [0, Math.random() * 50 - 25]
-                        }}
-                        transition={{
-                            duration: Math.random() * 20 + 40,
-                            repeat: Infinity,
-                            ease: "linear"
-                        }}
-                    />
-                ))}
-            </div>
+            {/* 2. FLECHAS DE NAVEGACIÓN (Solo si no hay resultados de búsqueda) */}
+            {!showResults && (
+                <>
+                    <button
+                        onClick={prevSlide}
+                        className="absolute left-4 md:left-8 z-30 p-4 text-white/40 hover:text-white transition-all bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 group"
+                    >
+                        <FontAwesomeIcon icon={faChevronLeft} className="text-xl md:text-2xl group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <button
+                        onClick={nextSlide}
+                        className="absolute right-4 md:right-8 z-30 p-4 text-white/40 hover:text-white transition-all bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 group"
+                    >
+                        <FontAwesomeIcon icon={faChevronRight} className="text-xl md:text-2xl group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </>
+            )}
 
             {/* 3. CONTENIDO PRINCIPAL */}
-            <motion.div
-                className="text-center w-full max-w-6xl mx-auto px-6 z-10 pt-10"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-            >
+            <motion.div className="text-center w-full max-w-6xl mx-auto px-6 z-10 pt-10">
                 <AnimatePresence mode="wait">
                     {!showResults && (
                         <motion.div
-                            key="titles"
-                            exit={{ opacity: 0, y: -20 }}
+                            key={SLIDES[index].id}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -30 }}
+                            transition={{ duration: 0.7 }}
                             className="mb-12"
                         >
-                            <span className="text-[10px] tracking-[0.5em] text-white/60 mb-4 block uppercase font-bold">
-                                Lu Petruccelli presenta
+                            <span className="text-[10px] tracking-[0.6em] text-white/70 mb-4 block uppercase font-bold">
+                                {SLIDES[index].label}
                             </span>
-                            <h1 className="text-5xl md:text-8xl font-serif text-white mb-6 italic">
-                                Amor <span className="font-light not-italic opacity-80">Eterno</span>
+                            <h1 className="text-5xl md:text-8xl font-serif text-white mb-6 italic leading-tight">
+                                {SLIDES[index].title} <span className="font-light not-italic opacity-80">{SLIDES[index].subtitle}</span>
                             </h1>
-                            <div className="h-[1px] w-24 bg-[#B22222] mx-auto mb-8"></div>
+                            <motion.div
+                                className="h-[1px] w-24 mx-auto mb-8"
+                                animate={{ backgroundColor: SLIDES[index].color }}
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* SEARCH BAR GLASS */}
-                <div className="max-w-2xl w-full mx-auto relative">
-                    <div className="relative w-full group">
+                {/* SEARCH BAR */}
+                <div className="max-w-2xl w-full mx-auto relative z-20">
+                    <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                            <FontAwesomeIcon icon={faSearch} className="text-white/40 group-focus-within:text-[#B22222] transition-colors" />
+                            <FontAwesomeIcon icon={faSearch} className="text-white/40 group-focus-within:text-white transition-colors" />
                         </div>
                         <input
                             type="text"
                             placeholder="BUSCAR EL REGALO IDEAL..."
-                            className="w-full pl-16 pr-16 py-5 text-center text-xs tracking-[0.3em] uppercase bg-white/5 backdrop-blur-md border border-white/10 rounded-full focus:outline-none focus:border-[#B22222]/50 transition-all placeholder-white/30 text-white font-medium"
+                            className="w-full pl-16 pr-16 py-5 text-center text-xs tracking-[0.3em] uppercase bg-white/5 backdrop-blur-xl border border-white/10 rounded-full focus:outline-none focus:border-white/30 transition-all placeholder-white/20 text-white font-medium"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        {search && (
-                            <button onClick={() => setSearch("")} className="absolute inset-y-0 right-0 pr-6">
-                                <FontAwesomeIcon icon={faTimes} className="text-white/30 hover:text-white" />
-                            </button>
-                        )}
                     </div>
 
-                    {/* QUICK CATEGORIES */}
+                    {/* Dots Indicadores */}
                     {!showResults && (
-                        <motion.div
-                            className="flex flex-wrap justify-center gap-3 mt-8"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.8 }}
-                        >
-                            {["Velas", "Sets", "Accesorios"].map((cat) => (
+                        <div className="flex justify-center gap-3 mt-10">
+                            {SLIDES.map((_, i) => (
                                 <button
-                                    key={cat}
-                                    onClick={() => handleFilterByCategory(cat)}
-                                    className="text-[9px] tracking-widest uppercase text-white/50 hover:text-white px-6 py-2 rounded-full border border-white/5 bg-white/5 hover:bg-[#B22222]/20 transition-all"
-                                >
-                                    {cat}
-                                </button>
+                                    key={i}
+                                    onClick={() => setIndex(i)}
+                                    className={`h-[3px] transition-all duration-700 rounded-full ${index === i ? 'w-10' : 'w-4 bg-white/20'}`}
+                                    style={{ backgroundColor: index === i ? SLIDES[index].color : '' }}
+                                />
                             ))}
-                        </motion.div>
+                        </div>
                     )}
                 </div>
 
-                {/* SEARCH RESULTS */}
+                {/* RESULTADOS DE BÚSQUEDA */}
                 <AnimatePresence>
                     {showResults && (
-                        <motion.div
-                            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
+                        <motion.div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                             {filteredProducts.map((p) => (
                                 <motion.div
                                     key={p.ProductId}
                                     whileHover={{ y: -5 }}
-                                    className="bg-white p-3 rounded-xl shadow-2xl cursor-pointer"
+                                    className="bg-white/90 backdrop-blur-lg p-3 rounded-xl shadow-2xl cursor-pointer"
                                     onClick={() => navigate(`/product/${p.ProductId}`)}
                                 >
                                     <div className="h-32 w-full bg-gray-50 rounded-lg mb-3 overflow-hidden">
-                                        {p.imagenes?.[0] ? (
-                                            <img src={p.imagenes[0]} className="w-full h-full object-cover" alt={p.nombre} />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center"><FontAwesomeIcon icon={faWineBottle} className="text-gray-200" /></div>
-                                        )}
+                                        {p.imagenes?.[0] && <img src={p.imagenes[0]} className="w-full h-full object-cover" alt={p.nombre} />}
                                     </div>
-                                    <p className="text-[#B22222] font-bold text-sm">{formatPrice(p.precio)}</p>
-                                    <p className="text-[10px] text-gray-500 uppercase truncate">{p.nombre}</p>
+                                    <p className="font-bold text-sm" style={{ color: SLIDES[index].color }}>{formatPrice(p.precio)}</p>
+                                    <p className="text-[10px] text-gray-500 uppercase truncate font-bold">{p.nombre}</p>
                                 </motion.div>
                             ))}
                         </motion.div>
@@ -206,10 +238,7 @@ const Hero = () => {
 
             {/* SCROLL ICON */}
             {!showResults && (
-                <motion.div
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/30"
-                    animate={controls}
-                >
+                <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/30" animate={controls}>
                     <FontAwesomeIcon icon={faAngleDown} />
                 </motion.div>
             )}
