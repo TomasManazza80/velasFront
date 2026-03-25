@@ -1,149 +1,167 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faSearch, 
-  faBoxOpen, 
-  faCreditCard,
-  faTruck
+import {
+    faSearch,
+    faCartPlus,
+    faShieldHalved,
+    faCreditCard,
+    faTruckFast,
+    faMicrochip
 } from "@fortawesome/free-solid-svg-icons";
+import video from "../../images/videos/herofede.mp4";
 
-const BuySteps = () => {
-  const steps = [
-    {
-      icon: faSearch,
-      title: "1. Descubre tu Estilo",
-      description: "Explora nuestra colección exclusiva y encuentra piezas que mas te representen.",
-      color: "from-pink-100 to-pink-50"
-    },
-    {
-      icon: faBoxOpen,
-      title: "2. Personaliza tu Pedido",
-      description: "Selecciona modelo y cantidades para cada artículo seleccionado.",
-      color: "from-purple-100 to-purple-50"
-    },
-    {
-      icon: faCreditCard,
-      title: "3. Carga de Datos",
-      description: "Carga tus datos de envío, dirección y agrega una nota espesificando detalles de tu direccion para que podamos encontrarla fácilmente.",
-      color: "from-blue-100 to-blue-50"
-    },
-    {
-      icon: faCreditCard,
-      title: "4. Pago Seguro",
-      description: "Proceso de pago encriptado con múltiples métodos de pago disponibles. Mediante Mercado Pago, Tarjeta de Crédito o Débito.(recomendamos tener mercado pago instalado o abierto en el navegador)",
-      color: "from-blue-100 to-blue-50"
-    },
-    {
-      icon: faTruck,
-      title: "5. Envío Express",
-      description: "Recibe tu pedido en 24-48h con nuestro servicio premium de envíos.",
-      color: "from-teal-100 to-teal-50",
-      fullWidth: true // Nueva propiedad para identificar el paso de ancho completo
-    }
-  ];
+const BuySteps = ({ videoSrc = video }) => {
+    const steps = [
+        {
+            id: "01",
+            icon: faSearch,
+            title: "Explora la Colección",
+            description: "Navega por nuestro catálogo de fragancias exclusivas. Encuentra el aroma perfecto para tu espacio.",
+        },
+        {
+            id: "02",
+            icon: faCartPlus,
+            title: "Configura tu Pedido",
+            description: "Selecciona tus velas y accesorios. Nuestro sistema asegura la disponibilidad en tiempo real.",
+        },
+        {
+            id: "03",
+            icon: faShieldHalved,
+            title: "Checkout Seguro",
+            description: "Carga tus datos de envío bajo protocolos de encriptación avanzada para una transacción 100% confiable.",
+        },
+        {
+            id: "04",
+            icon: faCreditCard,
+            title: "Pasarela de Pago",
+            description: "Procesa tu operación con total fluidez. Aceptamos todas las tarjetas de crédito y débito.",
+        },
+        {
+            id: "05",
+            icon: faTruckFast,
+            title: "Envío Cuidadoso",
+            description: "Tu pedido es preparado, embalado con extrema protección y enviado con seguimiento prioritario a tu domicilio.",
+            fullWidth: true
+        }
+    ];
 
-  // Animaciones
-  const container = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2
-      }
-    }
-  };
+    const container = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { delayChildren: 0.3, staggerChildren: 0.15 }
+        }
+    };
 
-  const item = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5
-      }
-    }
-  };
+    const item = {
+        hidden: { y: 30, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { duration: 0.6, ease: "easeOut" }
+        }
+    };
 
-  return (
-    <section className="py-16 md:py-20 bg-white">
-      <div className="container mx-auto px-4">
-        {/* Encabezado */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-2">
-           Lifestyle Decoration
-          </h2>
-          <p className="text-sm md:text-base text-gray-600 mb-6">
-            Envíos a todo el país 
-          </p>
-          <p className="text-sm md:text-base text-white mb-6">
-            velas santa fe
-          </p>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent mx-auto"></div>
-        </motion.div>
+    return (
+        <section className="py-24 md:py-32 bg-[#ffffff] font-sans text-[#333333] relative overflow-hidden selection:bg-[#cba394] selection:text-white">
+            {/* Video de Fondo con Overlay Minimalista */}
+            <video
+                autoPlay loop muted playsInline
+                className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-10 grayscale"
+                src={videoSrc}
+            />
+            <div className="absolute inset-0 bg-[#ffffff]/90 z-1" />
 
-        {/* Pasos - Modificado para que el último paso ocupe ancho completo */}
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
-        >
-          {steps.map((step, index) => (
-            <motion.article 
-              key={index}
-              variants={item}
-              className={`group ${step.fullWidth ? 'md:col-span-2 lg:col-span-4' : ''}`}
-            >
-              <div className={`h-full bg-gradient-to-br ${step.color} p-6 rounded-lg transition-all duration-300 group-hover:shadow-md ${step.fullWidth ? 'flex flex-col md:flex-row items-center md:text-left text-center' : ''}`}>
-                <div className={`${step.fullWidth ? 'md:mr-6 md:mb-0 mb-4' : ''}`}>
-                  <div className={`w-12 h-12 rounded-full bg-white flex items-center justify-center ${step.fullWidth ? 'md:mx-0 mx-auto' : 'mb-4'} shadow-sm`}>
-                    <FontAwesomeIcon 
-                      icon={step.icon} 
-                      className="text-lg text-gray-700" 
-                    />
-                  </div>
-                </div>
-                <div className={step.fullWidth ? 'flex-1' : ''}>
-                  <h3 className={`text-lg font-medium text-gray-900 ${step.fullWidth ? 'md:mt-0 mt-2' : 'mb-2'}`}>
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </motion.div>
+            <div className="container mx-auto max-w-7xl px-4 md:px-8 relative z-10">
 
-        {/* Llamada a la acción */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 text-center"
-        >
-          <button className="px-8 py-3 bg-black text-white font-light text-sm tracking-wider rounded-none hover:bg-gray-800 transition-colors duration-300">
-            COMPRAR AHORA
-          </button>
-          <p className="text-sm md:text-base text-white mb-6">
-            velas santa fe
-          </p>
-          <p className="mt-4 text-xs text-gray-500">
-            Descubre nuestra colección exclusiva
-          </p>
-        </motion.div>
-      </div>
-    </section>
-  );
+                {/* Encabezado */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-24"
+                >
+                    <div className="flex items-center justify-center mb-6">
+                        <span className="text-[#cba394] tracking-[0.3em] text-xs md:text-sm font-light uppercase block">
+                            The LuPetruccelli Experience
+                        </span>
+                    </div>
+
+                    <h2 className="text-4xl md:text-5xl font-sans font-light tracking-[0.15em] uppercase text-[#333333] leading-tight mb-8">
+                        PROCESO DE <span className="font-semibold">COMPRA</span>
+                    </h2>
+
+                    {/* DIVISOR GEOMÉTRICO */}
+                    <div className="flex items-center justify-center opacity-70">
+                        <div className="w-16 h-[1px] bg-[#cba394]"></div>
+                        <div className="w-2 h-2 rotate-45 bg-[#cba394] mx-4"></div>
+                        <div className="w-16 h-[1px] bg-[#cba394]"></div>
+                    </div>
+                </motion.div>
+
+                {/* Pasos Grid */}
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                >
+                    {steps.map((step, index) => (
+                        <motion.article
+                            key={index}
+                            variants={item}
+                            className={`${step.fullWidth ? 'md:col-span-2 lg:col-span-4' : ''} h-full group`}
+                        >
+                            <div className={`h-full bg-[#f9f3f2] p-10 md:p-14 relative overflow-hidden transition-all duration-500 hover:bg-[#f2ebe9] flex flex-col items-center text-center ${step.fullWidth ? 'lg:flex-row lg:text-left lg:px-20' : ''}`}>
+
+                                {/* ID Subliminal */}
+                                <span className="absolute top-6 right-8 text-[#e8dbd8] text-5xl font-light font-sans tracking-tighter select-none transition-transform duration-700 group-hover:scale-110">
+                                    {step.id}
+                                </span>
+
+                                {/* Ícono */}
+                                <div className={`relative z-10 ${step.fullWidth ? 'lg:mb-0 lg:mr-12 lg:pr-12 lg:border-r lg:border-[#e8dbd8]' : 'mb-8 mt-4'}`}>
+                                    <FontAwesomeIcon
+                                        icon={step.icon}
+                                        className="text-3xl text-[#cba394] font-light"
+                                    />
+                                </div>
+
+                                {/* Texto */}
+                                <div className="relative z-10 flex flex-col flex-1 items-center lg:items-start">
+                                    <h3 className="text-sm font-sans font-normal uppercase tracking-widest text-[#333333] mb-4">
+                                        {step.title}
+                                    </h3>
+                                    <p className={`text-xs font-light text-[#777777] leading-relaxed ${step.fullWidth ? 'max-w-2xl text-center lg:text-left' : 'max-w-[250px]'}`}>
+                                        {step.description}
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.article>
+                    ))}
+                </motion.div>
+
+                {/* Call to Action */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="mt-24 text-center"
+                >
+                    <button
+                        className="bg-gradient-to-r from-[#cba394] to-[#b07d6b] px-12 py-5 text-white text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-90 shadow-sm flex items-center justify-center gap-3 mx-auto"
+                    >
+                        INICIAR COMPRA <span className="text-[10px]">&gt;</span>
+                    </button>
+                    <p className="mt-8 text-[10px] text-[#999999] uppercase tracking-[0.2em] font-light">
+                        Protocolo de compra seguro verificado
+                    </p>
+                </motion.div>
+            </div>
+        </section>
+    );
 };
 
 export default BuySteps;

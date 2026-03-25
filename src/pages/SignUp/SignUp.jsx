@@ -1,8 +1,9 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { GoogleLogin } from '@react-oauth/google';
 import * as Yup from "yup";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiUser, FiPhone, FiMail, FiLock, FiCheck } from "react-icons/fi";
+import { FiUser, FiPhone, FiMail, FiLock } from "react-icons/fi";
 import authContext from "../../store/store";
 import { useContext, useEffect } from "react";
 
@@ -21,26 +22,15 @@ function SignUp() {
     termsAndConditions: false,
   };
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .min(2, "El nombre debe tener al menos 2 caracteres")
-      .required("Nombre requerido"),
-    number: Yup.string()
-      .matches(/^[0-9]+$/, "Solo números permitidos")
-      .min(8, "El teléfono debe tener al menos 8 dígitos")
-      .required("Teléfono requerido"),
-    email: Yup.string()
-      .email("Formato de email inválido")
-      .required("Email requerido"),
-    password: Yup.string()
-      .min(6, "La contraseña debe tener al menos 6 caracteres")
-      .required("Contraseña requerida"),
+  const validationSchema = Yup.object({
+    name: Yup.string().min(2).required("*Nombre requerido"),
+    number: Yup.string().matches(/^[0-9]+$/).min(8).required("*Número requerido"),
+    email: Yup.string().email().required("*Email requerido"),
+    password: Yup.string().min(6).required("*Contraseña requerida"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Las contraseñas no coinciden")
-      .required("Confirma tu contraseña"),
-    termsAndConditions: Yup.boolean()
-      .oneOf([true], "Debes aceptar los términos y condiciones")
-      .required("Debes aceptar los términos y condiciones"),
+      .oneOf([Yup.ref("password")], "*Las contraseñas no coinciden")
+      .required("*Confirmación requerida"),
+    termsAndConditions: Yup.boolean().oneOf([true], "*Debes aceptar los términos"),
   });
 
   const onSubmit = async (values, { setSubmitting, setStatus }) => {
@@ -52,204 +42,207 @@ function SignUp() {
         password: values.password,
       };
 
-      const response = await axios.post(`${API_URL}/createuser`, data);
-      console.log(response);
+      await axios.post(`${API_URL}/createuser`, data);
       navigate("/login");
     } catch (error) {
-      setStatus(error.response?.data?.message || "Error al registrar. Intenta nuevamente.");
+      setStatus("Error al crear la cuenta. Intente nuevamente.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await axios.post(`${API_URL}/google-login`, {
+        token: credentialResponse.credential
+      });
+      authCtx.setToken(response.data.token);
+      localStorage.setItem("token", response.data.token);
+      navigate("/");
+    } catch (error) {
+      console.error("Google Signup Error:", error);
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.log('Login Failed');
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     authCtx.setToken(token);
-    if (token) {
-      navigate("/");
-    }
+    if (token) navigate("/");
   }, [authCtx, navigate]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Encabezado */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-light text-gray-800 mb-2">Fashion Designer</h1>
-          <p className="text-gray-500">Envíos a todo el país</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#ffffff] text-[#333333] font-sans px-4 py-12 selection:bg-[#cba394] selection:text-white">
+      <div className="w-full max-w-md bg-[#f9f3f2] border-0 p-12 rounded-sm text-center">
 
-        {/* Tarjeta de Registro */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <h2 className="text-2xl font-normal text-gray-800 mb-8 text-center">
-            Crear Cuenta
-          </h2>
+        {/* HEADER */}
 
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={onSubmit}
-          >
-            {({ isSubmitting, status }) => (
-              <Form className="space-y-4">
-                {/* Campo Nombre */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUser className="text-gray-400" />
-                  </div>
+
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+        >
+          {({ isSubmitting, status }) => (
+            <Form className="space-y-6 text-left">
+
+              {/* NOMBRE */}
+              <div>
+                <p className="text-[11px] tracking-widest text-[#b07d6b] uppercase mb-1 font-medium">
+                  Nombre Completo
+                </p>
+                <div className="relative group">
+                  <FiUser className="absolute left-3 top-3.5 text-[#cba394] group-focus-within:text-[#b07d6b] transition-colors" />
                   <Field
-                    type="text"
                     name="name"
-                    id="name"
-                    className="w-full pl-10 pr-3 py-2 border-b border-gray-300 focus:border-black focus:outline-none text-gray-700 placeholder-gray-400"
-                    placeholder="Nombre completo"
-                  />
-                  <ErrorMessage
-                    name="name"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
+                    className="w-full bg-white border-b border-[#cba394]/30 px-10 py-3 text-[13px] font-light focus:outline-none focus:border-[#b07d6b] transition-all placeholder:text-gray-400"
+                    placeholder="Tu nombre"
                   />
                 </div>
+                <ErrorMessage name="name" component="p" className="text-[11px] text-[#b07d6b] mt-1 italic" />
+              </div>
 
-                {/* Campo Teléfono */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiPhone className="text-gray-400" />
-                  </div>
+              {/* TELEFONO */}
+              <div>
+                <p className="text-[11px] tracking-widest text-[#b07d6b] uppercase mb-1 font-medium">
+                  Teléfono
+                </p>
+                <div className="relative group">
+                  <FiPhone className="absolute left-3 top-3.5 text-[#cba394] group-focus-within:text-[#b07d6b] transition-colors" />
                   <Field
-                    type="tel"
                     name="number"
-                    id="number"
-                    className="w-full pl-10 pr-3 py-2 border-b border-gray-300 focus:border-black focus:outline-none text-gray-700 placeholder-gray-400"
-                    placeholder="Teléfono"
-                  />
-                  <ErrorMessage
-                    name="number"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
+                    className="w-full bg-white border-b border-[#cba394]/30 px-10 py-3 text-[13px] font-light focus:outline-none focus:border-[#b07d6b] transition-all placeholder:text-gray-400"
+                    placeholder="Tu número"
                   />
                 </div>
+                <ErrorMessage name="number" component="p" className="text-[11px] text-[#b07d6b] mt-1 italic" />
+              </div>
 
-                {/* Campo Email */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiMail className="text-gray-400" />
-                  </div>
+              {/* EMAIL */}
+              <div>
+                <p className="text-[11px] tracking-widest text-[#b07d6b] uppercase mb-1 font-medium">
+                  Email
+                </p>
+                <div className="relative group">
+                  <FiMail className="absolute left-3 top-3.5 text-[#cba394] group-focus-within:text-[#b07d6b] transition-colors" />
                   <Field
                     type="email"
                     name="email"
-                    id="email"
-                    className="w-full pl-10 pr-3 py-2 border-b border-gray-300 focus:border-black focus:outline-none text-gray-700 placeholder-gray-400"
-                    placeholder="Correo electrónico"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
+                    className="w-full bg-white border-b border-[#cba394]/30 px-10 py-3 text-[13px] font-light focus:outline-none focus:border-[#b07d6b] transition-all placeholder:text-gray-400"
+                    placeholder="tu@email.com"
                   />
                 </div>
+                <ErrorMessage name="email" component="p" className="text-[11px] text-[#b07d6b] mt-1 italic" />
+              </div>
 
-                {/* Campo Contraseña */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiLock className="text-gray-400" />
-                  </div>
+              {/* PASSWORD */}
+              <div>
+                <p className="text-[11px] tracking-widest text-[#b07d6b] uppercase mb-1 font-medium">
+                  Contraseña
+                </p>
+                <div className="relative group">
+                  <FiLock className="absolute left-3 top-3.5 text-[#cba394] group-focus-within:text-[#b07d6b] transition-colors" />
                   <Field
                     type="password"
                     name="password"
-                    id="password"
-                    className="w-full pl-10 pr-3 py-2 border-b border-gray-300 focus:border-black focus:outline-none text-gray-700 placeholder-gray-400"
-                    placeholder="Contraseña"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
+                    className="w-full bg-white border-b border-[#cba394]/30 px-10 py-3 text-[13px] font-light tracking-widest focus:outline-none focus:border-[#b07d6b] transition-all placeholder:text-gray-400"
+                    placeholder="••••••••"
                   />
                 </div>
+                <ErrorMessage name="password" component="p" className="text-[11px] text-[#b07d6b] mt-1 italic" />
+              </div>
 
-                {/* Campo Confirmar Contraseña */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiLock className="text-gray-400" />
-                  </div>
+              {/* CONFIRM PASSWORD */}
+              <div>
+                <p className="text-[11px] tracking-widest text-[#b07d6b] uppercase mb-1 font-medium">
+                  Confirmar Contraseña
+                </p>
+                <div className="relative group">
+                  <FiLock className="absolute left-3 top-3.5 text-[#cba394] group-focus-within:text-[#b07d6b] transition-colors" />
                   <Field
                     type="password"
                     name="confirmPassword"
-                    id="confirmPassword"
-                    className="w-full pl-10 pr-3 py-2 border-b border-gray-300 focus:border-black focus:outline-none text-gray-700 placeholder-gray-400"
-                    placeholder="Confirmar contraseña"
-                  />
-                  <ErrorMessage
-                    name="confirmPassword"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
+                    className="w-full bg-white border-b border-[#cba394]/30 px-10 py-3 text-[13px] font-light tracking-widest focus:outline-none focus:border-[#b07d6b] transition-all placeholder:text-gray-400"
+                    placeholder="••••••••"
                   />
                 </div>
+                <ErrorMessage
+                  name="confirmPassword"
+                  component="p"
+                  className="text-[11px] text-[#b07d6b] mt-1 italic"
+                />
+              </div>
 
-                {/* Términos y condiciones */}
-                <div className="flex items-start mt-4">
-                  <div className="flex items-center h-5">
-                    <Field
-                      type="checkbox"
-                      name="termsAndConditions"
-                      id="termsAndConditions"
-                      className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <label
-                      htmlFor="termsAndConditions"
-                      className="text-sm text-gray-700"
-                    >
-                      Acepto los{' '}
-                      <a href="#" className="text-gray-500 hover:text-gray-700 underline">
-                        términos y condiciones
-                      </a>
-                    </label>
-                    <ErrorMessage
-                      name="termsAndConditions"
-                      component="p"
-                      className="text-red-500 text-xs mt-1"
-                    />
-                  </div>
-                </div>
+              {/* TERMS */}
+              <div className="flex items-start gap-3 mt-4">
+                <Field
+                  type="checkbox"
+                  name="termsAndConditions"
+                  className="mt-0.5 w-3.5 h-3.5 border-[#cba394] text-[#b07d6b] focus:ring-0 rounded-sm transition-all accent-[#b07d6b]"
+                />
+                <span className="text-[12px] font-light text-[#333333]">
+                  Acepto los términos y condiciones de LuPetruccelli
+                </span>
+              </div>
+              <ErrorMessage
+                name="termsAndConditions"
+                component="p"
+                className="text-[11px] text-[#b07d6b] italic"
+              />
 
-                {/* Mensaje de error */}
-                {status && (
-                  <p className="text-red-500 text-sm text-center">{status}</p>
-                )}
+              {status && (
+                <p className="text-[11px] text-[#b07d6b] text-center uppercase tracking-wider bg-white p-2 rounded-sm border border-[#b07d6b]/20">
+                  {status}
+                </p>
+              )}
 
-                {/* Botón de Registro */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300 disabled:opacity-50 mt-6"
-                >
-                  {isSubmitting ? "Registrando..." : "Registrarse"}
-                </button>
-              </Form>
-            )}
-          </Formik>
-
-          {/* Enlace a Login */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              ¿Ya tienes una cuenta?{' '}
-              <NavLink
-                to="/login"
-                className="font-medium text-gray-700 hover:text-black"
+              {/* BUTTON */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-6 py-4 bg-gradient-to-r from-[#cba394] to-[#b07d6b] text-white font-medium tracking-widest text-[12px] uppercase hover:opacity-90 transition-opacity rounded-sm shadow-sm disabled:opacity-50"
               >
-                Iniciar sesión
-              </NavLink>
-            </p>
+                {isSubmitting ? "PROCESANDO..." : "REGISTRARSE"}
+              </button>
+            </Form>
+          )}
+        </Formik>
+
+        {/* Divider */}
+        <div className="mt-10 relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#cba394]/30"></div>
+          </div>
+          <div className="relative flex justify-center text-[#cba394]">
+            <span className="px-4 bg-[#f9f3f2] text-[14px]">✦</span>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} Fashion Designer. Todos los derechos reservados.</p>
+        <div className="mt-8 flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            theme="outline"
+            shape="rectangular"
+            text="signup_with"
+            size="large"
+            width="300"
+          />
         </div>
+
+        {/* FOOTER */}
+        <p className="text-[12px] text-[#333333] font-light text-center mt-10">
+          ¿Ya tienes una cuenta?{" "}
+          <NavLink
+            to="/login"
+            className="font-medium text-[#b07d6b] hover:text-[#cba394] transition-colors ml-1 border-b border-transparent hover:border-[#cba394] pb-0.5 uppercase tracking-wider text-[11px]"
+          >
+            Iniciar Sesión
+          </NavLink>
+        </p>
       </div>
     </div>
   );

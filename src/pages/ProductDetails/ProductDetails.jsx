@@ -1,423 +1,376 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Add } from "../../store/redux/cart/CartAction";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// Importaciones de iconos sólidos
-import { faPlus, faMinus, faTruck, faChevronLeft, faChevronRight, faTag } from "@fortawesome/free-solid-svg-icons";
-// Importación del icono de marca (WhatsApp)
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons"; 
+import {
+  faPlus,
+  faMinus,
+  faMicrochip,
+  faShieldHalved,
+  faTruckFast,
+  faChevronLeft,
+  faChevronRight,
+  faCreditCard,
+  faCheck,
+  faCircleExclamation,
+  faBagShopping
+} from "@fortawesome/free-solid-svg-icons";
 
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { motion, AnimatePresence } from "framer-motion";
+import { IKContext, IKImage } from "imagekitio-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// =================================================================
+// ESTILOS LU: MINIMALIST LUXURY
+// =================================================================
+const LuStyles = `
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400&family=Montserrat:wght@300;400;500&display=swap');
+
+.lu-title { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.15em; }
+.lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
+.lu-script { font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: #cba394; }
+
+.lu-card {
+    background-color: #f9f3f2;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.lu-gradient-btn {
+    background: linear-gradient(135deg, #cba394 0%, #b07d6b 100%);
+    transition: opacity 0.3s ease;
+}
+
+.lu-gradient-btn:hover {
+    opacity: 0.9;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Enhancements for mobile fixed action bar */
+.safe-area-pb {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ZOOM OUT -67% CONFIGURATION (Mantenido para la estructura visual del proyecto) */
+.module-zoom {
+    zoom: 67%;
+}
+
+@-moz-document url-prefix() {
+    .module-zoom {
+        transform: scale(0.67);
+        transform-origin: top center;
+        width: 149.25%;
+    }
+}
+`;
+
+// Mapa de colores para renderizar los círculos
+const COLOR_MAP = {
+  "rojo": "#A50011",
+  "blanco": "#F5F5F7",
+  "negro": "#1C1C1E",
+  "azul": "#273746",
+  "gris": "#8E8E93",
+  "oro": "#F9E5C9"
+};
+
 function ProductDetails() {
-  // ******* LÓGICA DE ESTADOS Y HOOKS *******
-  const [product, setProduct] = useState({});
-  const [quantity, setQuantity] = useState(1);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { id } = useParams(); // Captura el ID de la URL
+  const { id } = useParams();
   const dispatch = useDispatch();
+  const [product, setProduct] = useState({ variantes: [], imagenes: [] });
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedStorage, setSelectedStorage] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const cartItems = useSelector((state) => state.cart);
+  const colors = [...new Set((product.variantes || []).map(v => v.color))];
 
-  const cartItem = {
-    id: product.ProductId,
-    title: product.nombre,
-    price: product.precio,
-    image: product.imagenes ? product.imagenes[0] : "",
-    quantity: quantity,
-    total: parseFloat(product.precio || 0) * quantity,
-  };
+  const availableStorages = (product.variantes || [])
+    .filter(v => v.color === selectedColor)
+    .map(v => v.almacenamiento);
 
-  // ******* LÓGICA DE FETCHING *******
+  const currentVariant = (product.variantes || []).find(
+    v => v.color === selectedColor && v.almacenamiento === selectedStorage
+  );
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    fetchProduct();
+  }, [id]);
+
+  useEffect(() => {
+    if (product.variantes && selectedColor) {
+      const validStorages = product.variantes
+        .filter(v => v.color === selectedColor)
+        .map(v => v.almacenamiento);
+
+      if (validStorages.length > 0 && !validStorages.includes(selectedStorage)) {
+        setSelectedStorage(validStorages[0]);
+      }
+    }
+  }, [selectedColor, product.variantes, selectedStorage]);
+
   const fetchProduct = async () => {
     try {
       const { data } = await axios.get(`${API_URL}/products/${id}`);
       setProduct(data);
-      // Opcional: Reiniciar la cantidad y la imagen a la primera al cargar un nuevo producto
-      setQuantity(1); 
-      setCurrentImageIndex(0);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    }
-  };
-
-  const fetchRelatedProducts = async () => {
-    try {
-      const { data } = await axios.get(`${API_URL}/products`);
-      const related = data.filter(
-        (p) => p.categoria === product.categoria && p.ProductId !== product.ProductId
-      ).slice(0, 3);
-      setRelatedProducts(related);
-    } catch (error) {
-      console.error("Error fetching related products:", error);
-    }
-  };
-
-  // ******* LÓGICA DE INTERACCIÓN Y UTILS *******
-  const increaseQuantity = () => {
-    if (quantity < product.cantidad) {
-      setQuantity(quantity + 1);
-    }
-  };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  const nextImage = () => {
-    if (product.imagenes && product.imagenes.length > 0) {
-      setCurrentImageIndex((prevIndex) => 
-        prevIndex === product.imagenes.length - 1 ? 0 : prevIndex + 1
-      );
-    }
-  };
-
-  const prevImage = () => {
-    if (product.imagenes && product.imagenes.length > 0) {
-      setCurrentImageIndex((prevIndex) => 
-        prevIndex === 0 ? product.imagenes.length - 1 : prevIndex - 1
-      );
-    }
-  };
-
-  const selectImage = (index) => {
-    setCurrentImageIndex(index);
-  };
-
-  const addToCart = () => {
-    const existingItem = cartItems.find((item) => item.id === product.ProductId);
-    
-    if (existingItem) {
-      Swal.fire({
-        title: "Producto ya en carrito",
-        text: "Este producto ya está en tu carrito.",
-        icon: "info",
-        confirmButtonText: "Entendido",
-        customClass: { 
-          container: 'font-sans',
-          popup: 'shadow-2xl rounded-xl',
-          confirmButton: 'bg-black hover:bg-gray-800 text-white font-semibold',
-        }
-      });
-      return;
-    }
-
-    dispatch(Add(cartItem));
-    Swal.fire({
-      title: "¡Agregado al carrito!",
-      text: `${product.nombre} x${quantity} añadido.`,
-      icon: "success",
-      showConfirmButton: false,
-      timer: 2000,
-      customClass: { 
-        container: 'font-sans',
-        popup: 'shadow-2xl rounded-xl',
+      if (data.variantes?.length > 0) {
+        setSelectedColor(data.variantes[0].color);
+        setSelectedStorage(data.variantes[0].almacenamiento);
       }
-    });
+    } catch (error) { console.error("FETCH_ERROR", error); }
   };
 
-  const formatPrice = (price) => {
-    const numericPrice = parseFloat(price || 0);
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(numericPrice).replace('ARS', '$');
+  const hasColor = colors.length > 1 || (colors.length === 1 && colors[0] && colors[0].toLowerCase() !== 'unico');
+  const hasStorage = availableStorages.length > 1 || (availableStorages.length === 1 && availableStorages[0] && availableStorages[0].toLowerCase() !== 'unico');
+  const showSelectors = hasColor || hasStorage;
+
+  const handleAddToCart = () => {
+    if (!currentVariant || currentVariant.stock < 1) return;
+
+    const basePrice = Number(currentVariant?.precioAlPublico) || 0;
+    const wholePrice = Number(currentVariant?.precioMayorista) || basePrice;
+
+    dispatch(Add({
+      ProductId: product.id,
+      id: `${product.id}-${selectedColor}-${selectedStorage}`,
+      title: `${product.nombre}${selectedColor || selectedStorage ? ` (${(selectedColor || '').toUpperCase()} / ${(selectedStorage || '').toUpperCase()})` : ''}`,
+      price: basePrice,
+      precioAlPublico: basePrice,
+      precioMayorista: wholePrice,
+      image: product.imagenes?.[0],
+      quantity,
+      color: selectedColor,
+      storage: selectedStorage
+    }));
+
+    // Adaptación estética del alert para que coincida con la paleta LuPetruccelli
+    Swal.fire({ title: "AGREGADO A LA BOLSA", icon: "success", background: "#f9f3f2", color: "#333333", confirmButtonColor: "#cba394", showConfirmButton: false, timer: 1500 });
   };
-
-  const calculateTax = (price) => {
-    const numericPrice = parseFloat(price || 0);
-    const subtotal = numericPrice / 1.21;
-    const tax = numericPrice - subtotal;
-    return {
-      subtotal: formatPrice(subtotal),
-      tax: formatPrice(tax)
-    };
-  };
-
-  // ******* HOOKS DE EFECTOS (SOLUCIÓN DE SCROLL Y RECARGA) *******
-
-  /**
-   * 🟢 EFECTO PRINCIPAL: Carga el producto y ajusta el scroll.
-   * Depende de [id]. Cada vez que el ID de la URL cambia (al navegar),
-   * el efecto se ejecuta para:
-   * 1. Poner el scroll al inicio (0, 0).
-   * 2. Recargar los datos del nuevo producto.
-   */
-  useEffect(() => {
-    // 💡 SOLUCIÓN SCROLL: Fuerza el inicio de la página.
-    window.scrollTo(0, 0); 
-    
-    // Obtiene los datos del producto
-    fetchProduct();
-  }, [id]); 
-
-  /**
-   * ⚪ EFECTO SECUNDARIO: Carga de productos relacionados.
-   */
-  useEffect(() => {
-    if (product.categoria) {
-      fetchRelatedProducts();
-    }
-  }, [product.categoria]);
-
-  const { tax } = calculateTax(product.precio);
-  // ******* FIN LÓGICA *******
-
 
   return (
-    <div className=" bg-white min-h-screen font-sans antialiased">
-      <div className="container mx-auto max-w-7xl px-4 py-8 md:py-16">
-        
-        {/* Contenedor principal del producto - Estilo Card Elevado */}
-        <div className=" mt-[20px] bg-white p-4 sm:p-8 lg:p-10 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-100/50">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 xl:gap-20">
-            
-            {/* --- Columna Izquierda: Galería de Imágenes --- */}
-            <div className="lg:w-1/2 flex flex-col-reverse md:flex-row gap-4">
-              
-              {/* Miniaturas (Desktop/Tablet) */}
-              <div className="hidden md:flex flex-col gap-3 w-20 lg:w-24">
-                {product.imagenes?.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => selectImage(index)}
-                    aria-label={`Seleccionar miniatura ${index + 1}`}
-                    className={`
-                      w-full aspect-square border-2 rounded-xl overflow-hidden transition-all duration-200 ease-in-out
-                      ${
-                        currentImageIndex === index 
-                          ? 'border-black shadow-lg p-0.5' 
-                          : 'border-gray-200 hover:border-gray-400 opacity-80 hover:opacity-100'
-                      }
-                    `}
-                  >
-                    <img
-                      src={img}
-                      alt={`Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover rounded-xl"
-                      onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/E5E7EB/374151?text=IMG" }}
-                    />
-                  </button>
-                ))}
-              </div>
+    <div className="bg-[#ffffff] min-h-screen text-[#333333] lu-body antialiased pb-32 md:pb-20 module-zoom">
+      <style dangerouslySetInnerHTML={{ __html: LuStyles }} />
 
-              {/* Imagen principal con Slider Controls */}
-              <div className="flex-1 h-[400px] bg-gray-50 p-4 md:p-8 rounded-2xl flex items-center justify-center 
-                relative overflow-hidden shadow-inner">
-                {product.imagenes && product.imagenes.length > 0 ? (
-                  <>
-                    <img
-                      src={product.imagenes[currentImageIndex]}
-                      alt={product.nombre}
-                      className="w-full h-full object-contain transition-transform duration-500 ease-out hover:scale-105"
-                      onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/500x500/D1D5DB/6B7280?text=SIN+IMAGEN" }}
+      <div className="container mx-auto max-w-6xl px-4 pt-4 md:pt-10">
+
+        <nav className="flex items-center mt-[20px] gap-3 mb-8 md:mb-12 lu-title text-[10px] text-[#999999]">
+          <Link to="/" className="hover:text-[#b07d6b] transition-colors truncate">LUPETRUCCELLI</Link>
+          <div className="w-1 h-1 rotate-45 border border-[#cba394]"></div>
+          <span className="text-[#b07d6b] truncate">{product.categoria || 'COLECCIÓN'}</span>
+        </nav>
+
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
+
+          {/* SECCIÓN A: VISUALIZADOR (GALERÍA) */}
+          <div className="w-full lg:w-1/2">
+            <div className="relative aspect-square lu-card rounded-sm overflow-hidden flex items-center justify-center p-8 md:p-12">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentImageIndex}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="absolute inset-0 w-full h-full z-10 p-8"
+                >
+                  <IKContext urlEndpoint={import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT}>
+                    <IKImage
+                      src={product.imagenes?.[currentImageIndex] || ""}
+                      transformation={[{ width: "800", height: "800", crop: "fill", focus: "auto" }]}
+                      loading="lazy"
+                      lqip={{ active: true, quality: 20 }}
+                      className="w-full h-full object-contain mix-blend-multiply"
                     />
-                    
-                    {/* Controles de navegación */}
-                    {product.imagenes.length > 1 && (
-                      <>
-                        <button 
-                          onClick={prevImage}
-                          aria-label="Imagen anterior"
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/70 backdrop-blur-sm text-black rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:bg-white focus:ring-4 focus:ring-black/20 touch-manipulation"
-                        >
-                          <FontAwesomeIcon icon={faChevronLeft} />
-                        </button>
-                        <button 
-                          onClick={nextImage}
-                          aria-label="Imagen siguiente"
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/70 backdrop-blur-sm text-black rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:bg-white focus:ring-4 focus:ring-black/20 touch-manipulation"
-                        >
-                          <FontAwesomeIcon icon={faChevronRight} />
-                        </button>
-                        
-                        {/* Indicadores de imagen (puntos) para móviles */}
-                        <div className="md:hidden absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                          {product.imagenes.map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => selectImage(index)}
-                              aria-label={`Seleccionar imagen ${index + 1}`}
-                              className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 shadow-sm ${
-                                currentImageIndex === index ? 'bg-black' : 'bg-gray-400 hover:bg-gray-500'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-lg font-semibold">Cargando imagen...</div>
-                )}
-              </div>
+                  </IKContext>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* BOTONES DE NAVEGACIÓN */}
+              <button
+                onClick={() => setCurrentImageIndex(p => p === 0 ? product.imagenes.length - 1 : p - 1)}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#ffffff]/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#cba394] hover:bg-[#cba394] hover:text-white transition-all z-20 shadow-sm"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} className="text-sm font-light" />
+              </button>
+
+              <button
+                onClick={() => setCurrentImageIndex(p => p === product.imagenes.length - 1 ? 0 : p + 1)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#ffffff]/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#cba394] hover:bg-[#cba394] hover:text-white transition-all z-20 shadow-sm"
+              >
+                <FontAwesomeIcon icon={faChevronRight} className="text-sm font-light" />
+              </button>
             </div>
 
-            {/* --- Columna Derecha: Información y Compra --- */}
-            <div className="lg:w-1/2 pt-4 lg:pt-0"> 
-              
-              <h2 className="text-sm uppercase tracking-widest font-bold text-indigo-600 mb-1">
-                {product.marca || "Marca Desconocida"}
-              </h2>
-
-              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 leading-tight">
-                {product.nombre || "Nombre del Producto"}
-              </h1>
-              
-              {/* Precio y Detalles Fiscales */}
-              <div className="mb-6 border-y border-gray-200 py-4">
-                <span className="text-5xl md:text-6xl font-bold text-black tracking-tight">
-                  {formatPrice(product.precio)}
-                </span>
-                <div className="text-sm text-gray-500 mt-2">
-                  <span>IVA incluido: {tax}</span>
-                </div>
-              </div>
-
-              {/* Descripción del Producto */}
-              <div className="mb-6">
-                <p className="text-gray-700 leading-relaxed text-base">
-                  {product.descripcion || "Descripción no disponible. Articulo de decoración."}
-                </p>
-              </div>
-
-              {/* Oferta por Mayor (Card con ícono) */}
-              {product.talle && (
-                <div className="mb-6 p-4 rounded-xl bg-yellow-50 border-l-4 border-yellow-400 shadow-sm flex items-center gap-3">
-                  <FontAwesomeIcon icon={faTag} className="text-yellow-600 text-xl" />
-                  <div>
-                    <h1 className="text-sm font-bold text-yellow-800">Precio por Mayor:</h1>
-                    <p className="text-base font-semibold text-gray-900 mt-0">{product.talle}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Selector de Cantidad */}
-              <div className="mb-8">
-                <p className="text-base font-semibold mb-3 text-gray-700">Cantidad:</p>
-                
-                <div className="inline-flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm bg-white">
-                  <button
-                    onClick={decreaseQuantity}
-                    aria-label="Disminuir cantidad"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors duration-150 active:bg-gray-200 disabled:opacity-50 touch-manipulation"
-                    disabled={quantity <= 1}
-                  >
-                    <FontAwesomeIcon icon={faMinus} className="text-lg sm:text-xl text-gray-600" />
-                  </button>
-                  <span className="text-lg sm:text-xl font-bold w-14 sm:w-16 text-center text-gray-900 select-none">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={increaseQuantity}
-                    aria-label="Aumentar cantidad"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors duration-150 active:bg-gray-200 disabled:opacity-50 touch-manipulation"
-                    disabled={quantity >= product.cantidad}
-                  >
-                    <FontAwesomeIcon icon={faPlus} className="text-lg sm:text-xl text-gray-600" />
-                  </button>
-                </div>
-                
-                {/* Texto de Stock */}
-                <p className="text-sm text-gray-500 font-medium mt-2">
-                  Stock: <span className="font-bold text-gray-900">{product.cantidad || 0}</span>
-                </p>
-              </div>
-              {/* FIN SELECTOR HORIZONTAL */}
-
-              {/* Botones de acción - Alto contraste */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                {/* Botón principal (Agregar al carrito) */}
+            <div className="flex gap-4 mt-6 md:mt-8 overflow-x-auto no-scrollbar pb-2 justify-center">
+              {product.imagenes?.map((img, idx) => (
                 <button
-                  onClick={addToCart}
-                  className="w-full sm:flex-1 bg-black text-white py-4 rounded-xl uppercase tracking-wider text-base font-bold transition-all duration-300 hover:bg-gray-800 active:bg-gray-900 shadow-2xl shadow-black/30 hover:shadow-black/50 touch-manipulation"
+                  key={idx}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  className={`w-16 h-16 md:w-20 md:h-20 rounded-sm border p-2 bg-white transition-all flex-shrink-0 ${currentImageIndex === idx ? 'border-[#b07d6b] scale-105 shadow-sm' : 'border-[#f9f3f2] opacity-60 hover:opacity-100'}`}
                 >
-                  🛒 AGREGAR AL CARRITO
+                  <img src={img} className="w-full h-full object-contain mix-blend-multiply" alt="thumbnail" />
                 </button>
-
-                {/* Botón secundario (Encargo por mayor - WhatsApp) */}
-                <button
-                  onClick={() => window.open('https://wa.me/+543425243854', '_blank')}
-                  className="w-full sm:flex-1 inline-flex items-center justify-center px-6 py-4 border-2 border-green-500 text-base font-bold rounded-xl text-green-700 bg-green-50 transition-all duration-300 hover:bg-green-100 focus:outline-none focus:ring-4 focus:ring-green-100 shadow-lg touch-manipulation"
-                >
-                  <FontAwesomeIcon icon={faWhatsapp} className="mr-2" />
-                  <span>Encargo por Mayor</span>
-                </button>
-              </div>
-
-              {/* Información de envío/entrega */}
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex items-center gap-3 text-base text-gray-900 font-bold mb-2">
-                  <FontAwesomeIcon icon={faTruck} className="text-indigo-600" />
-                  <span>Envío y Retiro</span>
-                </div>
-                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-                  <li>**Disponible para envío** a todo el país.</li>
-                  <li>Consultar stock para retiro en punto **PICKUP**.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
----
-
-        {/* --------------------------- Productos Relacionados --------------------------- */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-20 md:mt-28">
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-8 md:mb-10 text-center text-gray-900 border-b pb-3">
-              Productos Relacionados
-            </h2>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-              {relatedProducts.map((relatedProduct) => (
-                <div 
-                  key={relatedProduct.ProductId} 
-                  className="group bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-xl hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  {/* ✅ CLAVE: El Link navega al nuevo producto, lo que cambia el ID y activa el useEffect */}
-                  <Link to={`/product/${relatedProduct.ProductId}`} className="block">
-                    {/* Imagen de Producto */}
-                    <div className="bg-gray-50 p-4 rounded-t-xl h-36 md:h-48 flex items-center justify-center overflow-hidden">
-                      {relatedProduct.imagenes && relatedProduct.imagenes[0] ? (
-                        <img
-                          src={relatedProduct.imagenes[0]}
-                          alt={relatedProduct.nombre}
-                          className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
-                          onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/400x400/E5E7EB/374151?text=IMG" }}
-                        />
-                      ) : (
-                        <div className="text-gray-400 text-sm">Imagen</div>
-                      )}
-                    </div>
-                    
-                    {/* Contenido del Producto */}
-                    <div className="p-4">
-                      <p className="text-gray-500 text-xs uppercase font-medium mb-1">
-                        {relatedProduct.marca || relatedProduct.categoria}
-                      </p>
-                      <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-black transition-colors">
-                        {relatedProduct.nombre}
-                      </h3>
-                      <p className="text-black font-extrabold text-xl tracking-tight">
-                        {formatPrice(relatedProduct.precio)}
-                      </p>
-                    </div>
-                  </Link>
-                </div>
               ))}
             </div>
           </div>
-        )}
+
+          {/* SECCIÓN B: PANEL DE CONFIGURACIÓN */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center">
+            <header className="mb-10 md:mb-14 text-center lg:text-left">
+              <span className="lu-script block mb-4">Elegance</span>
+              <h1 className="lu-title text-3xl md:text-4xl lg:text-5xl font-light text-[#333333] leading-tight mb-6">
+                {product.nombre}
+              </h1>
+              <div className="flex flex-col gap-3 items-center lg:items-start">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl md:text-4xl font-medium text-[#b07d6b]">
+                    ${new Intl.NumberFormat('es-AR').format(currentVariant?.precioAlPublico || 0)}
+                  </span>
+                </div>
+                <div className={`lu-title text-[9px] flex items-center gap-2 ${currentVariant?.stock > 0 ? 'text-[#cba394]' : 'text-[#999999]'}`}>
+                  <FontAwesomeIcon icon={currentVariant?.stock > 0 ? faCheck : faCircleExclamation} />
+                  {currentVariant?.stock > 0 ? `DISPONIBLE: ${currentVariant.stock} UNIDADES` : 'AGOTADO'}
+                </div>
+              </div>
+            </header>
+
+            {/* SELECTORES DE VARIANTES */}
+            {showSelectors && (
+              <div className="space-y-10 mb-12">
+                {/* COLORES */}
+                {hasColor && (
+                  <div className="w-full relative text-center lg:text-left">
+                    <span className="lu-title text-[10px] text-[#999999] mb-6 block">COLOR DE PRESENTACIÓN</span>
+                    <div className="w-full max-w-[calc(100vw-2rem)] md:max-w-none overflow-x-auto pb-4 no-scrollbar flex justify-center lg:justify-start" style={{ WebkitOverflowScrolling: 'touch' }}>
+                      <div className="inline-flex gap-5 min-w-max">
+                        {colors.map(c => (
+                          <button
+                            key={c}
+                            onClick={() => setSelectedColor(c)}
+                            className={`flex-none w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all block relative ${selectedColor === c ? 'border-[#b07d6b] scale-110 shadow-md z-10' : 'border-[#f9f3f2] opacity-70 hover:scale-105'}`}
+                            style={{ backgroundColor: COLOR_MAP[c.toLowerCase()] || c }}
+                            title={c}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ALMACENAMIENTO / PRESENTACIÓN */}
+                {hasStorage && (
+                  <div className="text-center lg:text-left">
+                    <span className="lu-title text-[10px] text-[#999999] mb-6 block">TAMAÑO / PRESENTACIÓN</span>
+                    <div className="grid grid-cols-2 md:flex md:flex-wrap gap-4 justify-center lg:justify-start">
+                      {availableStorages?.map(s => {
+                        const variantOption = product.variantes?.find(v => v.color === selectedColor && v.almacenamiento === s);
+                        const stockOption = variantOption?.stock || 0;
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => setSelectedStorage(s)}
+                            className={`px-6 py-4 rounded-sm lu-title text-[11px] transition-all border flex flex-col items-center justify-center gap-2 min-h-[4.5rem] ${selectedStorage === s ? 'bg-[#f9f3f2] text-[#333333] border-[#b07d6b]' : 'bg-[#ffffff] text-[#999999] border-[#f9f3f2] hover:border-[#cba394]'}`}
+                          >
+                            <span className="font-medium tracking-widest">{s}</span>
+                            <span className="text-[8px] opacity-70 tracking-widest">STOCK: {stockOption}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!showSelectors && (
+              <div className="mb-12 p-8 lu-card rounded-sm text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-8 h-[1px] bg-[#cba394]"></div>
+                </div>
+                <h3 className="lu-title text-[11px] text-[#333333] mb-4">DETALLES DEL PRODUCTO</h3>
+                <p className="lu-body text-sm text-[#999999] leading-relaxed">
+                  {product.descripcion}
+                </p>
+              </div>
+            )}
+
+            {/* PANEL DE ACCIÓN MAESTRO (MAX-IMPACT MOBILE) */}
+            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-[#ffffff] border-t border-[#f9f3f2] px-6 pt-4 pb-8 safe-area-pb md:static md:p-0 md:mt-6 md:border-none shadow-[0_-10px_20px_rgba(0,0,0,0.02)] md:shadow-none">
+              <div className="flex flex-col md:flex-row gap-5 w-full items-center">
+
+                {/* CONTADOR */}
+                <div className="flex items-center justify-between w-full md:w-40 h-14 rounded-sm border border-[#cba394]/30 bg-[#ffffff]">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="w-12 h-full flex items-center justify-center text-[#cba394] hover:bg-[#f9f3f2] transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faMinus} className="text-xs font-light" />
+                  </button>
+
+                  <span className="lu-body text-lg text-[#333333]">
+                    {quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(q => Math.min(currentVariant?.stock || 1, q + 1))}
+                    className="w-12 h-full flex items-center justify-center text-[#cba394] hover:bg-[#f9f3f2] transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faPlus} className="text-xs font-light" />
+                  </button>
+                </div>
+
+                {/* BOTÓN AÑADIR A LA BOLSA */}
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!currentVariant || currentVariant.stock < 1}
+                  className={`flex-1 w-full h-14 rounded-sm lu-title text-[11px] tracking-widest flex items-center justify-center gap-3 transition-all
+        ${!currentVariant || currentVariant.stock < 1
+                      ? 'bg-[#f9f3f2] text-[#999999] border border-[#f9f3f2]'
+                      : 'lu-gradient-btn text-white'}`}
+                >
+                  <FontAwesomeIcon icon={faBagShopping} className="text-sm" />
+                  <span>
+                    {currentVariant?.stock > 0 ? 'AÑADIR A LA BOLSA' : 'AGOTADO'}
+                  </span>
+                </button>
+
+              </div>
+            </div>
+
+            {/* BOTÓN WHATSAPP */}
+            <div className="mt-8 mb-8 md:mb-0 text-center lg:text-left">
+              <button onClick={() => window.open('https://wa.me/+543425937358', '_blank')} className="w-full h-14 rounded-sm lu-title text-[10px] tracking-widest flex items-center justify-center gap-3 hover:bg-[#f9f3f2] transition-colors border border-[#cba394]/30 text-[#b07d6b]">
+                <FontAwesomeIcon icon={faWhatsapp} className="text-lg" /> ATENCIÓN PERSONALIZADA
+              </button>
+            </div>
+
+            {/* REPORTE TÉCNICO INFERIOR */}
+            {showSelectors && (
+              <div className="mt-12 p-10 lu-card rounded-sm text-center">
+                <div className="flex justify-center mb-6 gap-3 items-center">
+                  <div className="w-6 h-[1px] bg-[#cba394]/50"></div>
+                  <div className="w-2 h-2 rotate-45 border border-[#cba394]"></div>
+                  <div className="w-6 h-[1px] bg-[#cba394]/50"></div>
+                </div>
+                <h3 className="lu-title text-[11px] text-[#333333] mb-4">NOTAS DE LA FRAGANCIA</h3>
+                <p className="lu-body text-sm text-[#999999] leading-relaxed">
+                  {product.descripcion}
+                </p>
+              </div>
+            )}
+
+          </div>
+        </div>
       </div>
     </div>
   );

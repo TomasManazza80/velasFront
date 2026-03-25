@@ -14,8 +14,22 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import Checkout from "../pages/Checkout/Checkout.jsx";
 import Fproduct from "../components/Fproduct/Fproduct.jsx";
 import Admin from "../pages/admin/admin.jsx";
+import ResellersModule from "../pages/Revendedores/revendedores.jsx";
+import ServicioTecnico from "../pages/seccionParaTecnicos/seccionParaTecnicos.jsx";
+import EmpleadoVentas from "../pages/empleadoVentas/seccionEmpleadoVentas.jsx";
+import ProductDetailsWholesale from "../pages/ProductDetails/ProductDetailsWholesale.jsx";
+import SeccionReparacionesPasoAPaso from "../components/seccionReparacionesPasoAPaso/SeccionReparacionesPasoAPaso.jsx";
+import PagoExitoso from "../pages/admin/pagoExitoso/pagoExitoso.jsx";
+import ExcelToProductJson from "../pages/admin/conversorDeExcelAJson/conversorExcelAJson.jsx";
+
+
+
+
+
 
 import AdminRoute from './AdminRoute.jsx';
+import RoleBasedRoute from './RoleBasedRoute.jsx';
+import CartWholesale from "../pages/Cart/CartWholesale.jsx";
 
 function MyRoutes() {
   return (
@@ -23,6 +37,21 @@ function MyRoutes() {
       <Routes>
         <Route path="/" element={<NavBar />}>
           <Route index element={<HOME />} />
+          <Route path="/seccionReparaciones" element={<SeccionReparacionesPasoAPaso />} />
+
+          <Route path="/servicioTecnico" element={
+            <RoleBasedRoute allowedRoles={['tecnico', 'admin']}>
+              <ServicioTecnico />
+            </RoleBasedRoute>
+          } />
+          <Route path="/empleadoVentas" element={
+            <RoleBasedRoute allowedRoles={['vendedor', 'ventas', 'admin']}>
+              <EmpleadoVentas />
+            </RoleBasedRoute>
+          } />
+
+          <Route path="revendedores" element={<ResellersModule />} />
+          <Route path="conversorExcelAJson" element={<ExcelToProductJson />} />
           <Route
             path="checkout"
             element={
@@ -32,10 +61,13 @@ function MyRoutes() {
             }
           />
           <Route path="cart" element={<Cart />} />
+          <Route path="cart-wholesale" element={<CartWholesale />} />
+          <Route path="producto-mayorista/:id" element={<ProductDetailsWholesale />} />
           <Route path="product/:id" element={<ProductDetails />}>
             <Route index element={<Fproduct />} />
           </Route>
           <Route path="products" element={<Products />}></Route>
+          <Route path="success" element={<PagoExitoso />} />
           <Route path="about" element={<About />} />
           <Route path="admin" element={
             <AdminRoute>

@@ -2,128 +2,155 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FiMail, FiPhone, FiInstagram, FiArrowLeft } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+import { motion } from "framer-motion";
+
+// =================================================================
+// CONFIGURACIÓN ESTILOS LUPETRUCCELLI
+// =================================================================
+const STYLES = {
+  title: "font-['Montserrat'] font-light uppercase tracking-widest text-[#333333]",
+  accent: "font-[cursive] text-[#cba394] text-xl md:text-2xl",
+  body: "font-sans font-light text-[13px] md:text-[14px] text-[#333333]",
+};
 
 function ContactUs() {
-  // Enlace base para WhatsApp
-  const whatsappLink = "https://wa.me/+543425243854?text=Hola%2C%20quisiera%20saber%20más%20sobre%20tus%20diseños.";
-
   const contacts = [
     {
-      id: 1,
-      icon: <FiMail className="w-7 h-7 text-gray-700 transition-colors duration-300 group-hover:text-blue-600" />,
-      text: "lufpetruccelli@gmail.com",
-      // MODIFICACIÓN CLAVE: Usamos 'mailto:' para abrir el cliente de correo.
-      link: "mailto:lufpetruccelli@gmail.com", 
+      id: "01",
+      icon: <FiMail className="w-6 h-6 text-[#cba394]" strokeWidth={1} />,
+      label: "Escribinos",
+      text: "hola@lupetruccelli.com",
     },
     {
-      id: 2,
-      icon: <FiPhone className="w-7 h-7 text-gray-700 transition-colors duration-300 group-hover:text-red-600" />,
-      text: "342-5243854",
-      link: "tel:+543425243854", // Link para llamada
+      id: "02",
+      icon: <FiPhone className="w-6 h-6 text-[#cba394]" strokeWidth={1} />,
+      label: "Llamanos",
+      text: "+54 342 5937358",
     },
     {
-      id: 3,
-      icon: <FiInstagram className="w-7 h-7 text-gray-700 transition-colors duration-300 group-hover:text-pink-600" />,
-      text: "@lu.petruccelli",
-      link: "https://www.instagram.com/lu.petruccelli/", // Link para Instagram
+      id: "03",
+      icon: <FiInstagram className="w-6 h-6 text-[#cba394]" strokeWidth={1} />,
+      label: "Instagram",
+      text: (
+        <a
+          href="https://www.instagram.com/lupetruccelli/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-[#cba394] transition-colors"
+        >
+          @lupetruccelli
+        </a>
+      ),
     },
-    // Botón de WhatsApp
     {
-      id: 4,
-      icon: <FaWhatsapp className="w-7 h-7 text-gray-700 transition-colors duration-300 group-hover:text-emerald-600" />, 
-      text: "Envía un mensaje",
-      link: whatsappLink, 
-      isWhatsapp: true, 
+      id: "04",
+      icon: <FaWhatsapp className="w-6 h-6 text-[#cba394]" />,
+      label: "WhatsApp",
+      text: (
+        <a
+          href="https://wa.me/+543425937358?text=Hola! Quisiera realizar una consulta."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-[#cba394] transition-colors"
+        >
+          Iniciar chat
+        </a>
+      ),
     },
   ];
 
   return (
-    <section className="relative min-h-screen bg-white flex items-center justify-center overflow-hidden">
-      {/* Fondo sutil minimalista */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#fafafa_1px,transparent_1px)] bg-[length:22px_22px]" />
+    <section className="relative min-h-screen w-full bg-[#ffffff] overflow-x-hidden text-[#333333] pt-32 pb-16">
 
-      <div className="relative container mx-auto px-6 py-24">
-        
-        {/* Encabezado SEO */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-light tracking-[0.2em] text-gray-900 mb-4">
-            CONTACTO | VELAS ARTESANALES SANTA FE
+      <div className="relative container mx-auto px-6 lg:px-12">
+
+        {/* Encabezado */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-24"
+        >
+          <span className={STYLES.accent + " mb-6 block"}>
+            Estamos cerca
+          </span>
+          <h1 className={STYLES.title + " text-4xl md:text-6xl mb-6 leading-relaxed"}>
+            Contacto
           </h1>
-          <p className="text-sm tracking-widest text-gray-500 uppercase">
-            Comunícate con Lu Petruccelli
+          <p className={STYLES.body + " max-w-xl mx-auto opacity-80"}>
+            Nos encantaría escucharte. Ya sea para una consulta, un pedido especial o simplemente para decir hola, aquí estamos.
           </p>
-          <div className="w-16 h-px bg-gray-300 mx-auto mt-6"></div>
-        </div>
 
-        {/* Bloque de Contenido SEO */}
-        <div className="text-center mb-20 max-w-4xl mx-auto">
-          <p className="text-lg text-gray-600 leading-relaxed">
-            ¿Tienes alguna consulta sobre nuestros productos, quieres realizar un pedido mayorista o personalizar tus **velas de cera de soja en Santa Fe**? Estamos aquí para ayudarte. Ponte en contacto directamente con **Lu Petruccelli**, la creadora de tus **velas artesanales favoritas en la ciudad de Santa Fe**. Utiliza cualquiera de los canales a continuación para resolver tus dudas sobre aromas, envíos o diseños especiales.
-          </p>
-        </div>
+          {/* Divisor Minimalista Rose Gold */}
+          <div className="flex items-center justify-center gap-4 mt-12 opacity-70">
+            <div className="h-[1px] w-12 bg-[#cba394]"></div>
+            <span className="text-[#cba394] text-[10px]">✦</span>
+            <div className="h-[1px] w-12 bg-[#cba394]"></div>
+          </div>
+        </motion.div>
 
-        {/* Tarjetas de contacto */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {contacts.map((contact, index) => {
-            const isClickable = contact.link;
-            
-            // Componente que renderiza el contenido de la tarjeta
-            const CardContent = () => (
-              <div 
-                // Añadimos 'hover:border-black' para un toque extra en el hover
-                className={`relative bg-white border border-gray-100 shadow-sm rounded-2xl p-10 flex flex-col items-center text-center group transform transition duration-500 hover:-translate-y-2 ${isClickable ? 'cursor-pointer hover:shadow-xl hover:border-black' : ''} animate-fade-up h-full`}
-                style={{ animationDelay: `${index * 200}ms` }}
-              >
-                <div className="mb-6 p-4 bg-gray-50 rounded-full shadow-sm transform transition duration-500 group-hover:rotate-6">
-                  {contact.icon}
-                </div>
-                <p className={`text-gray-600 text-base tracking-wide ${contact.isWhatsapp ? 'group-hover:text-emerald-700 font-medium transition-colors duration-300' : isClickable ? 'group-hover:text-black transition-colors duration-300' : ''}`}>
-                  {contact.text}
-                </p>
+        {/* Tarjetas de Comunicación */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          {contacts.map((contact, index) => (
+            <motion.div
+              key={contact.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.8, ease: "easeOut" }}
+              className="relative bg-[#f9f3f2] p-12 flex flex-col items-center text-center group transition-transform duration-700 hover:-translate-y-2"
+            >
+              {/* ID Sutil */}
+              <span className="absolute top-6 right-6 font-['Montserrat'] text-[#cba394]/20 text-2xl font-light">
+                {contact.id}
+              </span>
+
+              {/* Contenedor de Ícono (sin fondo blanco pesado) */}
+              <div className="mb-6 transition-transform duration-500 group-hover:scale-110">
+                {contact.icon}
               </div>
-            );
 
-            if (isClickable) {
-              // Si es email o teléfono, no necesitamos 'target="_blank"'
-              const target = (contact.link.startsWith('http') || contact.link.startsWith('wa.me')) ? "_blank" : "_self";
+              {/* Etiqueta */}
+              <span className="font-['Montserrat'] text-[10px] text-[#cba394] mb-3 uppercase tracking-widest">
+                {contact.label}
+              </span>
 
-              return (
-                <a
-                  key={contact.id}
-                  href={contact.link}
-                  target={target}
-                  rel="noopener noreferrer"
-                  className="block h-full"
-                >
-                  <CardContent />
-                </a>
-              );
-            }
-
-            return (
-              <CardContent key={contact.id} />
-            );
-          })}
+              {/* Texto de contacto */}
+              <p className={STYLES.body + " text-[13px] tracking-wide"}>
+                {contact.text}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Botón volver */}
-        <div className="text-center mt-16">
+        {/* Botón de Retorno */}
+        <motion.div
+          className="text-center mt-24"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
           <NavLink
             to="/"
-            className="inline-flex items-center px-8 py-3 border border-black text-xs font-medium tracking-[0.2em] uppercase rounded-xl bg-black text-white hover:bg-gray-800 transition-all duration-300"
+            className="inline-flex items-center group relative overflow-hidden bg-gradient-to-r from-[#ffffff] to-[#f9f3f2] border border-[#cba394]/30 px-12 py-5 transition-all duration-500 hover:border-[#cba394]/60 hover:shadow-[0_8px_30px_rgba(203,163,148,0.1)]"
           >
-            <FiArrowLeft className="mr-2" />
-            Volver al Inicio
+            <FiArrowLeft className="mr-4 text-[#cba394] transition-transform duration-500 group-hover:-translate-x-1" strokeWidth={1} />
+            <span className="relative z-10 text-[#333333] font-['Montserrat'] font-light text-[11px] tracking-[0.25em] uppercase transition-colors duration-500 group-hover:text-[#cba394]">
+              Volver al inicio
+            </span>
           </NavLink>
-        </div>
+        </motion.div>
 
-        {/* Footer */}
-        <div className="text-center mt-20 pt-10 border-t border-gray-200">
-          <p className="text-xs text-gray-500 tracking-wide">
-            &copy; {new Date().getFullYear()} Lu Petruccelli Velas. Todos los
-            derechos reservados.
+        {/* Footer Minimalista */}
+        <motion.div
+          className="text-center mt-32 pt-10 border-t border-[#cba394]/20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 1 }}
+        >
+          <p className="font-['Montserrat'] text-[9px] text-[#333333]/50 uppercase tracking-[0.25em]">
+            &copy; {new Date().getFullYear()} LuPetruccelli ✦ Santa Fe, AR.
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
