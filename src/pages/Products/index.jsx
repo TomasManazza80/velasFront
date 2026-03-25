@@ -5,7 +5,6 @@ import { Outlet, Link, useSearchParams } from "react-router-dom";
 import { FiX, FiSearch, FiDollarSign, FiFilter, FiPlusCircle } from "react-icons/fi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
-import { useDispatch } from "react-redux";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -107,26 +106,6 @@ const Products = () => {
             setShowFilters(true); // Mostrar filtros si venimos de una categoría específica
         }
     }, [searchParams]);
-    const dispatch = useDispatch();
-
-    const handleAddToCart = (e, product, price) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dispatch({
-            type: "ADD_TO_CART",
-            payload: {
-                ...product,
-                price: price,
-                quantity: 1,
-                origenDeVenta: 'Ecommerce',
-                image: product.imagenes?.[0]
-            }
-        });
-        window.dispatchEvent(new CustomEvent("showNotification", {
-            detail: { message: "Agregado al carrito", type: "success" }
-        }));
-    };
-
     const availableCategories = [...new Set(products.map(p => p.categoria))].filter(Boolean).sort();
     const availableBrands = [...new Set(products.map(p => p.marca))].filter(Boolean).sort();
 
@@ -417,13 +396,12 @@ const Products = () => {
 
                                                         {/* Botón Acción - Posición fija absoluta en la CARD para simetría visual */}
                                                         {isAvailable ? (
-                                                            <button
-                                                                onClick={(e) => handleAddToCart(e, product, price)}
+                                                            <div
                                                                 className="absolute bottom-6 right-6 w-11 h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 hover:scale-110"
                                                                 aria-label="Agregar al carrito"
                                                             >
                                                                 <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
-                                                            </button>
+                                                            </div>
                                                         ) : (
                                                             <div className="absolute bottom-6 right-6 w-11 h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
                                                                 <FontAwesomeIcon icon={faCartPlus} className="text-sm" />

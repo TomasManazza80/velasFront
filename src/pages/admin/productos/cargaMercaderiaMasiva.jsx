@@ -76,6 +76,12 @@ const IngresoMercaderia = () => {
     const [expandedRemito, setExpandedRemito] = useState(null);
     const [showColorPicker, setShowColorPicker] = useState(false);
 
+    // Estados JSON Masivo
+    const [jsonInput, setJsonInput] = useState('');
+    const [jsonOutput, setJsonOutput] = useState('');
+    const [transformedData, setTransformedData] = useState(null);
+    const [loadingProgress, setLoadingProgress] = useState(null); // { current, total, errors }
+
     const [datosRemito, setDatosRemito] = useState({
         numeroRemito: '',
         proveedorGeneral: '',
@@ -264,6 +270,130 @@ const IngresoMercaderia = () => {
         }
     };
 
+    // --- LÓGICA DE CARGA MASIVA JSON ---
+    const handleTransformJson = () => {
+        try {
+            const parsed = JSON.parse(jsonInput);
+            if (!Array.isArray(parsed)) throw new Error("El JSON debe ser un array de productos.");
+
+            const today = new Date().toISOString().split('T')[0];
+            let total = 0;
+
+            parsed.forEach(p => {
+                total += (Math.abs(parseFloat(p.precio)) || 0) * (Math.abs(parseFloat(p.cantidad)) || 0);
+            });
+
+            let proveedorGeneral = "Lu petruccelli";
+            if (parsed.length > 0 && parsed[0].marca) {
+                proveedorGeneral = parsed[0].marca.trim();
+                if (!proveedorGeneral) proveedorGeneral = "Lu petruccelli";
+            }
+
+            const remitoId = "REM-" + Date.now();
+
+            const transformedProducts = parsed.map(p => {
+                const qty = Math.abs(parseFloat(p.cantidad)) || 0;
+                const precioNumerico = Math.abs(parseFloat(p.precio)) || 0;
+                const precioMayoristaNum = p.talle ? Math.abs(parseFloat(p.talle)) : null;
+                const marcaLimpia = p.marca ? p.marca.trim() : "";
+
+                return {
+                    nombre: p.nombre || "Sin nombre",
+                    marca: marcaLimpia,
+                    categoria: p.categoria || "Otros",
+                    descripcion: p.descripcion || "",
+                    imagenes: Array.isArray(p.imagenes) ? p.imagenes : [],
+                    alerta: 5,
+                    proveedor: marcaLimpia || proveedorGeneral,
+                    origenDeVenta: "admin",
+                    fechaActualizacion: today,
+                    fechaUltimoCargo: today,
+                    cantidad: qty,
+                    variantes: [
+                        {
+                            color: "N/A",
+                            almacenamiento: "N/A",
+                            stock: qty,
+                            costoDeCompra: null,
+                            precioAlPublico: precioNumerico,
+                            precioMayorista: Number.isNaN(precioMayoristaNum) ? null : precioMayoristaNum,
+                            precioRevendedor: null
+                        }
+                    ]
+                };
+            });
+
+            const finalResult = {
+                RemitoId: remitoId,
+                proveedor: proveedorGeneral,
+                fechaRecepcion: today,
+                total: total,
+                productos: transformedProducts
+            };
+
+            setJsonOutput(JSON.stringify(finalResult, null, 2));
+            setTransformedData(finalResult);
+        } catch (e) {
+            alert("SISTEMA: Error al procesar JSON. " + e.message);
+        }
+    };
+
+    const handleCopyJson = () => {
+        if (!jsonOutput) return;
+        navigator.clipboard.writeText(jsonOutput);
+        alert("SISTEMA: JSON transformado copiado al portapapeles.");
+    };
+
+    const handleLoadMassiveJson = async () => {
+        if (!transformedData) return alert("SISTEMA: Primero debe transformar un JSON válido.");
+
+        const productos = transformedData.productos;
+        if (!productos || productos.length === 0) return alert("SISTEMA: No hay productos para cargar.");
+
+        const total = productos.length;
+        let exitosos = 0;
+        let errores = 0;
+
+        setLoadingProgress({ current: 0, total, errors: 0 });
+
+        for (let i = 0; i < productos.length; i++) {
+            const producto = productos[i];
+            const payloadIndividual = {
+                RemitoId: `${transformedData.RemitoId}-${i + 1}`,
+                proveedor: transformedData.proveedor,
+                fechaRecepcion: transformedData.fechaRecepcion,
+                total: producto.variantes?.[0]?.precioAlPublico || 0,
+                productos: [producto]
+            };
+
+            try {
+                const res = await fetch(`${BASE_URL}/crearRemito`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadIndividual)
+                });
+                if (res.ok) {
+                    exitosos++;
+                } else {
+                    errores++;
+                    console.error(`ERROR_PRODUCTO_${i + 1}:`, await res.text());
+                }
+            } catch (err) {
+                errores++;
+                console.error(`NET_ERROR_PRODUCTO_${i + 1}:`, err);
+            }
+
+            setLoadingProgress({ current: i + 1, total, errors: errores });
+        }
+
+        setLoadingProgress(null);
+        alert(`SISTEMA: Carga completada.\n✅ ${exitosos} productos cargados correctamente.\n${errores > 0 ? `❌ ${errores} productos fallaron.` : ''}`);
+        setJsonInput('');
+        setJsonOutput('');
+        setTransformedData(null);
+        setActiveTab('HISTORIAL');
+    };
+
     return (
         <div className="bg-black min-h-screen p-8 text-white font-['Inter'] selection:bg-[#ff8c00] selection:text-black">
 
@@ -275,6 +405,7 @@ const IngresoMercaderia = () => {
                 </div>
                 <div className="flex gap-4">
                     <button onClick={() => setActiveTab('CARGA')} className={`${STYLES.tech} px-6 py-3 transition-all ${activeTab === 'CARGA' ? 'bg-[#ff8c00] text-black shadow-[0_0_20px_rgba(255,140,0,0.3)]' : 'bg-white/5 text-zinc-500'}`}>CARGAR NUEVO</button>
+                    <button onClick={() => setActiveTab('MASIVA_JSON')} className={`${STYLES.tech} px-6 py-3 transition-all ${activeTab === 'MASIVA_JSON' ? 'bg-[#ff8c00] text-black shadow-[0_0_20px_rgba(255,140,0,0.3)]' : 'bg-white/5 text-zinc-500'}`}>JSON MASIVO</button>
                     <button onClick={() => setActiveTab('HISTORIAL')} className={`${STYLES.tech} px-6 py-3 transition-all ${activeTab === 'HISTORIAL' ? 'bg-[#ff8c00] text-black shadow-[0_0_20px_rgba(255,140,0,0.3)]' : 'bg-white/5 text-zinc-500'}`}>HISTORIAL DE LOGS</button>
                 </div>
             </header>
@@ -425,6 +556,82 @@ const IngresoMercaderia = () => {
                             </button>
                         </div>
 
+                    </motion.div>
+                ) : activeTab === 'MASIVA_JSON' ? (
+                    <motion.div key="masiva_json" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                        <section className={`${STYLES.glass} p-8 mb-8 border-[#ff8c00]/10`}>
+                            <h3 className={STYLES.sectionTitle}>TRANSFORMACIÓN Y CARGA DE JSON</h3>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                                <div>
+                                    <label className={STYLES.label}>JSON Original (Array de Productos)</label>
+                                    <textarea 
+                                        className={`${STYLES.input} h-[400px] resize-none font-['JetBrains_Mono'] text-[10px] sm:text-xs leading-relaxed overflow-y-auto whitespace-pre`} 
+                                        value={jsonInput} 
+                                        onChange={e => setJsonInput(e.target.value)} 
+                                        placeholder='[
+  {
+    "nombre": "Ejemplo",
+    "precio": 1000,
+    "cantidad": 5,
+    "marca": "Lu Petruccelli",
+    ...
+  }
+]'
+                                    />
+                                    <button 
+                                        onClick={handleTransformJson} 
+                                        className="w-full bg-[#ff8c00] hover:bg-white text-black font-black text-[10px] py-4 mt-4 uppercase tracking-[0.2em] transition-all flex justify-center items-center gap-2"
+                                    >
+                                        <FiLoader className={!transformedData && jsonInput ? 'animate-spin' : 'hidden'} />
+                                        TRANSFORMAR JSON
+                                    </button>
+                                </div>
+                                <div>
+                                    <label className={STYLES.label}>JSON Transformado</label>
+                                    <textarea 
+                                        className={`${STYLES.input} h-[400px] resize-none font-['JetBrains_Mono'] text-[10px] sm:text-xs leading-relaxed overflow-y-auto whitespace-pre bg-zinc-950 text-[#ff8c00] border-zinc-900 focus:border-white focus:ring-1 focus:ring-white`} 
+                                        value={jsonOutput} 
+                                        readOnly 
+                                        placeholder='Esperando transformación...'
+                                    />
+                                    <div className="grid grid-cols-2 gap-4 mt-4">
+                                        <button 
+                                            onClick={handleCopyJson} 
+                                            className="w-full border border-white/20 hover:border-white text-white font-black text-[10px] py-4 uppercase tracking-[0.2em] transition-all flex justify-center items-center gap-2"
+                                        >
+                                            <FiFileText />
+                                            COPIAR JSON
+                                        </button>
+                                        <button 
+                                            onClick={handleLoadMassiveJson} 
+                                            disabled={!transformedData || !!loadingProgress}
+                                            className={`w-full font-black text-[10px] py-4 uppercase tracking-[0.2em] transition-all flex flex-col justify-center items-center gap-1 ${transformedData && !loadingProgress ? 'bg-white text-black hover:bg-[#ff8c00]' : 'bg-white/5 text-zinc-500 cursor-not-allowed'}`}
+                                        >
+                                            {loadingProgress ? (
+                                                <>
+                                                    <span className="flex items-center gap-2">
+                                                        <FiLoader className="animate-spin" />
+                                                        CARGANDO {loadingProgress.current}/{loadingProgress.total}
+                                                    </span>
+                                                    <div className="w-full bg-zinc-800 h-1 rounded-full mt-1 overflow-hidden">
+                                                        <div 
+                                                            className="h-full bg-[#ff8c00] transition-all duration-300"
+                                                            style={{ width: `${(loadingProgress.current / loadingProgress.total) * 100}%` }}
+                                                        />
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {transformedData && <FiCheck className="text-green-500" />}
+                                                    CARGAR AL SISTEMA
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </motion.div>
                 ) : (
                     /* HISTORIAL */

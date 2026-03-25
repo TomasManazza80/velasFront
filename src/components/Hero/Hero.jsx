@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faChevronLeft, faChevronRight, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from "react-redux";
 
 // Importamos tus imágenes (asumiendo que mantienes las rutas)
 
@@ -33,7 +32,6 @@ const LuStyles = `
 `;
 
 const Hero = () => {
-    const dispatch = useDispatch();
     const [index, setIndex] = useState(0);
     const [slides, setSlides] = useState([]);
     const [products, setProducts] = useState([]);
@@ -53,7 +51,7 @@ const Hero = () => {
             try {
                 const res = await axios.get(`${API_URL}/api/hero-slider`);
                 const heroItems = res.data;
-                
+
                 if (heroItems && heroItems.length > 0) {
                     setSlides(heroItems);
                 } else {
@@ -83,40 +81,12 @@ const Hero = () => {
         fetchProducts();
     }, [API_URL]);
 
-    const handleAddToCart = (e, prod) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const variant = prod.variantes?.find(v => Number(v.stock) > 0) || prod.variantes?.[0];
-        if (!variant) return;
-
-        const price = Number(variant.precioAlPublico) || 0;
-
-        dispatch({
-            type: "ADD_TO_CART",
-            payload: {
-                ProductId: prod.id,
-                id: `${prod.id}-${variant.color}-${variant.almacenamiento}`,
-                title: prod.nombre,
-                image: prod.imagenes?.[0] || prod.image || "",
-                price: price,
-                quantity: 1,
-                color: variant.color,
-                storage: variant.almacenamiento
-            }
-        });
-
-        window.dispatchEvent(new CustomEvent("showNotification", {
-            detail: { message: "Producto añadido al carrito", type: "success" }
-        }));
-    };
-
     // Navegación del carrusel
     const nextSlide = useCallback(() => {
         if (slides.length === 0) return;
         setIndex((prev) => (prev + 1) % slides.length);
     }, [slides]);
-    
+
     const prevSlide = useCallback(() => {
         if (slides.length === 0) return;
         setIndex((prev) => (prev - 1 + slides.length) % slides.length);
@@ -159,204 +129,204 @@ const Hero = () => {
             <div ref={heroRef} className="relative w-full h-[85vh] md:h-[90vh] flex items-center overflow-hidden bg-[#F9F7F2]">
                 <style dangerouslySetInnerHTML={{ __html: LuStyles }} />
 
-            {/* 1. LAYOUT DIVIDIDO (Inspirado en la foto) */}
-            <div className="flex w-full h-full flex-col md:flex-row">
+                {/* 1. LAYOUT DIVIDIDO (Inspirado en la foto) */}
+                <div className="flex w-full h-full flex-col md:flex-row">
 
-                {/* LADO IZQUIERDO: TEXTO */}
-                <div className="w-full md:w-1/2 flex flex-col justify-center items-center text-center p-10 z-10 bg-white md:bg-transparent">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={slides[index]?.id || 'empty'}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <span className="text-[10px] tracking-[0.5em] text-gray-400 mb-6 block uppercase font-medium">
-                                {slides[index]?.label}
-                            </span>
-                            <h1 className="text-4xl md:text-7xl font-serif text-[#1a1a1a] mb-2 tracking-tighter">
-                                {slides[index]?.title}
-                            </h1>
-                            <p className="text-lg md:text-xl font-light text-gray-500 italic mb-10">
-                                {slides[index]?.subtitle}
-                            </p>
-
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                className="px-10 py-3 bg-[#e0d7cc] text-[#5a4d40] text-xs tracking-[0.2em] uppercase font-bold hover:bg-[#d4c8ba] transition-colors"
+                    {/* LADO IZQUIERDO: TEXTO */}
+                    <div className="w-full md:w-1/2 flex flex-col justify-center items-center text-center p-10 z-10 bg-white md:bg-transparent">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={slides[index]?.id || 'empty'}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                transition={{ duration: 0.8 }}
                             >
-                                SHOP NOW
-                            </motion.button>
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
+                                <span className="text-[10px] tracking-[0.5em] text-gray-400 mb-6 block uppercase font-medium">
+                                    {slides[index]?.label}
+                                </span>
+                                <h1 className="text-4xl md:text-7xl font-serif text-[#1a1a1a] mb-2 tracking-tighter">
+                                    {slides[index]?.title}
+                                </h1>
+                                <p className="text-lg md:text-xl font-light text-gray-500 italic mb-10">
+                                    {slides[index]?.subtitle}
+                                </p>
 
-                {/* LADO DERECHO: IMAGEN */}
-                <div className="w-full md:w-1/2 relative overflow-hidden">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={slides[index]?.id || 'empty-img'}
-                            className="absolute inset-0"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1 }}
-                            style={{ y: yBg }}
-                        >
-                            <img 
-                                src={slides[index]?.image} 
-                                alt="Candle" 
-                                className="w-full h-full object-cover" 
-                                style={{ objectPosition: slides[index]?.position || 'center' }}
-                            />
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </div>
-
-
-            <div className="mt-[-200px] absolute top-1/2 left-0 w-[120%] -translate-x-[5%] -translate-y-1/2 pointer-events-none z-20 overflow-visible rotate-[-1deg]">
-                <svg viewBox="0 0 1000 150" className="w-full overflow-visible">
-                    {/* Definición del camino de la onda */}
-                    <path
-                        id="wavePath"
-                        d="M0,80 C150,20 350,140 500,80 C650,20 850,140 1000,80"
-                        fill="none"
-                    />
-
-                    {/* LA CINTA: Ahora es un trazo grueso que sigue el path exactamente */}
-                    <use
-                        href="#wavePath"
-                        stroke="#e0d7cc"
-                        strokeWidth="50"
-                        fill="none"
-                        className="opacity-80"
-                        strokeLinecap="round"
-                    />
-
-                    {/* EL TEXTO: Flota perfectamente sobre la cinta curva */}
-                    <text className="text-[13px] uppercase tracking-[0.25em] font-serif fill-[#5a4d40]">
-                        <textPath href="#wavePath" startOffset="0%">
-                            Our best sellers - Gentle scents - Discover our new products - Our best sellers - Gentle scents - Discover our new products
-                            <animate
-                                attributeName="startOffset"
-                                from="0%"
-                                to="-50%"
-                                dur="25s"
-                                repeatCount="indefinite"
-                            />
-                        </textPath>
-                    </text>
-                </svg>
-            </div>
-
-
-            {/* 2. CINTA ONDEANTE ORGÁNICA */}
-            <div className="mt-[200px] absolute top-1/2 left-0 w-[120%] -translate-x-[5%] -translate-y-1/2 pointer-events-none z-20 overflow-visible rotate-[-1deg]">
-                <svg viewBox="0 0 1000 150" className="w-full overflow-visible">
-                    {/* Definición del camino de la onda */}
-                    <path
-                        id="wavePath"
-                        d="M0,80 C150,20 350,140 500,80 C650,20 850,140 1000,80"
-                        fill="none"
-                    />
-
-                    {/* LA CINTA: Ahora es un trazo grueso que sigue el path exactamente */}
-                    <use
-                        href="#wavePath"
-                        stroke="#e0d7cc"
-                        strokeWidth="50"
-                        fill="none"
-                        className="opacity-80"
-                        strokeLinecap="round"
-                    />
-
-                    {/* EL TEXTO: Flota perfectamente sobre la cinta curva */}
-                    <text className="text-[13px] uppercase tracking-[0.25em] font-serif fill-[#5a4d40]">
-                        <textPath href="#wavePath" startOffset="0%">
-                            Our best sellers - Gentle scents - Discover our new products - Our best sellers - Gentle scents - Discover our new products
-                            <animate
-                                attributeName="startOffset"
-                                from="0%"
-                                to="-50%"
-                                dur="25s"
-                                repeatCount="indefinite"
-                            />
-                        </textPath>
-                    </text>
-                </svg>
-            </div>
-
-            {/* 3. SEARCH BAR (Estilo Minimalista) */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-30">
-                <div className="relative group">
-                    <input
-                        type="text"
-                        placeholder="BUSCAR AROMA..."
-                        className="w-full py-4 text-center text-[10px] tracking-[0.3em] uppercase bg-white/80 backdrop-blur-md border border-[#e0d7cc] rounded-none focus:outline-none focus:border-[#8b5e3c] transition-all placeholder-gray-400 text-gray-700 font-medium"
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            if (e.target.value === "") setShowResults(false);
-                        }}
-                    />
-                    <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                        <FontAwesomeIcon icon={faSearch} className="text-gray-300 text-xs" />
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    className="px-10 py-3 bg-[#e0d7cc] text-[#5a4d40] text-xs tracking-[0.2em] uppercase font-bold hover:bg-[#d4c8ba] transition-colors"
+                                >
+                                    SHOP NOW
+                                </motion.button>
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
 
-                    <AnimatePresence>
-                        {showResults && filteredProducts.length > 0 && (
+                    {/* LADO DERECHO: IMAGEN */}
+                    <div className="w-full md:w-1/2 relative overflow-hidden">
+                        <AnimatePresence mode="wait">
                             <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className="absolute top-full left-0 right-0 bg-white border border-[#e0d7cc] shadow-2xl max-h-80 overflow-y-auto z-50 rounded-b-xl"
+                                key={slides[index]?.id || 'empty-img'}
+                                className="absolute inset-0"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 1 }}
+                                style={{ y: yBg }}
                             >
-                                {filteredProducts.map((prod) => {
-                                    const totalStock = prod.variantes?.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0) || 0;
-                                    const isAvailable = totalStock > 0;
-                                    return (
-                                    <Link to={`/product/${prod.id}`} key={prod.id} className="relative flex items-center gap-5 p-5 hover:bg-[#F9F7F2] transition-colors border-b border-gray-100 last:border-none group min-w-0 pr-16">
-                                        <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl bg-gray-50">
-                                            <img src={optimizeImage(prod.imagenes?.[0] || prod.image)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        </div>
-                                        <div className="text-left flex-1 min-w-0">
-                                            <h4 className="lu-title text-[11px] font-bold text-[#333333] truncate mb-0.5">{prod.nombre}</h4>
-                                            <p className="lu-body text-[10px] text-gray-400 tracking-[0.1em] uppercase mb-1">{prod.marca || 'LU PETRUCCELLI'}</p>
-                                            {prod.variantes && prod.variantes.some(v => Number(v.precioAlPublico) > 0) && (
-                                                <div className="lu-title text-[12px] text-[#b07d6b] font-bold">
-                                                    ${Math.min(...prod.variantes.map(v => Number(v.precioAlPublico) || 0).filter(p => p > 0)).toLocaleString('es-AR')}
-                                                </div>
-                                            )}
-                                        </div>
-                                        {isAvailable ? (
-                                            <button
-                                                onClick={(e) => handleAddToCart(e, prod)}
-                                                className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-md hover:bg-black transition-all flex-shrink-0 z-10"
-                                            >
-                                                <FontAwesomeIcon icon={faCartPlus} className="text-xs" />
-                                            </button>
-                                        ) : (
-                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-10 opacity-60">
-                                                <FontAwesomeIcon icon={faCartPlus} className="text-xs" />
-                                            </div>
-                                        )}
-                                    </Link>
-                                )})}
+                                <img
+                                    src={slides[index]?.image}
+                                    alt="Candle"
+                                    className="w-full h-full object-cover"
+                                    style={{ objectPosition: slides[index]?.position || 'center' }}
+                                />
                             </motion.div>
-                        )}
-                    </AnimatePresence>
+                        </AnimatePresence>
+                    </div>
                 </div>
-            </div>
 
-            {/* FLECHAS DE NAVEGACIÓN */}
-            <button onClick={prevSlide} className="absolute left-6 z-40 text-gray-300 hover:text-gray-600 transition-colors hidden md:block">
-                <FontAwesomeIcon icon={faChevronLeft} size="lg" />
-            </button>
-            <button onClick={nextSlide} className="absolute right-6 z-40 text-gray-300 hover:text-gray-600 transition-colors hidden md:block">
-                <FontAwesomeIcon icon={faChevronRight} size="lg" />
-            </button>
+
+                <div className="mt-[-200px] absolute top-1/2 left-0 w-[120%] -translate-x-[5%] -translate-y-1/2 pointer-events-none z-20 overflow-visible rotate-[-1deg]">
+                    <svg viewBox="0 0 1000 150" className="w-full overflow-visible">
+                        {/* Definición del camino de la onda */}
+                        <path
+                            id="wavePath"
+                            d="M0,80 C150,20 350,140 500,80 C650,20 850,140 1000,80"
+                            fill="none"
+                        />
+
+                        {/* LA CINTA: Ahora es un trazo grueso que sigue el path exactamente */}
+                        <use
+                            href="#wavePath"
+                            stroke="#e0d7cc"
+                            strokeWidth="50"
+                            fill="none"
+                            className="opacity-80"
+                            strokeLinecap="round"
+                        />
+
+                        {/* EL TEXTO: Flota perfectamente sobre la cinta curva */}
+                        <text className="text-[13px] uppercase tracking-[0.25em] font-serif fill-[#5a4d40]">
+                            <textPath href="#wavePath" startOffset="0%">
+                                Our best sellers - Gentle scents - Discover our new products - Our best sellers - Gentle scents - Discover our new products
+                                <animate
+                                    attributeName="startOffset"
+                                    from="0%"
+                                    to="-50%"
+                                    dur="25s"
+                                    repeatCount="indefinite"
+                                />
+                            </textPath>
+                        </text>
+                    </svg>
+                </div>
+
+
+                {/* 2. CINTA ONDEANTE ORGÁNICA */}
+                <div className="mt-[200px] absolute top-1/2 left-0 w-[120%] -translate-x-[5%] -translate-y-1/2 pointer-events-none z-20 overflow-visible rotate-[-1deg]">
+                    <svg viewBox="0 0 1000 150" className="w-full overflow-visible">
+                        {/* Definición del camino de la onda */}
+                        <path
+                            id="wavePath"
+                            d="M0,80 C150,20 350,140 500,80 C650,20 850,140 1000,80"
+                            fill="none"
+                        />
+
+                        {/* LA CINTA: Ahora es un trazo grueso que sigue el path exactamente */}
+                        <use
+                            href="#wavePath"
+                            stroke="#e0d7cc"
+                            strokeWidth="50"
+                            fill="none"
+                            className="opacity-80"
+                            strokeLinecap="round"
+                        />
+
+                        {/* EL TEXTO: Flota perfectamente sobre la cinta curva */}
+                        <text className="text-[13px] uppercase tracking-[0.25em] font-serif fill-[#5a4d40]">
+                            <textPath href="#wavePath" startOffset="0%">
+                                Our best sellers - Gentle scents - Discover our new products - Our best sellers - Gentle scents - Discover our new products
+                                <animate
+                                    attributeName="startOffset"
+                                    from="0%"
+                                    to="-50%"
+                                    dur="25s"
+                                    repeatCount="indefinite"
+                                />
+                            </textPath>
+                        </text>
+                    </svg>
+                </div>
+
+                {/* 3. SEARCH BAR (Estilo Minimalista) */}
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-30">
+                    <div className="relative group">
+                        <input
+                            type="text"
+                            placeholder="BUSCAR AROMA..."
+                            className="w-full py-4 text-center text-[10px] tracking-[0.3em] uppercase bg-white/80 backdrop-blur-md border border-[#e0d7cc] rounded-none focus:outline-none focus:border-[#8b5e3c] transition-all placeholder-gray-400 text-gray-700 font-medium"
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                if (e.target.value === "") setShowResults(false);
+                            }}
+                        />
+                        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                            <FontAwesomeIcon icon={faSearch} className="text-gray-300 text-xs" />
+                        </div>
+
+                        <AnimatePresence>
+                            {showResults && filteredProducts.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute top-full left-0 right-0 bg-white border border-[#e0d7cc] shadow-2xl max-h-80 overflow-y-auto z-50 rounded-b-xl"
+                                >
+                                    {filteredProducts.map((prod) => {
+                                        const totalStock = prod.variantes?.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0) || 0;
+                                        const isAvailable = totalStock > 0;
+                                        return (
+                                            <Link to={`/product/${prod.id}`} key={prod.id} className="relative flex items-center gap-5 p-5 hover:bg-[#F9F7F2] transition-colors border-b border-gray-100 last:border-none group min-w-0 pr-16">
+                                                <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl bg-gray-50">
+                                                    <img src={optimizeImage(prod.imagenes?.[0] || prod.image)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                </div>
+                                                <div className="text-left flex-1 min-w-0">
+                                                    <h4 className="lu-title text-[11px] font-bold text-[#333333] truncate mb-0.5">{prod.nombre}</h4>
+                                                    <p className="lu-body text-[10px] text-gray-400 tracking-[0.1em] uppercase mb-1">{prod.marca || 'LU PETRUCCELLI'}</p>
+                                                    {prod.variantes && prod.variantes.some(v => Number(v.precioAlPublico) > 0) && (
+                                                        <div className="lu-title text-[12px] text-[#b07d6b] font-bold">
+                                                            ${Math.min(...prod.variantes.map(v => Number(v.precioAlPublico) || 0).filter(p => p > 0)).toLocaleString('es-AR')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {isAvailable ? (
+                                                    <div
+                                                        className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-md hover:bg-black transition-all flex-shrink-0 z-10"
+                                                    >
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-xs" />
+                                                    </div>
+                                                ) : (
+                                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-10 opacity-60">
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-xs" />
+                                                    </div>
+                                                )}
+                                            </Link>
+                                        )
+                                    })}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* FLECHAS DE NAVEGACIÓN */}
+                <button onClick={prevSlide} className="absolute left-6 z-40 text-gray-300 hover:text-gray-600 transition-colors hidden md:block">
+                    <FontAwesomeIcon icon={faChevronLeft} size="lg" />
+                </button>
+                <button onClick={nextSlide} className="absolute right-6 z-40 text-gray-300 hover:text-gray-600 transition-colors hidden md:block">
+                    <FontAwesomeIcon icon={faChevronRight} size="lg" />
+                </button>
             </div>
 
             {/* SECTION: PRODUCT GRID - NEW */}
@@ -445,13 +415,12 @@ const Hero = () => {
 
                                             {/* Botón Acción - Posición fija absoluta en la CARD para simetría visual */}
                                             {isAvailable ? (
-                                                <button
-                                                    onClick={(e) => handleAddToCart(e, product)}
+                                                <div
                                                     className="absolute bottom-6 right-6 w-11 h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 hover:scale-110"
                                                     aria-label="Agregar al carrito"
                                                 >
                                                     <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
-                                                </button>
+                                                </div>
                                             ) : (
                                                 <div className="absolute bottom-6 right-6 w-11 h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
                                                     <FontAwesomeIcon icon={faCartPlus} className="text-sm" />

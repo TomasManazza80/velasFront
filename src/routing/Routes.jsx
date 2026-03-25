@@ -21,7 +21,7 @@ import ProductDetailsWholesale from "../pages/ProductDetails/ProductDetailsWhole
 import SeccionReparacionesPasoAPaso from "../components/seccionReparacionesPasoAPaso/SeccionReparacionesPasoAPaso.jsx";
 import PagoExitoso from "../pages/admin/pagoExitoso/pagoExitoso.jsx";
 import ExcelToProductJson from "../pages/admin/conversorDeExcelAJson/conversorExcelAJson.jsx";
-
+import CargaMercaderiaMasiva from "../pages/admin/productos/cargaMercaderiaMasiva.jsx";
 
 
 
@@ -38,7 +38,7 @@ function MyRoutes() {
         <Route path="/" element={<NavBar />}>
           <Route index element={<HOME />} />
           <Route path="/seccionReparaciones" element={<SeccionReparacionesPasoAPaso />} />
-
+          <Route path="/cargaMercaderiaMasiva" element={<CargaMercaderiaMasiva />} />
           <Route path="/servicioTecnico" element={
             <RoleBasedRoute allowedRoles={['tecnico', 'admin']}>
               <ServicioTecnico />

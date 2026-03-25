@@ -24,7 +24,6 @@ import {
     faChild,
     faEllipsis
 } from "@fortawesome/free-solid-svg-icons";
-import { useDispatch } from "react-redux";
 import { FiPlusCircle } from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -109,8 +108,6 @@ const ResellersModule = () => {
     // Paginación
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-
-    const dispatch = useDispatch();
 
     const categoryIconMap = useMemo(() => ({
         "CELULARES": faMobileScreenButton,
@@ -229,32 +226,6 @@ const ResellersModule = () => {
             return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
         });
     }, [products, searchTerm, debouncedSearch, activeCategory, minPrice, maxPrice]);
-
-    const handleAddToCart = (product) => {
-        // Adaptación al modelo Product.js: Seleccionar variante específica para el carrito
-        const variant = product.variantes?.find(v => Number(v.stock) > 0) || product.variantes?.[0];
-        if (!variant) return;
-
-        const price = Number(variant.precioMayorista) || getMinWholesalePrice(product);
-
-        dispatch({
-            type: "ADD_TO_CART",
-            payload: {
-                ProductId: product.id,
-                id: `${product.id}-${variant.color}-${variant.almacenamiento}`, // ID único compuesto requerido por Cart
-                title: product.nombre,
-                image: product.imagenes?.[0] || "",
-                price: price,
-                quantity: product.aplicarMayoristaPorCantidad ? (wholesaleConfig?.productQtyMin || 1) : 1,
-                color: variant.color,
-                storage: variant.almacenamiento,
-                origenDeVenta: 'Revendedor'
-            }
-        });
-        window.dispatchEvent(new CustomEvent("showNotification", {
-            detail: { message: "Agregado al pedido mayorista. Verifique condiciones en el carrito.", type: "success" }
-        }));
-    };
 
     const resetFilters = () => {
         setSearchTerm("");
@@ -467,33 +438,32 @@ const ResellersModule = () => {
                                                     </div>
                                                 </div>
                                                 {/* ÁREA INFERIOR: TEXTOS Y PRECIOS */}
-                                                    <div className="flex flex-col px-5 sm:px-6 pt-6 pb-8 bg-[#f9f3f2] flex-1 justify-between">
-                                                        <div>
-                                                            <span className="lu-title text-[9px] text-[#999999] mb-1">{product.categoria || 'Colección'}</span>
-                                                            <h3 className="lu-title text-[13px] text-[#333333] font-bold tracking-tight leading-tight truncate mt-1">{product.nombre}</h3>
-                                                            <p className="lu-body text-[11px] text-[#999999] mt-1 truncate w-full">{product.marca || 'LuPetruccelli'}</p>
-                                                        </div>
-
-                                                        <div className="flex items-baseline gap-2 mt-4 pr-12">
-                                                            <span className="lu-title text-lg sm:text-xl font-bold text-[#333333]">${minWholesale.toLocaleString('es-AR')}</span>
-                                                            <span className="text-[10px] text-[#999999] font-medium uppercase tracking-wider italic">P. Mayorista</span>
-                                                        </div>
+                                                <div className="flex flex-col px-5 sm:px-6 pt-6 pb-8 bg-[#f9f3f2] flex-1 justify-between">
+                                                    <div>
+                                                        <span className="lu-title text-[9px] text-[#999999] mb-1">{product.categoria || 'Colección'}</span>
+                                                        <h3 className="lu-title text-[13px] text-[#333333] font-bold tracking-tight leading-tight truncate mt-1">{product.nombre}</h3>
+                                                        <p className="lu-body text-[11px] text-[#999999] mt-1 truncate w-full">{product.marca || 'LuPetruccelli'}</p>
                                                     </div>
 
-                                                    {/* Botón Acción - Posición fija absoluta en la CARD para simetría visual */}
-                                                    {isAvailable ? (
-                                                        <button
-                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(product); }}
-                                                            className="absolute bottom-6 right-6 w-11 h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 hover:scale-110"
-                                                            aria-label="Agregar al carrito"
-                                                        >
-                                                            <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
-                                                        </button>
-                                                    ) : (
-                                                        <div className="absolute bottom-6 right-6 w-11 h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
-                                                            <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
-                                                        </div>
-                                                    )}
+                                                    <div className="flex items-baseline gap-2 mt-4 pr-12">
+                                                        <span className="lu-title text-lg sm:text-xl font-bold text-[#333333]">${minWholesale.toLocaleString('es-AR')}</span>
+                                                        <span className="text-[10px] text-[#999999] font-medium uppercase tracking-wider italic">P. Mayorista</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Botón Acción - Posición fija absoluta en la CARD para simetría visual */}
+                                                {isAvailable ? (
+                                                    <div
+                                                        className="absolute bottom-6 right-6 w-11 h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 hover:scale-110"
+                                                        aria-label="Agregar al carrito"
+                                                    >
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
+                                                    </div>
+                                                ) : (
+                                                    <div className="absolute bottom-6 right-6 w-11 h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
+                                                    </div>
+                                                )}
                                             </motion.div>
                                         </Link>
                                     )
