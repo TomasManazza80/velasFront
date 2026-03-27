@@ -5,7 +5,7 @@ import {
   FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDollarSign,
   FiPackage, FiShoppingCart, FiCalendar, FiClock, FiBarChart2, FiHome,
   FiTag, FiLayers, FiAlertTriangle, FiSearch, FiTrendingUp, FiArrowLeft, FiArrowRight, FiUploadCloud,
-  FiMinusCircle, FiCornerDownRight, FiMenu, FiCreditCard, FiMessageSquare, FiUser, FiTruck, FiActivity
+  FiMinusCircle, FiCornerDownRight, FiMenu, FiCreditCard, FiMessageSquare, FiUser, FiTruck, FiActivity, FiHeart
 } from 'react-icons/fi';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -24,6 +24,7 @@ import PersonalBalance from './balance/personalBalance.jsx';
 import CargaDeProductos from './productos/cargaDeProductos.jsx';
 import Facturacion from './facturacion/facturacion.jsx';
 import InventarioProductos from './productos/inventarioProductos.jsx';
+import LikesControl from './productos/LikesControl.jsx';
 import ModuloProveedores from './proveedores/proveedores.jsx';
 import ModuloClientes from './clientes/clientes.jsx';
 import ModuloRevendedores from './revendedores/revendedoresAdmin.jsx';
@@ -321,6 +322,7 @@ const Admin = () => {
               items: [
                 { id: 'productos', label: 'Stock', icon: <FiPackage /> },
                 { id: 'cargar', label: 'Nueva Carga', icon: <FiPlus /> },
+                { id: 'likes', label: 'Popularidad', icon: <FiHeart /> },
                 { id: 'cargarContenidoWeb', label: 'Contenido Web', icon: <FiEdit2 /> },
                 { id: 'proveedores', label: 'Proveedores', icon: <FiTruck /> },
               ]
@@ -496,6 +498,7 @@ const Admin = () => {
               {seccionActiva === 'caja' && <ModuloCaja />}
               {seccionActiva === 'productos' && <InventarioProductos />}
               {seccionActiva === 'cargar' && <CargaDeProductos />}
+              {seccionActiva === 'likes' && <LikesControl />}
               {seccionActiva === 'ventasOnline' && <VentasEcommerceOnline />}
               {seccionActiva === 'ventasLocal' && <HistorialDeVentasLocal />}
               {seccionActiva === 'historialRecaudacionFinal' && <HistorialRecaudacionFinal />}

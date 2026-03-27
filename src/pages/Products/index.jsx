@@ -97,7 +97,37 @@ const Products = () => {
     const [sortOption, setSortOption] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [likedProducts, setLikedProducts] = useState([]);
     const [searchParams] = useSearchParams();
+
+    // Cargar likes desde localStorage
+    useEffect(() => {
+        const savedLikes = JSON.parse(localStorage.getItem('lu_liked_products')) || [];
+        setLikedProducts(savedLikes);
+    }, []);
+
+    const handleToggleLike = async (e, productId) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isLiked = likedProducts.includes(productId);
+        let updatedLikes;
+
+        if (isLiked) {
+            updatedLikes = likedProducts.filter(id => id !== productId);
+        } else {
+            updatedLikes = [...likedProducts, productId];
+        }
+
+        setLikedProducts(updatedLikes);
+        localStorage.setItem('lu_liked_products', JSON.stringify(updatedLikes));
+
+        try {
+            await axios.patch(`${API_URL}/products/${productId}/like`, { isIncrement: !isLiked });
+        } catch (error) {
+            console.error("Error toggling like:", error);
+        }
+    };
 
     useEffect(() => {
         const categoryParam = searchParams.get('category');
@@ -109,7 +139,7 @@ const Products = () => {
     const availableCategories = [...new Set(products.map(p => p.categoria))].filter(Boolean).sort();
     const availableBrands = [...new Set(products.map(p => p.marca))].filter(Boolean).sort();
 
-    const MAX_PREVIEW_RESULTS = 5;
+    const MAX_PREVIEW_RESULTS = 10;
     const previewProducts = search.length > 0 ? filteredProducts.slice(0, MAX_PREVIEW_RESULTS) : [];
 
     useEffect(() => {
@@ -216,24 +246,66 @@ const Products = () => {
                     </motion.div>
                 </div>
 
-                <div className="container mx-auto px-6 md:px-12 lg:px-24">
+                <div className="container mx-auto px-2 sm:px-6 md:px-12 lg:px-24">
                     {/* BARRA DE CONTROL Y BÚSQUEDA */}
-                    <div className="bg-[#f9f3f2] p-8 md:p-12 mb-16 rounded-sm shadow-sm">
-                        <div className="flex flex-col gap-8">
-                            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-center">
-                                <div className="flex gap-4 w-full lg:w-auto flex-grow relative">
-                                    <div className="relative flex-grow group">
-                                        <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-[#cba394] text-lg" />
+                    <div className="bg-[#f9f3f2] p-6 md:p-12 mb-10 md:mb-16 rounded-sm shadow-sm relative z-[100]">
+                        <div className="flex flex-col gap-6 md:gap-8">
+                            <div className="flex flex-col lg:flex-row gap-4 md:gap-6 items-stretch lg:items-center">
+                                <div className="flex gap-4 w-full lg:w-auto flex-grow relative z-[100]">
+                                    <div className="relative flex-grow group z-[100]">
+                                        <FiSearch className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-[#cba394] text-sm md:text-lg z-20" />
                                         <input
                                             type="text"
                                             placeholder="Buscar fragancia o producto..."
-                                            className="lu-input w-full pl-14 pr-6 py-4 rounded-sm lu-body text-[13px] tracking-wide"
+                                            className="lu-input w-full pl-10 md:pl-14 pr-4 md:pr-6 py-3 md:py-4 rounded-sm lu-body text-[11px] md:text-[13px] tracking-wide relative z-10"
                                             onChange={(e) => setSearch(e.target.value)}
                                             value={search}
                                         />
+
+                                        {/* RESULTADOS DESPLEGABLES */}
+                                        <AnimatePresence>
+                                            {search.trim() !== "" && previewProducts.length > 0 && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#e0d7cc] shadow-2xl max-h-72 md:max-h-96 overflow-y-auto z-[110] rounded-b-xl"
+                                                >
+                                                    {previewProducts.map((prod) => {
+                                                        const totalStock = prod.variantes?.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0) || 0;
+                                                        const isAvailable = totalStock > 0;
+                                                        return (
+                                                            <Link to={`/product/${prod.id}`} key={prod.id} className="relative flex items-center gap-3 md:gap-5 p-3 md:p-5 hover:bg-[#F9F7F2] transition-colors border-b border-gray-100 last:border-none group min-w-0 pr-12 md:pr-16">
+                                                                <div className="w-10 h-10 md:w-16 md:h-16 flex-shrink-0 overflow-hidden rounded-lg md:rounded-xl bg-gray-50">
+                                                                    <img src={optimizeImage(prod.imagenes?.[0] || prod.image)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                                </div>
+                                                                <div className="text-left flex-1 min-w-0">
+                                                                    <h4 className="lu-title text-[9px] md:text-[11px] font-bold text-[#333333] truncate mb-0.5">{prod.nombre}</h4>
+                                                                    <p className="lu-body text-[8px] md:text-[10px] text-gray-400 tracking-[0.05em] md:tracking-[0.1em] uppercase mb-1 truncate">{prod.marca || 'LU PETRUCCELLI'}</p>
+                                                                    {prod.variantes && prod.variantes.some(v => Number(v.precioAlPublico) > 0) && (
+                                                                        <div className="lu-title text-[10px] md:text-[12px] text-[#b07d6b] font-bold">
+                                                                            ${Math.min(...prod.variantes.map(v => Number(v.precioAlPublico) || 0).filter(p => p > 0)).toLocaleString('es-AR')}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                {isAvailable ? (
+                                                                    <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-md hover:bg-black transition-all flex-shrink-0 z-10">
+                                                                        <FontAwesomeIcon icon={faCartPlus} className="text-[10px] md:text-xs" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-10 opacity-60">
+                                                                        <FontAwesomeIcon icon={faCartPlus} className="text-[10px] md:text-xs" />
+                                                                    </div>
+                                                                )}
+                                                            </Link>
+                                                        )
+                                                    })}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                     <button
-                                        className="lg:hidden px-5 bg-[#ffffff] border border-[#cba394]/30 text-[#cba394] rounded-sm flex items-center justify-center hover:bg-[#cba394] hover:text-white transition-colors"
+                                        className="lg:hidden px-4 md:px-5 bg-[#ffffff] border border-[#cba394]/30 text-[#cba394] rounded-sm flex items-center justify-center hover:bg-[#cba394] hover:text-white transition-colors"
                                         onClick={() => setShowFilters(!showFilters)}
                                     >
                                         <FiFilter />
@@ -241,7 +313,7 @@ const Products = () => {
                                 </div>
 
                                 <select
-                                    className={`${showFilters ? 'block' : 'hidden'} lg:block lu-input px-6 py-4 rounded-sm lu-title text-[10px] w-full lg:w-auto min-w-[200px] cursor-pointer`}
+                                    className={`${showFilters ? 'block' : 'hidden'} lg:block lu-input px-4 md:px-6 py-3 md:py-4 rounded-sm lu-title text-[9px] md:text-[10px] w-full lg:w-auto min-w-[200px] cursor-pointer relative z-10`}
                                     onChange={(e) => setSortOption(e.target.value)}
                                     value={sortOption}
                                 >
@@ -252,22 +324,22 @@ const Products = () => {
                             </div>
 
                             {/* FILTROS ADICIONALES */}
-                            <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex flex-col md:flex-row items-stretch md:items-center gap-6 pt-6 border-t border-[#cba394]/20`}>
-                                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                            <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-6 pt-4 md:pt-6 border-t border-[#cba394]/20`}>
+                                <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-start">
                                     <span className="lu-title text-[10px] text-[#999999] hidden md:inline">PRECIO</span>
                                     <div className="relative flex items-center flex-1 md:flex-none">
-                                        <FiDollarSign className="absolute left-4 text-[#cba394] text-sm" />
-                                        <input type="number" placeholder="Min" className="lu-input pl-9 pr-4 py-3 w-full md:w-32 rounded-sm lu-body text-[13px]" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                                        <FiDollarSign className="absolute left-3 md:left-4 text-[#cba394] text-xs md:text-sm" />
+                                        <input type="number" placeholder="Min" className="lu-input pl-7 md:pl-9 pr-2 md:pr-4 py-2 md:py-3 w-full md:w-32 rounded-sm lu-body text-[11px] md:text-[13px]" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
                                     </div>
-                                    <div className="h-[1px] w-4 bg-[#999999]/30"></div>
+                                    <div className="h-[1px] w-2 md:w-4 bg-[#999999]/30"></div>
                                     <div className="relative flex items-center flex-1 md:flex-none">
-                                        <FiDollarSign className="absolute left-4 text-[#cba394] text-sm" />
-                                        <input type="number" placeholder="Max" className="lu-input pl-9 pr-4 py-3 w-full md:w-32 rounded-sm lu-body text-[13px]" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                                        <FiDollarSign className="absolute left-3 md:left-4 text-[#cba394] text-xs md:text-sm" />
+                                        <input type="number" placeholder="Max" className="lu-input pl-7 md:pl-9 pr-2 md:pr-4 py-2 md:py-3 w-full md:w-32 rounded-sm lu-body text-[11px] md:text-[13px]" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
                                     </div>
                                 </div>
 
                                 {(search || category || brand || sortOption || minPrice || maxPrice) && (
-                                    <button onClick={resetFilters} className="text-[#b07d6b] hover:text-[#333333] transition-colors lu-title text-[10px] flex items-center justify-center gap-2 w-full md:w-auto px-4 py-3">
+                                    <button onClick={resetFilters} className="text-[#b07d6b] hover:text-[#333333] transition-colors lu-title text-[9px] md:text-[10px] flex items-center justify-center gap-2 w-full md:w-auto px-4 py-2 md:py-3">
                                         <FiX /> LIMPIAR FILTROS
                                     </button>
                                 )}
@@ -275,16 +347,16 @@ const Products = () => {
                         </div>
                     </div>
 
-                    <div className={`${showFilters ? 'grid' : 'hidden'} lg:grid grid-cols-1 md:grid-cols-2 gap-12 mb-20`}>
+                    <div className={`${showFilters ? 'grid' : 'hidden'} lg:grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-20 px-2 md:px-0`}>
                         {/* CATEGORÍAS */}
                         <div>
-                            <h2 className="lu-title text-[10px] text-[#999999] mb-6">COLECCIONES</h2>
-                            <div className="flex flex-nowrap md:flex-wrap gap-6 overflow-x-auto pb-4 md:pb-0 no-scrollbar">
+                            <h2 className="lu-title text-[10px] text-[#999999] mb-4 md:mb-6">COLECCIONES</h2>
+                            <div className="flex flex-nowrap md:flex-wrap gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 no-scrollbar">
                                 {availableCategories.length > 0 ? availableCategories.map((cat) => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(category === cat ? "" : cat)}
-                                        className={`lu-category pb-1 lu-title text-[11px] tracking-wider whitespace-nowrap ${category === cat ? 'active' : ''}`}
+                                        className={`lu-category pb-1 lu-title text-[9px] md:text-[11px] tracking-wider whitespace-nowrap ${category === cat ? 'active' : ''}`}
                                     >
                                         {cat}
                                     </button>
@@ -294,13 +366,13 @@ const Products = () => {
 
                         {/* MARCAS / LÍNEAS */}
                         <div>
-                            <h2 className="lu-title text-[10px] text-[#999999] mb-6">LÍNEA DE PRODUCTO</h2>
-                            <div className="flex flex-nowrap md:flex-wrap gap-6 overflow-x-auto pb-4 md:pb-0 no-scrollbar">
+                            <h2 className="lu-title text-[10px] text-[#999999] mb-4 md:mb-6">LÍNEA DE PRODUCTO</h2>
+                            <div className="flex flex-nowrap md:flex-wrap gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 no-scrollbar">
                                 {availableBrands.length > 0 ? availableBrands.map((b) => (
                                     <button
                                         key={b}
                                         onClick={() => setBrand(brand === b ? "" : b)}
-                                        className={`lu-category pb-1 lu-title text-[11px] tracking-wider whitespace-nowrap ${brand === b ? 'active' : ''}`}
+                                        className={`lu-category pb-1 lu-title text-[9px] md:text-[11px] tracking-wider whitespace-nowrap ${brand === b ? 'active' : ''}`}
                                     >
                                         {b}
                                     </button>
@@ -309,20 +381,20 @@ const Products = () => {
                         </div>
                     </div>
 
-                    {/* GRID DE PRODUCTOS */}
+                    {/* GRID DE PRODUCTOS (3 COLUMNAS EN MÓVIL) */}
                     {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-                            {[...Array(8)].map((_, i) => (
-                                <div key={i} className="h-[450px] bg-[#f9f3f2] rounded-sm animate-pulse" />
+                        <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6 lg:gap-8 gap-y-6 sm:gap-y-12 lg:gap-y-16">
+                            {[...Array(12)].map((_, i) => (
+                                <div key={i} className="h-[150px] sm:h-[400px] lg:h-[450px] bg-[#f9f3f2] rounded-xl sm:rounded-[2rem] animate-pulse" />
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-20">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                        <div className="flex flex-col gap-10 md:gap-20">
+                            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6 lg:gap-8 gap-y-6 sm:gap-y-12 lg:gap-y-16">
                                 <AnimatePresence>
                                     {filteredProducts.length === 0 ? (
-                                        <div className="col-span-full py-32 text-center">
-                                            <p className="lu-body text-[#999999] text-lg">No se encontraron productos en esta selección.</p>
+                                        <div className="col-span-full py-20 md:py-32 text-center">
+                                            <p className="lu-body text-[#999999] text-sm md:text-lg">No se encontraron productos en esta selección.</p>
                                         </div>
                                     ) : (
                                         filteredProducts.map((product) => {
@@ -338,11 +410,10 @@ const Products = () => {
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         exit={{ opacity: 0, y: 20 }}
-                                                        className="lu-card h-full flex flex-col relative overflow-hidden rounded-[2rem]"
+                                                        className="lu-card h-full flex flex-col relative overflow-hidden rounded-xl sm:rounded-[2rem] shadow-sm hover:shadow-md transition-shadow"
                                                     >
                                                         {/* ÁREA SUPERIOR: IMAGEN FULL COVER */}
                                                         <div className="relative w-full aspect-square bg-[#ffffff] overflow-hidden">
-                                                            {/* Imagen Principal */}
                                                             <img
                                                                 src={optimizeImage(product.imagenes?.[0] || product.image)}
                                                                 alt={product.nombre}
@@ -350,61 +421,63 @@ const Products = () => {
                                                                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                             />
 
-                                                            {/* Overlay superior (Badges y Corazón) */}
-                                                            <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
-                                                                <div className="flex items-center">
+                                                            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex justify-between items-start z-10">
+                                                                <div className="flex items-center flex-wrap gap-1 sm:gap-2">
                                                                     {!isAvailable ? (
-                                                                        <span className="bg-[#f9f3f2] text-[#b07d6b] text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full shadow-sm">Agotado</span>
+                                                                        <span className="bg-[#f9f3f2] text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">Agotado</span>
                                                                     ) : (
                                                                         <>
-                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full shadow-sm">-50%</span>
-                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#b07d6b] text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full shadow-sm ml-2 hidden xs:block">Bestseller</span>
+                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">-50%</span>
+                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm hidden xs:block">Bestseller</span>
                                                                         </>
                                                                     )}
                                                                 </div>
-                                                                <button
-                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                                    className="bg-white/70 backdrop-blur-sm p-2 rounded-full text-gray-400 hover:text-red-400 transition-colors shadow-sm"
-                                                                >
-                                                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                                </button>
+                                                                {(() => {
+                                                                    const isLiked = likedProducts.includes(product.id);
+                                                                    return (
+                                                                        <button
+                                                                            onClick={(e) => handleToggleLike(e, product.id)}
+                                                                            className={`bg-white/70 backdrop-blur-sm p-1 sm:p-2 rounded-full transition-colors shadow-sm ${isLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                                                                        >
+                                                                            <svg className="w-3 h-3 sm:w-5 sm:h-5" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                                        </button>
+                                                                    );
+                                                                })()}
                                                             </div>
 
-                                                            {/* Overlay Inferior (Colores) */}
-                                                            <div className="absolute bottom-5 left-5 flex items-center z-10 transition-opacity duration-300 group-hover:opacity-0">
-                                                                <div className="flex items-center bg-white/70 backdrop-blur-md p-1.5 rounded-full shadow-sm">
-                                                                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#fcd34d] border-2 border-white z-30"></div>
-                                                                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#333333] border-2 border-white -ml-1.5 z-20"></div>
-                                                                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#93c5fd] border-2 border-white -ml-1.5 z-10"></div>
-                                                                    <span className="text-[9px] sm:text-[10px] text-[#333333] font-medium ml-1.5 px-1">+5</span>
+                                                            <div className="hidden md:flex absolute bottom-4 sm:bottom-5 left-4 sm:left-5 items-center z-10 transition-opacity duration-300 group-hover:opacity-0">
+                                                                <div className="flex items-center bg-white/70 backdrop-blur-md p-1 sm:p-1.5 rounded-full shadow-sm">
+                                                                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#fcd34d] border-2 border-white z-30"></div>
+                                                                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#333333] border-2 border-white -ml-1 sm:-ml-1.5 z-20"></div>
+                                                                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#93c5fd] border-2 border-white -ml-1 sm:-ml-1.5 z-10"></div>
+                                                                    <span className="text-[8px] sm:text-[10px] text-[#333333] font-medium ml-1 sm:ml-1.5 px-1">+5</span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        {/* ÁREA INFERIOR: TEXTOS Y PRECIOS */}
-                                                        <div className="flex flex-col px-5 sm:px-6 pt-6 pb-8 bg-[#f9f3f2] flex-1 justify-between">
+
+                                                        <div className="flex flex-col px-2 sm:px-5 md:px-6 pt-2 sm:pt-6 pb-3 sm:pb-8 bg-[#f9f3f2] flex-1 justify-between">
                                                             <div>
-                                                                <span className="lu-title text-[9px] text-[#999999] mb-1">{product.categoria || 'Colección'}</span>
-                                                                <h3 className="lu-title text-[13px] text-[#333333] font-bold tracking-tight leading-tight truncate mt-1">{product.nombre}</h3>
-                                                                <p className="lu-body text-[11px] text-[#999999] mt-1 truncate w-full">{product.marca || 'LuPetruccelli'}</p>
+                                                                <span className="lu-title text-[6px] sm:text-[9px] text-[#999999] mb-0.5 block">{product.categoria || 'Colección'}</span>
+                                                                <h3 className="lu-title text-[8px] sm:text-[12px] md:text-[13px] text-[#333333] font-bold tracking-tight leading-tight truncate mt-0.5">{product.nombre}</h3>
+                                                                <p className="lu-body text-[7px] sm:text-[11px] text-[#999999] mt-0.5 truncate w-full">{product.marca || 'LuPetruccelli'}</p>
                                                             </div>
 
-                                                            <div className="flex items-baseline gap-2 mt-4 pr-12">
-                                                                <span className="lu-title text-lg sm:text-xl font-bold text-[#333333]">{formatPrice(price)}</span>
-                                                                <span className="text-xs text-[#999999] line-through font-medium">{formatPrice(price * 1.5)}</span>
+                                                            <div className="flex items-baseline gap-1 sm:gap-2 mt-2 sm:mt-4 pr-6 sm:pr-12">
+                                                                <span className="lu-title text-[10px] sm:text-lg md:text-xl font-bold text-[#333333]">{formatPrice(price)}</span>
+                                                                <span className="text-[7px] sm:text-xs text-[#999999] line-through font-medium">{formatPrice(price * 1.5)}</span>
                                                             </div>
                                                         </div>
 
-                                                        {/* Botón Acción - Posición fija absoluta en la CARD para simetría visual */}
                                                         {isAvailable ? (
                                                             <div
-                                                                className="absolute bottom-6 right-6 w-11 h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 hover:scale-110"
+                                                                className="absolute bottom-2 right-2 sm:bottom-6 sm:right-6 w-6 h-6 sm:w-11 sm:h-11 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-black transition-all z-30 sm:hover:scale-110"
                                                                 aria-label="Agregar al carrito"
                                                             >
-                                                                <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
+                                                                <FontAwesomeIcon icon={faCartPlus} className="text-[8px] sm:text-sm" />
                                                             </div>
                                                         ) : (
-                                                            <div className="absolute bottom-6 right-6 w-11 h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
-                                                                <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
+                                                            <div className="absolute bottom-2 right-2 sm:bottom-6 sm:right-6 w-6 h-6 sm:w-11 sm:h-11 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-30 opacity-60">
+                                                                <FontAwesomeIcon icon={faCartPlus} className="text-[8px] sm:text-sm" />
                                                             </div>
                                                         )}
                                                     </motion.div>
@@ -417,15 +490,15 @@ const Products = () => {
 
                             {/* BOTON CARGAR MAS */}
                             {hasMore && (
-                                <div className="flex justify-center pt-12">
+                                <div className="flex justify-center pt-8 md:pt-12">
                                     <button
                                         onClick={() => setPage(p => p + 1)}
                                         disabled={isLoadingMore}
-                                        className="lu-gradient-btn text-white px-10 py-4 lu-title text-[11px] shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-4 rounded-sm"
+                                        className="lu-gradient-btn text-white px-6 py-3 md:px-10 md:py-4 lu-title text-[9px] md:text-[11px] shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-3 md:gap-4 rounded-sm w-full sm:w-auto justify-center"
                                     >
                                         {isLoadingMore ? "CARGANDO..." : (
                                             <>
-                                                <FiPlusCircle className="text-lg font-light" />
+                                                <FiPlusCircle className="text-base md:text-lg font-light" />
                                                 DESCUBRIR MÁS PRODUCTOS
                                             </>
                                         )}

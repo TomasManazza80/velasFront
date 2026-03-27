@@ -97,6 +97,7 @@ const ResellersModule = () => {
     const [activeCategory, setActiveCategory] = useState("todos");
     const [categories, setCategories] = useState([]);
     const [wholesaleConfig, setWholesaleConfig] = useState(null);
+    const [likedProducts, setLikedProducts] = useState([]);
 
     // Estados para filtros
     const [searchTerm, setSearchTerm] = useState("");
@@ -108,6 +109,35 @@ const ResellersModule = () => {
     // Paginación
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+
+    // Cargar likes desde localStorage
+    useEffect(() => {
+        const savedLikes = JSON.parse(localStorage.getItem('lu_liked_products')) || [];
+        setLikedProducts(savedLikes);
+    }, []);
+
+    const handleToggleLike = async (e, productId) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isLiked = likedProducts.includes(productId);
+        let updatedLikes;
+
+        if (isLiked) {
+            updatedLikes = likedProducts.filter(id => id !== productId);
+        } else {
+            updatedLikes = [...likedProducts, productId];
+        }
+
+        setLikedProducts(updatedLikes);
+        localStorage.setItem('lu_liked_products', JSON.stringify(updatedLikes));
+
+        try {
+            await axios.patch(`${API_URL}/products/${productId}/like`, { isIncrement: !isLiked });
+        } catch (error) {
+            console.error("Error toggling like:", error);
+        }
+    };
 
     const categoryIconMap = useMemo(() => ({
         "CELULARES": faMobileScreenButton,
@@ -424,6 +454,17 @@ const ResellersModule = () => {
                                                                 </>
                                                             )}
                                                         </div>
+                                                        {(() => {
+                                                            const isLiked = likedProducts.includes(product.id);
+                                                            return (
+                                                                <button
+                                                                    onClick={(e) => handleToggleLike(e, product.id)}
+                                                                    className={`bg-white/70 backdrop-blur-sm p-1.5 rounded-full transition-colors shadow-sm ml-auto ${isLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                                                                >
+                                                                    <svg className="w-4 h-4" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                                </button>
+                                                            );
+                                                        })()}
                                                     </div>
 
 
