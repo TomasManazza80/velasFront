@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaFacebook, FaInstagram, FaTwitter, FaEnvelope, FaChevronDown, FaChevronUp, FaTimes } from "react-icons/fa";
 
 // =================================================================
@@ -9,7 +9,7 @@ const LuFooterStyles = `
 
 .lu-title { font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; }
 .lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
-.lu-script { font-family: 'Great Vibes', cursive; }
+.lu-script { font-family: 'Inter', sans-serif; }
 
 .lu-gradient-btn {
     background: linear-gradient(135deg, #cba394 0%, #b07d6b 100%);
@@ -57,6 +57,30 @@ const Footer = () => {
     const [floatingContent, setFloatingContent] = useState(null);
     const [showFloatingDiv, setShowFloatingDiv] = useState(false);
 
+    const [footerContent, setFooterContent] = useState({});
+
+    useEffect(() => {
+        const fetchFooterContent = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/footer`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Object.keys(data).length > 0) {
+                        setFooterContent(data);
+                    } else {
+                        setFooterContent(defaultContentMap);
+                    }
+                } else {
+                    setFooterContent(defaultContentMap);
+                }
+            } catch (error) {
+                console.error("Error fetching footer content:", error);
+                setFooterContent(defaultContentMap);
+            }
+        };
+        fetchFooterContent();
+    }, []);
+
     const toggleSection = (section) => {
         setOpenSections(prev => ({
             ...prev,
@@ -64,65 +88,67 @@ const Footer = () => {
         }));
     };
 
-    const handleFloatingContent = (contentKey) => {
-        // Definir el contenido para cada opción
-        const contentMap = {
-            historia: {
-                title: "Nuestra Historia",
-                content: "Soy lu petruccelli! Artista y diseñadora de decoración enfocada en el estilo de vida. Esta marca nació desde una necesidad artistica y estética, y las ganas de crear productos que acompañen el día a día de las personas desde un lugar de bienestar y dedicación a uno mismo. Empecé con este proyecto en el 2024 y hoy somos un equipo de 5 personas creciendo cada día más!"
-            },
-            sustentabilidad: {
-                title: "Sustentabilidad",
-                content: "Nos comprometemos con prácticas sostenibles en todos nuestros procesos. Utilizamos materiales reciclados y reducimos nuestro impacto ambiental al mínimo."
-            },
-            tiendas: {
-                title: "Nuestras Tiendas Exclusivas",
-                content: "Contamos con tiendas físicas en las principales ciudades. Visítanos y experimenta nuestros productos en persona. Horario: Lunes a Sábado de 10:00 a 20:00."
-            },
-            trabajo: {
-                title: "Trabaja con Nosotros",
-                content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a lufpetruccelli@gmail.com y sé parte de esta gran familia."
-            },
-            cuidado: {
-                title: "Cuidado del Producto",
-                content: "Para prolongar la vida de tus velas, mantenlas alejadas de la luz solar directa y recorta la mecha antes de cada uso. Los aromatizadores funcionan mejor en espacios cerrados."
-            },
-            mayoristas: {
-                title: "Mayoristas",
-                content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a lufpetruccelli@gmail.com para más información sobre nuestros descuentos por volumen."
-            },
-            compra: {
-                title: "Información para tu Compra",
-                content: "Todos nuestros productos incluyen envío gratuito para compras superiores a $100.000. Procesamos los pedidos en un plazo de 24-48 horas."
-            },
-            terminos: {
-                title: "Términos y Condiciones",
-                content: "Al realizar una compra, aceptas nuestros términos y condiciones. Los productos pueden ser devueltos dentro de los 30 días posteriores a la compra si se encuentran en su estado original."
-            },
-            arrepentimiento: {
-                title: "Botón de Arrepentimiento",
-                content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a lufpetruccelli@gmail.com"
-            },
-            aromatizadores: {
-                title: "Aromatizadores Ultrasónicos",
-                content: "Nuestros aromatizadores ultrasónicos utilizan tecnología de última generación para dispersar fragancias de manera uniforme en cualquier espacio. Incluyen modo automático y manual."
-            },
-            difusores: {
-                title: "Difusores de ambiente",
-                content: "Disfruta de una fragancia constante y duradera con nuestros difusores de cañas naturales. Cada unidad tiene una duración aproximada de 3 meses."
-            },
-            velas: {
-                title: "Velas aromáticas cera de soja",
-                content: "Elaboradas con cera de soja 100% natural, nuestras velas proporcionan una combustión limpia y una fragancia que perdura incluso apagadas. Tiempo de combustión: 40-50 horas."
-            },
-            productos: {
-                title: "Todos los productos",
-                content: "Explora nuestra completa gama de productos para el hogar. Desde velas y difusores hasta accesorios exclusivos, tenemos todo para crear el ambiente perfecto."
-            }
-        };
+    const defaultContentMap = {
+        historia: {
+            title: "Nuestra Historia",
+            content: "Soy lu petruccelli! Artista y diseñadora de decoración enfocada en el estilo de vida. Esta marca nació desde una necesidad artistica y estética, y las ganas de crear productos que acompañen el día a día de las personas desde un lugar de bienestar y dedicación a uno mismo. Empecé con este proyecto en el 2024 y hoy somos un equipo de 5 personas creciendo cada día más!"
+        },
+        sustentabilidad: {
+            title: "Sustentabilidad",
+            content: "Nos comprometemos con prácticas sostenibles en todos nuestros procesos. Utilizamos materiales reciclados y reducimos nuestro impacto ambiental al mínimo."
+        },
+        tiendas: {
+            title: "Nuestras Tiendas Exclusivas",
+            content: "Contamos con tiendas físicas en las principales ciudades. Visítanos y experimenta nuestros productos en persona. Horario: Lunes a Sábado de 10:00 a 20:00."
+        },
+        trabajo: {
+            title: "Trabaja con Nosotros",
+            content: "¿Te gustaría unirte a nuestro equipo? Envía tu CV a lufpetruccelli@gmail.com y sé parte de esta gran familia."
+        },
+        cuidado: {
+            title: "Cuidado del Producto",
+            content: "Para prolongar la vida de tus velas, mantenlas alejadas de la luz solar directa y recorta la mecha antes de cada uso. Los aromatizadores funcionan mejor en espacios cerrados."
+        },
+        mayoristas: {
+            title: "Mayoristas",
+            content: "Ofrecemos precios especiales para compras al por mayor. Contáctanos a lufpetruccelli@gmail.com para más información sobre nuestros descuentos por volumen."
+        },
+        compra: {
+            title: "Información para tu Compra",
+            content: "Todos nuestros productos incluyen envío gratuito para compras superiores a $100.000. Procesamos los pedidos en un plazo de 24-48 horas."
+        },
+        terminos: {
+            title: "Términos y Condiciones",
+            content: "Al realizar una compra, aceptas nuestros términos y condiciones. Los productos pueden ser devueltos dentro de los 30 días posteriores a la compra si se encuentran en su estado original."
+        },
+        arrepentimiento: {
+            title: "Botón de Arrepentimiento",
+            content: "Si te arrepientes de tu compra, puedes cancelarla dentro de las 24 horas siguientes sin ningún costo. Contáctanos a lufpetruccelli@gmail.com"
+        },
+        aromatizadores: {
+            title: "Aromatizadores Ultrasónicos",
+            content: "Nuestros aromatizadores ultrasónicos utilizan tecnología de última generación para dispersar fragancias de manera uniforme en cualquier espacio. Incluyen modo automático y manual."
+        },
+        difusores: {
+            title: "Difusores de ambiente",
+            content: "Disfruta de una fragancia constante y duradera con nuestros difusores de cañas naturales. Cada unidad tiene una duración aproximada de 3 meses."
+        },
+        velas: {
+            title: "Velas aromáticas cera de soja",
+            content: "Elaboradas con cera de soja 100% natural, nuestras velas proporcionan una combustión limpia y una fragancia que perdura incluso apagadas. Tiempo de combustión: 40-50 horas."
+        },
+        productos: {
+            title: "Todos los productos",
+            content: "Explora nuestra completa gama de productos para el hogar. Desde velas y difusores hasta accesorios exclusivos, tenemos todo para crear el ambiente perfecto."
+        }
+    };
 
-        if (contentMap[contentKey]) {
-            setFloatingContent(contentMap[contentKey]);
+    const handleFloatingContent = (contentKey) => {
+        if (footerContent[contentKey]) {
+            setFloatingContent(footerContent[contentKey]);
+            setShowFloatingDiv(true);
+        } else if (defaultContentMap[contentKey]) {
+            setFloatingContent(defaultContentMap[contentKey]);
             setShowFloatingDiv(true);
         }
     };
@@ -218,8 +244,8 @@ const Footer = () => {
 
                     {/* Newsletter Section */}
                     <div className="mb-20 text-center">
-                        <h2 className="lu-script text-4xl md:text-5xl text-[#cba394] mb-4">Novedades & Beneficios</h2>
-                        <p className="lu-body text-[13px] text-[#666666] mb-8">Suscríbete a nuestro newsletter para recibir acceso anticipado y colecciones exclusivas.</p>
+                        <h2 className="lu-script text-5xl md:text-6xl text-[#cba394] mb-4">Novedades & Beneficios</h2>
+                        <p className="lu-body text-base text-[#666666] mb-8">Suscríbete a nuestro newsletter para recibir acceso anticipado y colecciones exclusivas.</p>
 
                         <form onSubmit={handleSubscribe} className="max-w-md mx-auto relative">
                             <div className="mb-6">
@@ -261,7 +287,7 @@ const Footer = () => {
                                 className="flex justify-between items-center cursor-pointer md:cursor-auto"
                                 onClick={() => toggleSection('company')}
                             >
-                                <h3 className="lu-title text-[11px] text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Compañía</h3>
+                                <h3 className="lu-title text-sm text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Compañía</h3>
                                 <span className="md:hidden text-[#cba394]">
                                     {openSections['company'] ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                                 </span>
@@ -272,7 +298,7 @@ const Footer = () => {
                                         <li key={index}>
                                             <button
                                                 onClick={() => handleFloatingContent(item.key)}
-                                                className="lu-body text-[13px] text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
+                                                className="lu-body text-sm md:text-base text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
                                             >
                                                 {item.title}
                                             </button>
@@ -288,7 +314,7 @@ const Footer = () => {
                                 className="flex justify-between items-center cursor-pointer md:cursor-auto"
                                 onClick={() => toggleSection('contact')}
                             >
-                                <h3 className="lu-title text-[11px] text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Contacto & Ayuda</h3>
+                                <h3 className="lu-title text-sm text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Contacto & Ayuda</h3>
                                 <span className="md:hidden text-[#cba394]">
                                     {openSections['contact'] ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                                 </span>
@@ -299,7 +325,7 @@ const Footer = () => {
                                         <li key={index}>
                                             <button
                                                 onClick={() => handleFloatingContent(item.key)}
-                                                className="lu-body text-[13px] text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
+                                                className="lu-body text-sm md:text-base text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
                                             >
                                                 {item.title}
                                             </button>
@@ -315,7 +341,7 @@ const Footer = () => {
                                 className="flex justify-between items-center cursor-pointer md:cursor-auto"
                                 onClick={() => toggleSection('products')}
                             >
-                                <h3 className="lu-title text-[11px] text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Colecciones</h3>
+                                <h3 className="lu-title text-sm text-[#b07d6b] tracking-[0.2em] w-full md:w-auto text-center md:text-left">Colecciones</h3>
                                 <span className="md:hidden text-[#cba394]">
                                     {openSections['products'] ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                                 </span>
@@ -326,7 +352,7 @@ const Footer = () => {
                                         <li key={index}>
                                             <button
                                                 onClick={() => handleFloatingContent(item.key)}
-                                                className="lu-body text-[13px] text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
+                                                className="lu-body text-sm md:text-base text-[#666666] hover:text-[#cba394] transition-colors duration-300 w-full md:w-auto text-center md:text-left"
                                             >
                                                 {item.title}
                                             </button>
@@ -355,7 +381,7 @@ const Footer = () => {
 
                         {/* Contact Email */}
                         <div className="mb-10">
-                            <a href="mailto:lufpetruccelli@gmail.com" className="flex items-center lu-body text-[12px] text-[#666666] hover:text-[#cba394] transition-colors duration-300">
+                            <a href="mailto:lufpetruccelli@gmail.com" className="flex items-center lu-body text-sm md:text-base text-[#666666] hover:text-[#cba394] transition-colors duration-300">
                                 <FaEnvelope className="mr-3 text-[#cba394]" />
                                 lufpetruccelli@gmail.com
                             </a>

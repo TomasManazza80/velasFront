@@ -1,42 +1,46 @@
 // src/components/admin/ProductForm.jsx
 
-import React from 'react';
-import { FiTrash2 } from 'react-icons/fi';
+import React from "react";
+import { FiTrash2 } from "react-icons/fi";
 
 // Mantenemos las categorías en un archivo central si son estáticas
 const categorias = [
-  'Vinos Tintos Malbec', 
-  'Vinos Tintos Cabernet Sauvignon', 
-  'Vinos Tintos Otros Varietales', 
-  'Vinos Blancos', 
-  'Vinos Rosados', 
-  'Vinos Espumantes',
-  'Licores y Destilados',
-  'Chocolates y Delicatessen',
-  'Accesorios de Vino',
-  'Ofertas / Promociones'
+  "Vinos Tintos Malbec",
+  "Vinos Tintos Cabernet Sauvignon",
+  "Vinos Tintos Otros Varietales",
+  "Vinos Blancos",
+  "Vinos Rosados",
+  "Vinos Espumantes",
+  "Licores y Destilados",
+  "Chocolates y Delicatessen",
+  "Accesorios de Vino",
+  "Ofertas / Promociones",
 ];
 
-
-const ProductForm = ({ 
-  nuevoProducto, 
-  handleInputChange, 
-  handleFileChange, 
-  handleRemoveImage, 
-  handleAgregarProducto, 
-  loading, 
-  uploadProgress 
+const ProductForm = ({
+  nuevoProducto,
+  handleInputChange,
+  handleFileChange,
+  handleRemoveImage,
+  handleAgregarProducto,
+  loading,
+  uploadProgress,
 }) => {
   return (
     <div className="bg-gray-800 shadow-lg rounded-lg border border-gray-700 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-700">
-        <h2 className="text-lg font-medium text-white">Agregar Nuevo Producto</h2>
+        <h2 className="text-lg font-medium text-white">
+          Agregar Nuevo Producto
+        </h2>
       </div>
       <div className="p-6">
         <form className="space-y-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="nombre"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Nombre del Producto
               </label>
               <input
@@ -52,7 +56,10 @@ const ProductForm = ({
 
             {/* Campo Marca */}
             <div>
-              <label htmlFor="marca" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="marca"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Marca
               </label>
               <input
@@ -66,7 +73,10 @@ const ProductForm = ({
             </div>
 
             <div>
-              <label htmlFor="precio" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="precio"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Precio
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -87,10 +97,13 @@ const ProductForm = ({
                 />
               </div>
             </div>
-            
+
             {/* Precio por mayor (mapeado a 'talle') */}
             <div>
-              <label htmlFor="talle" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="talle"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Precio por mayor
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -110,9 +123,12 @@ const ProductForm = ({
                 />
               </div>
             </div>
-            
+
             <div>
-              <label htmlFor="categoria" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="categoria"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Categoría
               </label>
               <select
@@ -125,13 +141,18 @@ const ProductForm = ({
               >
                 <option value="">Seleccionar categoría</option>
                 {categorias.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="cantidad" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="cantidad"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Cantidad en Stock
               </label>
               <input
@@ -147,7 +168,10 @@ const ProductForm = ({
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="descripcion"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Descripción
               </label>
               <textarea
@@ -191,7 +215,7 @@ const ProductForm = ({
                 </p>
               </div>
             </div>
-            
+
             {/* Mostrar progreso de carga */}
             {loading && uploadProgress > 0 && (
               <div className="mt-2">
@@ -200,14 +224,14 @@ const ProductForm = ({
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
               </div>
             )}
-            
+
             {/* Mostrar miniaturas de imágenes */}
             {nuevoProducto.imagenes.length > 0 && (
               <div className="mt-4">
@@ -244,7 +268,7 @@ const ProductForm = ({
               disabled={loading}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Guardando...' : 'Guardar Producto'}
+              {loading ? "Guardando..." : "Guardar Producto"}
             </button>
           </div>
         </form>

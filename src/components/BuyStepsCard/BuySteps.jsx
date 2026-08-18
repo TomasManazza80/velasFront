@@ -83,12 +83,12 @@ const BuySteps = ({ videoSrc = video }) => {
                     className="text-center mb-24"
                 >
                     <div className="flex items-center justify-center mb-6">
-                        <span className="text-[#cba394] tracking-[0.3em] text-xs md:text-sm font-light uppercase block">
+                        <span className="text-[#cba394] tracking-[0.3em] text-sm md:text-base font-light uppercase block">
                             The LuPetruccelli Experience
                         </span>
                     </div>
 
-                    <h2 className="text-4xl md:text-5xl font-sans font-light tracking-[0.15em] uppercase text-[#333333] leading-tight mb-8">
+                    <h2 className="text-4xl md:text-5xl font-sans font-light tracking-[0.15em] uppercase text-[#111111] leading-tight mb-8">
                         PROCESO DE <span className="font-semibold">COMPRA</span>
                     </h2>
 
@@ -117,7 +117,7 @@ const BuySteps = ({ videoSrc = video }) => {
                             <div className={`h-full bg-[#f9f3f2] p-10 md:p-14 relative overflow-hidden transition-all duration-500 hover:bg-[#f2ebe9] flex flex-col items-center text-center ${step.fullWidth ? 'lg:flex-row lg:text-left lg:px-20' : ''}`}>
 
                                 {/* ID Subliminal */}
-                                <span className="absolute top-6 right-8 text-[#e8dbd8] text-5xl font-light font-sans tracking-tighter select-none transition-transform duration-700 group-hover:scale-110">
+                                <span className="absolute top-6 right-8 text-black text-5xl font-light font-sans tracking-tighter select-none transition-transform duration-700 group-hover:scale-110">
                                     {step.id}
                                 </span>
 
@@ -130,11 +130,11 @@ const BuySteps = ({ videoSrc = video }) => {
                                 </div>
 
                                 {/* Texto */}
-                                <div className="relative z-10 flex flex-col flex-1 items-center lg:items-start">
-                                    <h3 className="text-sm font-sans font-normal uppercase tracking-widest text-[#333333] mb-4">
+                                <div className="relative z-10 flex flex-col flex-1 items-center lg:items-start w-full">
+                                    <h3 className="text-base md:text-lg font-sans font-medium uppercase tracking-widest text-[#222222] mb-3 text-center lg:text-left w-full">
                                         {step.title}
                                     </h3>
-                                    <p className={`text-xs font-light text-[#777777] leading-relaxed ${step.fullWidth ? 'max-w-2xl text-center lg:text-left' : 'max-w-[250px]'}`}>
+                                    <p className={`text-sm md:text-base font-normal text-[#555555] leading-relaxed ${step.fullWidth ? 'max-w-3xl text-center lg:text-left' : 'max-w-sm text-center lg:text-left w-full'}`}>
                                         {step.description}
                                     </p>
                                 </div>
@@ -151,11 +151,11 @@ const BuySteps = ({ videoSrc = video }) => {
                     className="mt-24 text-center"
                 >
                     <button
-                        className="bg-gradient-to-r from-[#cba394] to-[#b07d6b] px-12 py-5 text-white text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-90 shadow-sm flex items-center justify-center gap-3 mx-auto"
+                        className="bg-gradient-to-r from-[#cba394] to-[#b07d6b] px-12 py-5 text-white text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-90 shadow-sm flex items-center justify-center gap-3 mx-auto"
                     >
-                        INICIAR COMPRA <span className="text-[10px]">&gt;</span>
+                        INICIAR COMPRA <span className="text-sm md:text-base">&gt;</span>
                     </button>
-                    <p className="mt-8 text-[10px] text-[#999999] uppercase tracking-[0.2em] font-light">
+                    <p className="mt-8 text-sm text-[#777777] uppercase tracking-[0.2em] font-medium">
                         Protocolo de compra seguro verificado
                     </p>
                 </motion.div>

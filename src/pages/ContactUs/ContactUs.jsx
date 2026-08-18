@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 // =================================================================
 const STYLES = {
   title: "font-['Montserrat'] font-light uppercase tracking-widest text-[#333333]",
-  accent: "font-[cursive] text-[#cba394] text-xl md:text-2xl",
+  accent: "font-['Inter'] text-[#cba394] text-xl md:text-2xl",
   body: "font-sans font-light text-[13px] md:text-[14px] text-[#333333]",
 };
 

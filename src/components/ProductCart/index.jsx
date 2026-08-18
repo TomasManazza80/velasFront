@@ -45,10 +45,17 @@ const ProductCard = (props) => {
     >
       {/* HEADER TECH - ESTILOS FEDECELL */}
       <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-20">
-        <span className="text-[9px] text-white/30 tracking-[0.3em] uppercase"
-          style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          FC-2026 // ID_{safeId}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] text-white/30 tracking-[0.3em] uppercase"
+            style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+            FC-2026 // ID_{safeId}
+          </span>
+          {Number(data.descuento) > 0 && (
+            <span className="bg-[#ff8c00] text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
+              -{data.descuento}%
+            </span>
+          )}
+        </div>
         <div className="flex gap-1">
           <div className="w-1 h-1 bg-[#ff8c00] rounded-full animate-pulse"></div>
           <div className="w-1 h-1 bg-white/10 rounded-full"></div>

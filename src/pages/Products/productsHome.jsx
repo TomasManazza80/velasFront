@@ -80,54 +80,76 @@ const ProductsHome = () => {
                     viewport={{ once: true }}
                     className="grid grid-cols-1 md:grid-cols-4 gap-3 h-auto md:h-[450px]"
                 >
-                    <motion.div
-                        variants={itemVariants}
-                        whileHover={{ borderColor: ACCENT_ORANGE }}
-                        className="md:col-span-1 bg-zinc-900 border border-white/5 relative overflow-hidden group p-6 flex flex-col justify-end"
-                    >
-                        <motion.img
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.6 }}
-                            src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000"
-                            className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 transition-all"
-                            alt="Hardware"
-                        />
-                        <div className="relative z-10">
-                            <h3 className="fedecell-title text-xl leading-none mb-1">SISTEMA DE <span style={{ color: ACCENT_ORANGE }}>SONIDO</span></h3>
-                            <p className="fedecell-tech text-[8px] uppercase tracking-[0.2em] text-gray-500 mb-4 font-bold">// DESCUENTO_30%</p>
-                            <button className="fedecell-title text-[9px] tracking-widest border-b border-orange-500 pb-0.5 hover:text-white transition-colors">
-                                COMPRAR_AHORA_
-                            </button>
-                        </div>
-                    </motion.div>
-
-                    <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {[
-                            { title: "RELOJ INTELIGENTE", img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=400", off: "20% DESC" },
-                            { title: "TABLET PRO", img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=400" },
-                            { title: "ALTAVOZ INTELIGENTE", img: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?q=80&w=400", tech: "CORE_AUDIO_V2" },
-                            { title: "MANDO JUEGOS", img: "https://images.unsplash.com/photo-1592840496694-26d035b52b48?q=80&w=400", accent: true }
-                        ].map((b, i) => (
+                    {filteredProducts.length > 0 ? (
+                        <>
+                            {/* Producto TOP 1 (El más popular/tendencia) */}
                             <motion.div
-                                key={i}
                                 variants={itemVariants}
-                                whileHover={{ y: -3, borderColor: ACCENT_ORANGE }}
-                                className={`relative border border-white/5 p-5 flex items-center justify-between overflow-hidden group ${b.accent ? 'bg-zinc-900/50' : 'bg-black'}`}
+                                whileHover={{ borderColor: ACCENT_ORANGE }}
+                                className="md:col-span-1 bg-zinc-900 border border-white/5 relative overflow-hidden group p-6 flex flex-col justify-end cursor-pointer"
+                                onClick={() => window.location.href = `/product/${filteredProducts[0].id}`}
                             >
-                                <div className="z-10">
-                                    {b.off && <p style={{ color: ACCENT_ORANGE }} className="fedecell-tech text-[8px] font-black mb-0.5">{b.off}</p>}
-                                    <h3 className="fedecell-title text-lg leading-tight">{b.title}</h3>
-                                    {b.tech && <p className="fedecell-tech text-[7px] text-gray-600 mt-1">{b.tech}</p>}
-                                </div>
                                 <motion.img
-                                    whileHover={{ rotate: -5, scale: 1.1 }}
-                                    src={b.img}
-                                    className="w-20 h-20 object-contain z-10"
-                                    alt={b.title}
+                                    whileHover={{ scale: 1.05 }}
+                                    transition={{ duration: 0.6 }}
+                                    src={filteredProducts[0].imagenes?.[0] || filteredProducts[0].image || "https://via.placeholder.com/1000"}
+                                    className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 transition-all"
+                                    alt={filteredProducts[0].nombre}
                                 />
+                                <div className="relative z-10">
+                                    <h3 className="fedecell-title text-xl leading-none mb-1">
+                                        <span style={{ color: ACCENT_ORANGE }}>TENDENCIA</span>
+                                    </h3>
+                                    <h3 className="fedecell-title text-lg leading-tight mb-1 uppercase line-clamp-2">
+                                        {filteredProducts[0].nombre}
+                                    </h3>
+                                    {Number(filteredProducts[0].descuento) > 0 && (
+                                        <p className="fedecell-tech text-[8px] uppercase tracking-[0.2em] text-gray-400 mb-4 font-bold">
+                                            // DESCUENTO_{filteredProducts[0].descuento}%
+                                        </p>
+                                    )}
+                                    <button className="fedecell-title text-[9px] tracking-widest border-b border-orange-500 pb-0.5 hover:text-white transition-colors">
+                                        VER_PRODUCTO_
+                                    </button>
+                                </div>
                             </motion.div>
-                        ))}
-                    </div>
+
+                            {/* Siguientes 4 Productos Populares */}
+                            <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {filteredProducts.slice(1, 5).map((product, i) => (
+                                    <motion.div
+                                        key={product.id || i}
+                                        variants={itemVariants}
+                                        whileHover={{ y: -3, borderColor: ACCENT_ORANGE }}
+                                        onClick={() => window.location.href = `/product/${product.id}`}
+                                        className={`relative border border-white/5 p-5 flex items-center justify-between overflow-hidden group cursor-pointer ${i % 2 === 0 ? 'bg-zinc-900/50' : 'bg-black'}`}
+                                    >
+                                        <div className="z-10 flex-1 pr-4">
+                                            {Number(product.descuento) > 0 && (
+                                                <p style={{ color: ACCENT_ORANGE }} className="fedecell-tech text-[8px] font-black mb-0.5">
+                                                    {product.descuento}% DESC
+                                                </p>
+                                            )}
+                                            <h3 className="fedecell-title text-lg leading-tight line-clamp-2">{product.nombre}</h3>
+                                            <p className="fedecell-tech text-[7px] text-gray-600 mt-1 uppercase">
+                                                {product.categoria || "NUEVO INGRESO"}
+                                            </p>
+                                        </div>
+                                        <motion.img
+                                            whileHover={{ rotate: -5, scale: 1.1 }}
+                                            src={product.imagenes?.[0] || product.image || "https://via.placeholder.com/400"}
+                                            className="w-20 h-20 md:w-28 md:h-28 object-contain z-10 drop-shadow-2xl"
+                                            alt={product.nombre}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="col-span-4 flex items-center justify-center h-full text-gray-500 fedecell-tech text-sm">
+                            CARGANDO_TENDENCIAS...
+                        </div>
+                    )}
                 </motion.div>
             </section>
 

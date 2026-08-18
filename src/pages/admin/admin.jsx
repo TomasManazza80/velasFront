@@ -1,41 +1,73 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDollarSign,
-  FiPackage, FiShoppingCart, FiCalendar, FiClock, FiBarChart2, FiHome,
-  FiTag, FiLayers, FiAlertTriangle, FiSearch, FiTrendingUp, FiArrowLeft, FiArrowRight, FiUploadCloud,
-  FiMinusCircle, FiCornerDownRight, FiMenu, FiCreditCard, FiMessageSquare, FiUser, FiTruck, FiActivity, FiHeart
-} from 'react-icons/fi';
+  FiEdit2,
+  FiTrash2,
+  FiCheck,
+  FiX,
+  FiPlus,
+  FiDollarSign,
+  FiPackage,
+  FiShoppingCart,
+  FiCalendar,
+  FiClock,
+  FiBarChart2,
+  FiHome,
+  FiTag,
+  FiLayers,
+  FiAlertTriangle,
+  FiSearch,
+  FiTrendingUp,
+  FiArrowLeft,
+  FiArrowRight,
+  FiUploadCloud,
+  FiMinusCircle,
+  FiCornerDownRight,
+  FiMenu,
+  FiCreditCard,
+  FiMessageSquare,
+  FiUser,
+  FiTruck,
+  FiActivity,
+  FiHeart,
+  FiZap,
+} from "react-icons/fi";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 // Componentes internos
-import HistorialDeVentas from '../admin/historialVentas';
-import ModuloCaja from '../admin/caja.jsx';
-import ConfiguracionCostos from './configuracionCostos.jsx';
-import Encargos from './encargos.jsx';
-import HistorialDeVentasLocal from '../admin/ventasLocalFisico.jsx';
-import HistorialRecaudacionFinal from '../admin/cierresDeCaja/historialRecaudacionFinal.jsx';
-import CierreCajaDiario from '../admin/cierresDeCaja/cierreCajaDiario.jsx';
-import BalanceModule from './balance/balance.jsx';
-import PersonalBalance from './balance/personalBalance.jsx';
-import CargaDeProductos from './productos/cargaDeProductos.jsx';
-import Facturacion from './facturacion/facturacion.jsx';
-import InventarioProductos from './productos/inventarioProductos.jsx';
-import LikesControl from './productos/LikesControl.jsx';
-import ModuloProveedores from './proveedores/proveedores.jsx';
-import ModuloClientes from './clientes/clientes.jsx';
-import ModuloRevendedores from './revendedores/revendedoresAdmin.jsx';
-import EnviosProductos from './envios/enviosProductos.jsx';
-import VentasEcommerceOnline from './ventas/ventasEcommerceOnline.jsx';
-import CargaContenidoWeb from './cargaDeContenido/cargaDeContenido.jsx';
-import Gastos from './gastos.jsx';
-import WhatsappQrSection from './whatsapp/whatsappQrSection.jsx';
-import ReporteGanancias from './reporteGanancias.jsx';
-import ConfiguracionMayorista from './configuracionMayorista.jsx';
-import ModuloEmpleados from './empleados/moduloEmpleados.jsx';
+import HistorialDeVentas from "../admin/historialVentas";
+import ModuloCaja from "../admin/caja.jsx";
+import ConfiguracionCostos from "./configuracionCostos.jsx";
+import Encargos from "./encargos.jsx";
+import HistorialDeVentasLocal from "../admin/ventasLocalFisico.jsx";
+import HistorialRecaudacionFinal from "../admin/cierresDeCaja/historialRecaudacionFinal.jsx";
+import CierreCajaDiario from "../admin/cierresDeCaja/cierreCajaDiario.jsx";
+import BalanceModule from "./balance/balance.jsx";
+import PersonalBalance from "./balance/personalBalance.jsx";
+import CargaDeProductos from "./productos/cargaDeProductos.jsx";
+import Facturacion from "./facturacion/facturacion.jsx";
+import InventarioProductos from "./productos/inventarioProductos.jsx";
+import LikesControl from "./productos/LikesControl.jsx";
+import ModuloProveedores from "./proveedores/proveedores.jsx";
+import ModuloClientes from "./clientes/clientes.jsx";
+import ModuloRevendedores from "./revendedores/revendedoresAdmin.jsx";
+import EnviosProductos from "./envios/enviosProductos.jsx";
+import VentasEcommerceOnline from "./ventas/ventasEcommerceOnline.jsx";
+import CargaContenidoWeb from "./cargaDeContenido/cargaDeContenido.jsx";
+import Gastos from "./gastos.jsx";
+import WhatsappQrSection from "./whatsapp/whatsappQrSection.jsx";
+import ReporteGanancias from "./reporteGanancias.jsx";
+import ConfiguracionMayorista from "./configuracionMayorista.jsx";
+import ModuloEmpleados from "./empleados/moduloEmpleados.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -44,18 +76,18 @@ const springTransition = { type: "spring", stiffness: 300, damping: 30 };
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: springTransition }
+  visible: { opacity: 1, y: 0, transition: springTransition },
 };
 
 const sectionVariants = {
   initial: { opacity: 0, x: 10 },
   animate: { opacity: 1, x: 0, transition: { duration: 0.3 } },
-  exit: { opacity: 0, x: -10, transition: { duration: 0.2 } }
+  exit: { opacity: 0, x: -10, transition: { duration: 0.2 } },
 };
 
 const sidebarGroupVariants = {
@@ -63,92 +95,96 @@ const sidebarGroupVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { staggerChildren: 0.1, ...springTransition }
-  }
+    transition: { staggerChildren: 0.1, ...springTransition },
+  },
 };
 
 const sidebarItemVariants = {
   hidden: { opacity: 0, x: -10 },
-  visible: { opacity: 1, x: 0 }
+  visible: { opacity: 1, x: 0 },
 };
-
-const MinimalistStyles = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-
-body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-.fedecell-title { font-family: 'Inter', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
-.fedecell-body { font-family: 'Inter', sans-serif; font-weight: 400; }
-.fedecell-tech { font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.05em; }
-
-.glass-card { 
-  background: #0a0a0a; 
-  border: 1px solid rgba(255, 255, 255, 0.1); 
-  transition: all 0.3s ease; 
-}
-.glass-card:hover { border-color: rgba(255, 255, 255, 0.3); }
-
-.sidebar-active { 
-  background: #ffffff !important; 
-  color: #000000 !important; 
-  font-weight: 800; 
-}
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: #ffffff; }
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  filter: invert(1);
-  opacity: 0.6;
-}
-
-.date-picker-container {
-  display: flex;
-  align-items: center;
-  background: #000;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px;
-  padding: 0 12px;
-  transition: all 0.3s;
-}
-.date-picker-container:hover {
-  border-color: #ffffff;
-}
-`;
 
 const EditarProducto = ({ producto, onGuardarCambios, onCancelar }) => {
   const [formData, setFormData] = useState({ ...producto });
 
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[110] p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4"
     >
       <motion.div
-        initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
-        className="glass-card p-6 md:p-10 w-full max-w-xl border-white/20"
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.95 }}
+        className="bg-white border border-gray-100 rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-xl"
       >
-        <h3 className="fedecell-title text-lg text-white mb-8 border-b border-white/10 pb-4">
-          <FiEdit2 className="inline mr-2" /> EDITAR REGISTRO
+        <h3 className="text-gray-900 font-bold text-lg mb-6 border-b border-gray-100 pb-4 flex items-center gap-2">
+          <FiEdit2 className="w-5 h-5 text-blue-600" /> Editar Registro
         </h3>
-        <form onSubmit={(e) => { e.preventDefault(); onGuardarCambios(formData); }} className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onGuardarCambios(formData);
+          }}
+          className="space-y-6"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2">
-              <label className="fedecell-tech text-[10px] text-zinc-500 uppercase block mb-2">Nombre del Producto</label>
-              <input type="text" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} className="w-full bg-transparent border-b border-white/20 p-2 text-white focus:border-white outline-none fedecell-body transition-colors" />
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                Nombre del Producto
+              </label>
+              <input
+                type="text"
+                value={formData.nombre}
+                onChange={(e) =>
+                  setFormData({ ...formData, nombre: e.target.value })
+                }
+                className="w-full bg-white border border-gray-200 rounded-full p-2.5 px-4 text-gray-900 text-sm font-medium outline-none transition-all focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              />
             </div>
             <div>
-              <label className="fedecell-tech text-[10px] text-zinc-500 uppercase block mb-2">Precio</label>
-              <input type="number" value={formData.precio} onChange={(e) => setFormData({ ...formData, precio: e.target.value })} className="w-full bg-transparent border-b border-white/20 p-2 text-white outline-none focus:border-white transition-colors" />
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                Precio
+              </label>
+              <input
+                type="number"
+                value={formData.precio}
+                onChange={(e) =>
+                  setFormData({ ...formData, precio: e.target.value })
+                }
+                className="w-full bg-white border border-gray-200 rounded-full p-2.5 px-4 text-gray-900 text-sm font-medium outline-none transition-all focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              />
             </div>
             <div>
-              <label className="fedecell-tech text-[10px] text-zinc-500 uppercase block mb-2">Stock</label>
-              <input type="number" value={formData.cantidad} onChange={(e) => setFormData({ ...formData, cantidad: e.target.value })} className="w-full bg-transparent border-b border-white/20 p-2 text-white outline-none focus:border-white transition-colors" />
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                Stock
+              </label>
+              <input
+                type="number"
+                value={formData.cantidad}
+                onChange={(e) =>
+                  setFormData({ ...formData, cantidad: e.target.value })
+                }
+                className="w-full bg-white border border-gray-200 rounded-full p-2.5 px-4 text-gray-900 text-sm font-medium outline-none transition-all focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              />
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-end gap-4 pt-6">
-            <button type="button" onClick={onCancelar} className="fedecell-title text-[11px] px-8 py-3 border border-white/10 hover:bg-white hover:text-black transition-all">CANCELAR</button>
-            <button type="submit" className="fedecell-title text-[11px] px-8 py-3 bg-white text-black hover:bg-zinc-200 transition-all">GUARDAR</button>
+          <div className="flex flex-col md:flex-row justify-end gap-4 pt-4 border-t border-gray-100 mt-4">
+            <button
+              type="button"
+              onClick={onCancelar}
+              className="bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-full px-4 py-2 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white text-sm font-medium rounded-full px-5 py-2 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm"
+            >
+              Guardar Cambios
+            </button>
           </div>
         </form>
       </motion.div>
@@ -160,14 +196,16 @@ const Admin = () => {
   const [recaudaciones, setRecaudaciones] = useState([]);
   const [productoAEditar, setProductoAEditar] = useState(null);
   const [todosMisProductos, setTodosMisProductos] = useState([]);
-  const [seccionActiva, setSeccionActiva] = useState(() => localStorage.getItem('adminSeccionActiva') || 'dashboard');
+  const [seccionActiva, setSeccionActiva] = useState(
+    () => localStorage.getItem("adminSeccionActiva") || "dashboard",
+  );
   const [loading, setLoading] = useState(false);
   const [ventasPendientesDeCierre, setVentasPendientesDeCierre] = useState([]);
   const [pagosCajaPendientes, setPagosCajaPendientes] = useState([]);
   const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
 
   const dateInicioRef = useRef(null);
   const dateFinRef = useRef(null);
@@ -179,12 +217,12 @@ const Admin = () => {
       if (mobile) setSidebarVisible(false);
       else setSidebarVisible(true);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('adminSeccionActiva', seccionActiva);
+    localStorage.setItem("adminSeccionActiva", seccionActiva);
   }, [seccionActiva]);
 
   const obtenerDatos = async () => {
@@ -194,159 +232,307 @@ const Admin = () => {
         axios.get(`${API_URL}/products`),
         axios.get(`${API_URL}/boughtProduct/AllboughtProducts`),
         axios.get(`${API_URL}/recaudacionFinal`),
-        axios.get(`${API_URL}/pagoCaja/pagos`)
+        axios.get(`${API_URL}/pagoCaja/pagos`),
       ]);
       setTodosMisProductos(prod.data);
       setVentasPendientesDeCierre(vent.data);
       setPagosCajaPendientes(caja.data || []);
-      setRecaudaciones(rec.data.map(r => {
-        let fechaExplicita = (r.op2 || '').replace('Fecha: ', '');
-        if (!fechaExplicita && r.createdAt) {
-          fechaExplicita = new Date(r.createdAt).toLocaleDateString('es-AR');
-        }
-        return {
-          id: r.id,
-          mes: fechaExplicita || r.mes || 'S/D',
-          montoRecaudado: parseFloat(r.totalFinal) || 0,
-          productosVendidos: [...(r.pagosEcommerce || []), ...(r.pagosLocal || [])],
-          createdAt: r.createdAt
-        };
-      }));
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+      setRecaudaciones(
+        rec.data.map((r) => {
+          let fechaExplicita = (r.op2 || "").replace("Fecha: ", "");
+          if (!fechaExplicita && r.createdAt) {
+            fechaExplicita = new Date(r.createdAt).toLocaleDateString("es-AR");
+          }
+          return {
+            id: r.id,
+            mes: fechaExplicita || r.mes || "S/D",
+            montoRecaudado: parseFloat(r.totalFinal) || 0,
+            productosVendidos: [
+              ...(r.pagosEcommerce || []),
+              ...(r.pagosLocal || []),
+            ],
+            createdAt: r.createdAt,
+          };
+        }),
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { obtenerDatos(); }, []);
+  useEffect(() => {
+    obtenerDatos();
+  }, []);
 
   const dataGrafico = useMemo(() => {
-    let filtered = [...recaudaciones].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    let filtered = [...recaudaciones].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+    );
     if (fechaInicio || fechaFin) {
-      if (fechaInicio) filtered = filtered.filter(r => new Date(r.createdAt) >= new Date(fechaInicio + 'T00:00:00'));
-      if (fechaFin) filtered = filtered.filter(r => new Date(r.createdAt) <= new Date(fechaFin + 'T23:59:59'));
-      return filtered.map(r => ({ mes: r.mes, recaudado: r.montoRecaudado }));
+      if (fechaInicio)
+        filtered = filtered.filter(
+          (r) => new Date(r.createdAt) >= new Date(fechaInicio + "T00:00:00"),
+        );
+      if (fechaFin)
+        filtered = filtered.filter(
+          (r) => new Date(r.createdAt) <= new Date(fechaFin + "T23:59:59"),
+        );
+      return filtered.map((r) => ({ mes: r.mes, recaudado: r.montoRecaudado }));
     }
-    return filtered.map(r => ({ mes: r.mes, recaudado: r.montoRecaudado })).slice(-10);
+    return filtered
+      .map((r) => ({ mes: r.mes, recaudado: r.montoRecaudado }))
+      .slice(-10);
   }, [recaudaciones, fechaInicio, fechaFin]);
 
   const recaudacionPendienteTotal = useMemo(() => {
-    const ecom = ventasPendientesDeCierre.reduce((acc, s) => acc + (parseFloat(s.precio) * parseInt(s.cantidad) * (1 - parseFloat(s.descuentoGlobalAplicado || 0) / 100)), 0);
-    const local = pagosCajaPendientes.reduce((acc, p) => acc + parseFloat(p.montoTotal || 0), 0);
+    const ecom = ventasPendientesDeCierre.reduce(
+      (acc, s) =>
+        acc +
+        parseFloat(s.precio) *
+        parseInt(s.cantidad) *
+        (1 - parseFloat(s.descuentoGlobalAplicado || 0) / 100),
+      0,
+    );
+    const local = pagosCajaPendientes.reduce(
+      (acc, p) => acc + parseFloat(p.montoTotal || 0),
+      0,
+    );
     return ecom + local;
   }, [ventasPendientesDeCierre, pagosCajaPendientes]);
 
   const desgloseCajaAbierta = useMemo(() => {
-    let ecomRev = 0, ecomCost = 0, localRev = 0, localCost = 0;
-    ventasPendientesDeCierre.forEach(s => {
-      const precioVenta = (parseFloat(s.precio) || 0) * (parseInt(s.cantidad) || 1) * (1 - parseFloat(s.descuentoGlobalAplicado || 0) / 100);
-      const costo = (parseFloat(s.precioCompra) || 0) * (parseInt(s.cantidad) || 1);
-      ecomRev += precioVenta; ecomCost += costo;
+    let ecomRev = 0,
+      ecomCost = 0,
+      localRev = 0,
+      localCost = 0;
+    ventasPendientesDeCierre.forEach((s) => {
+      const precioVenta =
+        (parseFloat(s.precio) || 0) *
+        (parseInt(s.cantidad) || 1) *
+        (1 - parseFloat(s.descuentoGlobalAplicado || 0) / 100);
+      const costo =
+        (parseFloat(s.precioCompra) || 0) * (parseInt(s.cantidad) || 1);
+      ecomRev += precioVenta;
+      ecomCost += costo;
     });
-    pagosCajaPendientes.forEach(p => {
+    pagosCajaPendientes.forEach((p) => {
       localRev += parseFloat(p.montoTotal) || 0;
-      (p.productos || []).forEach(prod => {
-        localCost += (parseFloat(prod.precioCompra) || 0) * (parseInt(prod.cantidad) || 1);
+      (p.productos || []).forEach((prod) => {
+        localCost +=
+          (parseFloat(prod.precioCompra) || 0) * (parseInt(prod.cantidad) || 1);
       });
     });
-    const gananciaTotal = (ecomRev + localRev) - (ecomCost + localCost);
+    const gananciaTotal = ecomRev + localRev - (ecomCost + localCost);
     return {
       ecommerce: { rev: ecomRev, cost: ecomCost, profit: ecomRev - ecomCost },
       local: { rev: localRev, cost: localCost, profit: localRev - localCost },
-      total: { rev: ecomRev + localRev, cost: ecomCost + localCost, profit: gananciaTotal }
+      total: {
+        rev: ecomRev + localRev,
+        cost: ecomCost + localCost,
+        profit: gananciaTotal,
+      },
     };
   }, [ventasPendientesDeCierre, pagosCajaPendientes]);
 
   const gananciaPendienteTotal = desgloseCajaAbierta.total.profit;
 
   return (
-    <div className="min-h-screen bg-black text-white fedecell-body overflow-x-hidden">
-      <style dangerouslySetInnerHTML={{ __html: MinimalistStyles }} />
-
+    <div className="min-h-screen bg-[#FAFAFA] text-gray-900 overflow-x-hidden font-sans">
       <AnimatePresence>
         {isMobile && sidebarVisible && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setSidebarVisible(false)}
-            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[50]"
+            className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[50]"
           />
         )}
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setSidebarVisible(!sidebarVisible)}
-        className="fixed h-[50px] top-[40px] left-[20px] z-[1001] bg-white text-black p-3 shadow-xl transition-all border border-white/10"
+        className="fixed h-[48px] top-[20px] md:top-[40px] left-[20px] z-[1001] bg-white text-gray-900 rounded-full shadow-sm border border-gray-200 p-3 flex items-center justify-center transition-all"
       >
-        {sidebarVisible && !isMobile ? <FiArrowLeft size={20} /> : <FiMenu size={20} />}
+        {sidebarVisible && !isMobile ? (
+          <FiArrowLeft size={20} className="w-5 h-5 text-gray-600" />
+        ) : (
+          <FiMenu size={20} className="w-5 h-5 text-gray-600" />
+        )}
       </motion.button>
 
       <motion.div
         initial={false}
-        animate={{ x: sidebarVisible ? 0 : (isMobile ? '-100%' : -240) }}
+        animate={{ x: sidebarVisible ? 0 : isMobile ? "-100%" : -260 }}
         transition={springTransition}
-        className={`fixed top-0 left-0 h-full bg-[#050505] border-r border-white/10 z-[55] overflow-y-auto pb-24 ${isMobile ? 'w-[80vw]' : 'w-60'}`}
+        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-sm z-[55] overflow-y-auto pb-24 ${isMobile ? "w-[80vw]" : "w-[260px]"}`}
       >
-        <div className="p-8 border-b border-white/10 pt-28 flex justify-between items-center">
-          <div className='mb-4'>
-            <h1 className="fedecell-title text-xs tracking-[0.3em] opacity-50">ADMIN PANEL</h1>
+        <div className="p-8 border-b border-gray-200 pt-28 flex justify-between items-center">
+          <div className="mb-2">
+            <h1 className="text-gray-900 font-bold text-2xl flex items-center gap-2">
+              <FiLayers className="text-blue-600 w-6 h-6" /> Admin Panel
+            </h1>
           </div>
           {isMobile && (
-            <button onClick={() => setSidebarVisible(false)} className="text-zinc-500 hover:text-white p-2">
-              <FiX size={20} />
+            <button
+              onClick={() => setSidebarVisible(false)}
+              className="text-gray-400 hover:text-gray-900 p-2 transition-colors"
+            >
+              <FiX size={20} className="w-5 h-5" />
             </button>
           )}
         </div>
 
-        <motion.nav variants={containerVariants} initial="hidden" animate="visible" className="p-4 space-y-8">
+        <motion.nav
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="p-4 space-y-6 mt-4"
+        >
           {[
             {
-              title: 'Principal',
+              title: "Principal",
               items: [
-                { id: 'dashboard', label: 'Dashboard', icon: <FiHome /> },
-                { id: 'caja', label: 'Caja Operativa', icon: <FiDollarSign /> },
-                { id: 'Encargos', label: 'Encargos / Pedidos', icon: <FiPackage /> },
-                { id: 'control', label: 'Cierre Diario', icon: <FiCheck /> },
-              ]
+                {
+                  id: "dashboard",
+                  label: "Dashboard",
+                  icon: <FiHome className="w-5 h-5" />,
+                },
+                {
+                  id: "caja",
+                  label: "Caja Operativa",
+                  icon: <FiDollarSign className="w-5 h-5" />,
+                },
+                {
+                  id: "Encargos",
+                  label: "Encargos / Pedidos",
+                  icon: <FiPackage className="w-5 h-5" />,
+                },
+                {
+                  id: "control",
+                  label: "Cierre Diario",
+                  icon: <FiCheck className="w-5 h-5" />,
+                },
+              ],
             },
             {
-              title: 'Finanzas',
+              title: "Finanzas",
               items: [
-                { id: 'Balance', label: 'Balance', icon: <FiBarChart2 /> },
-                { id: 'ganancias', label: 'Ganancias', icon: <FiTrendingUp /> },
-                { id: 'gastos', label: 'Gastos', icon: <FiDollarSign /> },
-                { id: 'historialRecaudacionFinal', label: 'Historial', icon: <FiClock /> },
-                { id: 'facturacion', label: 'Facturación', icon: <FiTag /> },
-                { id: 'configMayorista', label: 'Config. Mayorista', icon: <FiDollarSign /> },
-              ]
+                {
+                  id: "Balance",
+                  label: "Balance",
+                  icon: <FiBarChart2 className="w-5 h-5" />,
+                },
+
+                {
+                  id: "gastos",
+                  label: "Costos",
+                  icon: <FiDollarSign className="w-5 h-5" />,
+                },
+                {
+                  id: "historialRecaudacionFinal",
+                  label: "Historial",
+                  icon: <FiClock className="w-5 h-5" />,
+                },
+                {
+                  id: "facturacion",
+                  label: "Facturación",
+                  icon: <FiTag className="w-5 h-5" />,
+                },
+                {
+                  id: "configMayorista",
+                  label: "Config. Mayorista",
+                  icon: <FiDollarSign className="w-5 h-5" />,
+                },
+              ],
             },
             {
-              title: 'Inventario',
+              title: "Inventario",
               items: [
-                { id: 'productos', label: 'Stock', icon: <FiPackage /> },
-                { id: 'cargar', label: 'Nueva Carga', icon: <FiPlus /> },
-                { id: 'likes', label: 'Popularidad', icon: <FiHeart /> },
-                { id: 'cargarContenidoWeb', label: 'Contenido Web', icon: <FiEdit2 /> },
-                { id: 'proveedores', label: 'Proveedores', icon: <FiTruck /> },
-              ]
+                {
+                  id: "productos",
+                  label: "Stock",
+                  icon: <FiPackage className="w-5 h-5" />,
+                },
+                {
+                  id: "cargar",
+                  label: "Nueva Carga",
+                  icon: <FiPlus className="w-5 h-5" />,
+                },
+                {
+                  id: "likes",
+                  label: "Combos & Popularidad",
+                  icon: <FiZap className="w-5 h-5" />,
+                },
+                {
+                  id: "cargarContenidoWeb",
+                  label: "Contenido Web",
+                  icon: <FiEdit2 className="w-5 h-5" />,
+                },
+                {
+                  id: "proveedores",
+                  label: "Proveedores",
+                  icon: <FiTruck className="w-5 h-5" />,
+                },
+              ],
             },
             {
-              title: 'Ventas',
+              title: "Ventas",
               items: [
-                { id: 'ventasLocal', label: 'Local', icon: <FiShoppingCart /> },
-                { id: 'ventasOnline', label: 'Ecommerce', icon: <FiUploadCloud /> },
-                { id: 'envios', label: 'Logística', icon: <FiTrendingUp /> },
-                { id: 'clientes', label: 'Clientes', icon: <FiUser /> },
-              ]
+                {
+                  id: "ventasLocal",
+                  label: "Local",
+                  icon: <FiShoppingCart className="w-5 h-5" />,
+                },
+                {
+                  id: "ventasOnline",
+                  label: "Ecommerce",
+                  icon: <FiUploadCloud className="w-5 h-5" />,
+                },
+                {
+                  id: "envios",
+                  label: "Logística",
+                  icon: <FiTrendingUp className="w-5 h-5" />,
+                },
+                {
+                  id: "clientes",
+                  label: "Clientes",
+                  icon: <FiUser className="w-5 h-5" />,
+                },
+              ],
             },
             {
-              title: 'Sistema',
+              title: "Sistema",
               items: [
-                { id: 'whatsapp', label: 'WhatsApp', icon: <FiMessageSquare /> },
-                { id: 'empleados', label: 'Personal', icon: <FiUser /> },
-              ]
-            }
+                {
+                  id: "whatsapp",
+                  label: "WhatsApp",
+                  icon: <FiMessageSquare className="w-5 h-5" />,
+                },
+                {
+                  id: "empleados",
+                  label: "Personal",
+                  icon: <FiUser className="w-5 h-5" />,
+                },
+              ],
+            },
           ].map((group, i) => (
-            <motion.div key={i} variants={sidebarGroupVariants} className="space-y-1">
-              <motion.p variants={sidebarItemVariants} className="px-4 text-[9px] text-zinc-600 font-bold tracking-widest mb-3 uppercase">{group.title}</motion.p>
-              {group.items.map(item => (
+            <motion.div
+              key={i}
+              variants={sidebarGroupVariants}
+              className="space-y-1.5"
+            >
+              <motion.p
+                variants={sidebarItemVariants}
+                className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2"
+              >
+                {group.title}
+              </motion.p>
+              {group.items.map((item) => (
                 <motion.button
                   key={item.id}
                   variants={sidebarItemVariants}
@@ -354,10 +540,10 @@ const Admin = () => {
                     setSeccionActiva(item.id);
                     if (isMobile) setSidebarVisible(false);
                   }}
-                  className={`w-full flex items-center px-4 py-3 fedecell-tech text-[10px] tracking-widest transition-all rounded-none border-l-2
-                  ${seccionActiva === item.id ? 'sidebar-active border-white' : 'text-zinc-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                  className={`w-full flex items-center px-4 py-2.5 text-sm font-medium transition-all rounded-full border border-transparent
+                  ${seccionActiva === item.id ? "bg-blue-600 text-white shadow-sm" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"}`}
                 >
-                  <span className="mr-3 text-base">{item.icon}</span> {item.label.toUpperCase()}
+                  <span className="mr-3">{item.icon}</span> {item.label}
                 </motion.button>
               ))}
             </motion.div>
@@ -366,154 +552,278 @@ const Admin = () => {
       </motion.div>
 
       <motion.div
-        animate={{ paddingLeft: (sidebarVisible && !isMobile) ? 240 : 0 }}
+        animate={{ paddingLeft: sidebarVisible && !isMobile ? 260 : 0 }}
         transition={springTransition}
-        className="pt-24 md:pt-32 md:p-12 min-h-screen w-full"
+        className="pt-24 md:pt-28 p-4 md:p-8 min-h-screen w-full flex flex-col"
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={seccionActiva}
             variants={sectionVariants}
-            initial="initial" animate="animate" exit="exit"
+            initial="initial"
+            animate="animate"
+            exit="exit"
           >
-            {seccionActiva === 'dashboard' && (
-              <div className="p-6 md:p-0 mt-[-100px] space-y-12">
-                <div className="flex items-center justify-between">
-                  {loading && <p className="fedecell-tech text-[10px] text-white animate-pulse tracking-widest">STREAMS SYNCING...</p>}
+            {seccionActiva === "dashboard" && (
+              <div className="space-y-6 md:space-y-8">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Dashboard Overview
+                  </h2>
+                  {loading && (
+                    <p className="text-xs font-semibold text-gray-500 animate-pulse bg-white border border-gray-200 px-3 py-1.5 rounded-full">
+                      Sincronizando datos...
+                    </p>
+                  )}
                 </div>
 
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+                >
                   {[
-                    { label: 'Stock Items', val: todosMisProductos.length, icon: <FiPackage /> },
-                    { label: 'Live Sessions', val: ventasPendientesDeCierre.length + pagosCajaPendientes.length, icon: <FiClock /> },
-                    { label: 'Pending Gross', val: `$${recaudacionPendienteTotal.toLocaleString()}`, icon: <FiDollarSign /> },
-                    { label: 'Net Profit', val: `$${gananciaPendienteTotal.toLocaleString()}`, icon: <FiTrendingUp />, highlight: true }
+                    {
+                      label: "Stock Items",
+                      val: todosMisProductos.length,
+                      icon: <FiPackage className="w-6 h-6 text-gray-400" />,
+                    },
+                    {
+                      label: "Cajas Activas",
+                      val:
+                        ventasPendientesDeCierre.length +
+                        pagosCajaPendientes.length,
+                      icon: <FiClock className="w-6 h-6 text-gray-400" />,
+                    },
+                    {
+                      label: "Bruto Pendiente",
+                      val: `$${recaudacionPendienteTotal.toLocaleString()}`,
+                      icon: <FiDollarSign className="w-6 h-6 text-gray-400" />,
+                    },
+                    {
+                      label: "Ganancia Neta",
+                      val: `$${gananciaPendienteTotal.toLocaleString()}`,
+                      icon: <FiTrendingUp className="w-6 h-6 text-blue-600" />,
+                      highlight: true,
+                    },
                   ].map((card, i) => (
                     <motion.div
-                      key={i} variants={itemVariants}
-                      className={`glass-card p-6 flex justify-between items-center ${card.highlight ? 'bg-white text-black' : ''}`}
+                      key={i}
+                      variants={itemVariants}
+                      className={`bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex justify-between items-center ${card.highlight ? "border-blue-600/30 bg-blue-50/20" : ""}`}
                     >
                       <div>
-                        <p className={`fedecell-tech text-[9px] uppercase ${card.highlight ? 'text-black/60' : 'text-zinc-500'}`}>{card.label}</p>
-                        <p className={`fedecell-tech text-2xl font-black mt-2`}>{card.val}</p>
+                        <p
+                          className={`text-xs font-semibold uppercase tracking-wider ${card.highlight ? "text-blue-600" : "text-gray-500"}`}
+                        >
+                          {card.label}
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 mt-2">
+                          {card.val}
+                        </p>
                       </div>
-                      <div className={`text-2xl opacity-20`}>{card.icon}</div>
+                      <div className="bg-gray-50 p-3 rounded-2xl">
+                        {card.icon}
+                      </div>
                     </motion.div>
                   ))}
                 </motion.div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2 glass-card p-6 md:p-10">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-                      <h3 className="fedecell-title text-xs text-white flex items-center gap-3">
-                        <FiTrendingUp /> REVENUE ANALYTICS
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+                  <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                      <h3 className="text-gray-900 font-bold text-lg flex items-center gap-2">
+                        <FiBarChart2 className="w-5 h-5 text-blue-600" />{" "}
+                        Analíticas de Ingresos
                       </h3>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="date-picker-container" onClick={() => dateInicioRef.current?.showPicker()}>
-                          <FiCalendar className="text-white opacity-40" size={14} />
+                      <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <div className="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 transition-all">
+                          <FiCalendar className="text-gray-400 w-4 h-4 mr-2" />
                           <input
-                            ref={dateInicioRef} type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)}
-                            className="bg-transparent border-none text-[10px] text-white pl-3 py-2 outline-none fedecell-tech"
+                            type="date"
+                            value={fechaInicio}
+                            onChange={(e) => setFechaInicio(e.target.value)}
+                            className="bg-transparent border-none text-xs text-gray-700 font-medium outline-none w-full cursor-pointer"
                           />
                         </div>
-                        <div className="date-picker-container" onClick={() => dateFinRef.current?.showPicker()}>
-                          <FiCalendar className="text-white opacity-40" size={14} />
+                        <span className="text-gray-400 text-xs font-medium">a</span>
+                        <div className="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 transition-all">
+                          <FiCalendar className="text-gray-400 w-4 h-4 mr-2" />
                           <input
-                            ref={dateFinRef} type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)}
-                            className="bg-transparent border-none text-[10px] text-white pl-3 py-2 outline-none fedecell-tech"
+                            type="date"
+                            value={fechaFin}
+                            onChange={(e) => setFechaFin(e.target.value)}
+                            className="bg-transparent border-none text-xs text-gray-700 font-medium outline-none w-full cursor-pointer"
                           />
                         </div>
                         {(fechaInicio || fechaFin) && (
-                          <button onClick={() => { setFechaInicio(''); setFechaFin(''); }} className="hover:text-white text-zinc-500 transition-colors p-2">
-                            <FiX size={18} />
+                          <button
+                            onClick={() => {
+                              setFechaInicio("");
+                              setFechaFin("");
+                            }}
+                            className="bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-full p-2 transition-colors"
+                          >
+                            <FiX className="w-4 h-4" />
                           </button>
                         )}
                       </div>
                     </div>
 
-                    <div className="h-64 w-full">
+                    <div className="h-72 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={dataGrafico}>
-                          <CartesianGrid strokeDasharray="0" stroke="#ffffff08" vertical={false} />
-                          <XAxis dataKey="mes" stroke="#333" tick={{ fontSize: 9, family: 'Inter', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                          <YAxis stroke="#333" tick={{ fontSize: 9, family: 'Inter', fontWeight: 600 }} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val.toLocaleString()}`} width={60} />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#fff', border: 'none', color: '#000', fontSize: 10, fontWeight: 800, fontFamily: 'Inter' }}
-                            itemStyle={{ color: '#000' }} cursor={{ stroke: '#fff', strokeWidth: 1 }}
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#F1F5F9"
+                            vertical={false}
                           />
-                          <Line type="stepAfter" dataKey="recaudado" stroke="#ffffff" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#000', stroke: '#fff', strokeWidth: 2 }} />
+                          <XAxis
+                            dataKey="mes"
+                            stroke="#94A3B8"
+                            tick={{ fontSize: 11, fill: "#64748B" }}
+                            axisLine={false}
+                            tickLine={false}
+                            dy={10}
+                          />
+                          <YAxis
+                            stroke="#94A3B8"
+                            tick={{ fontSize: 11, fill: "#64748B" }}
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(val) => `$${val.toLocaleString()}`}
+                            dx={-10}
+                            width={70}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "#fff",
+                              border: "1px solid #E2E8F0",
+                              borderRadius: "16px",
+                              color: "#111827",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                            }}
+                            itemStyle={{ color: "#2563EB" }}
+                            cursor={{ stroke: "#E2E8F0", strokeWidth: 1 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="recaudado"
+                            stroke="#2563EB"
+                            strokeWidth={3}
+                            dot={{
+                              r: 4,
+                              fill: "#fff",
+                              stroke: "#2563EB",
+                              strokeWidth: 2,
+                            }}
+                            activeDot={{
+                              r: 6,
+                              fill: "#2563EB",
+                              stroke: "#fff",
+                              strokeWidth: 2,
+                            }}
+                          />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  <div className="glass-card flex flex-col">
-                    <div className="p-8 border-b border-white/10">
-                      <h3 className="fedecell-title text-[10px] text-zinc-400 flex items-center gap-2 mb-8">
-                        <FiActivity /> ACTIVE BALANCES
+                  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                    <div className="p-6 border-b border-gray-100">
+                      <h3 className="text-gray-900 font-bold text-lg flex items-center gap-2 mb-6">
+                        <FiActivity className="w-5 h-5 text-blue-600" />{" "}
+                        Resumen de Caja
                       </h3>
 
-                      <div className="space-y-6">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="fedecell-tech text-[9px] text-zinc-500 uppercase">Gross Income</p>
-                            <p className="fedecell-tech text-xl text-white font-bold tracking-tight">${desgloseCajaAbierta.total.rev.toLocaleString()}</p>
-                          </div>
+                      <div className="space-y-5">
+                        <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Ingresos Brutos
+                          </p>
+                          <p className="text-sm font-bold text-gray-900">
+                            ${desgloseCajaAbierta.total.rev.toLocaleString()}
+                          </p>
                         </div>
 
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="fedecell-tech text-[9px] text-zinc-500 uppercase">Estimated Costs</p>
-                            <p className="fedecell-tech text-xl text-white font-bold tracking-tight">${desgloseCajaAbierta.total.cost.toLocaleString()}</p>
-                          </div>
+                        <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Costos Estimados
+                          </p>
+                          <p className="text-sm font-bold text-gray-900">
+                            ${desgloseCajaAbierta.total.cost.toLocaleString()}
+                          </p>
                         </div>
 
-                        <div className="pt-8 mt-4 border-t border-white/10">
-                          <div className="p-5 bg-white text-black">
-                            <p className="fedecell-tech text-[10px] font-black uppercase mb-1">Current Net Profit</p>
-                            <p className="fedecell-tech text-3xl font-black tracking-tighter">${desgloseCajaAbierta.total.profit.toLocaleString()}</p>
+                        <div className="mt-6 pt-4">
+                          <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                              Ganancia Neta Actual
+                            </p>
+                            <p className="text-3xl font-bold text-blue-600 tracking-tight">
+                              $
+                              {desgloseCajaAbierta.total.profit.toLocaleString()}
+                            </p>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-8 overflow-y-auto flex-1 max-h-48 no-scrollbar">
-                      <h3 className="fedecell-title text-[10px] text-zinc-600 mb-6 uppercase">Recent History</h3>
-                      {recaudaciones.slice(0, 5).map(r => (
-                        <div key={r.id} className="border-b border-white/5 py-4 flex justify-between items-center group">
-                          <span className="fedecell-tech text-[10px] text-zinc-400 group-hover:text-white transition-colors uppercase">{r.mes}</span>
-                          <span className="fedecell-tech text-[11px] text-white font-bold">${r.montoRecaudado.toLocaleString()}</span>
-                        </div>
-                      ))}
+                    <div className="p-6 overflow-y-auto flex-1 max-h-56">
+                      <h3 className="text-xs font-semibold text-gray-500 mb-4 uppercase tracking-wider">
+                        Últimos Cierres
+                      </h3>
+                      <div className="space-y-3">
+                        {recaudaciones.slice(0, 5).map((r) => (
+                          <div
+                            key={r.id}
+                            className="bg-white border border-gray-200 p-3.5 rounded-2xl flex justify-between items-center hover:bg-gray-50 transition-colors"
+                          >
+                            <span className="text-xs font-medium text-gray-600 truncate mr-2">
+                              {r.mes}
+                            </span>
+                            <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                              ${r.montoRecaudado.toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="w-full">
-              {seccionActiva === 'Balance' && <BalanceModule />}
-              {seccionActiva === 'personalBalance' && <PersonalBalance />}
-              {seccionActiva === 'Encargos' && <Encargos />}
-              {seccionActiva === 'caja' && <ModuloCaja />}
-              {seccionActiva === 'productos' && <InventarioProductos />}
-              {seccionActiva === 'cargar' && <CargaDeProductos />}
-              {seccionActiva === 'likes' && <LikesControl />}
-              {seccionActiva === 'ventasOnline' && <VentasEcommerceOnline />}
-              {seccionActiva === 'ventasLocal' && <HistorialDeVentasLocal />}
-              {seccionActiva === 'historialRecaudacionFinal' && <HistorialRecaudacionFinal />}
-              {seccionActiva === 'facturacion' && <Facturacion />}
-              {seccionActiva === 'proveedores' && <ModuloProveedores />}
-              {seccionActiva === 'clientes' && <ModuloClientes />}
-              {seccionActiva === 'revendedores' && <ModuloRevendedores />}
-              {seccionActiva === 'envios' && <EnviosProductos />}
-              {seccionActiva === 'cargarContenidoWeb' && <CargaContenidoWeb />}
-              {seccionActiva === 'gastos' && <Gastos />}
-              {seccionActiva === 'whatsapp' && <WhatsappQrSection />}
-              {seccionActiva === 'ganancias' && <ReporteGanancias />}
-              {seccionActiva === 'control' && <CierreCajaDiario />}
-              {seccionActiva === 'configMayorista' && <ConfiguracionMayorista />}
-              {seccionActiva === 'empleados' && <ModuloEmpleados />}
+            <div className="w-full mt-4 flex-1 flex flex-col [&>div]:flex-1 [&>div]:w-full [&>div]:min-h-[calc(100vh-140px)]">
+              {seccionActiva === "Balance" && <BalanceModule />}
+              {seccionActiva === "personalBalance" && <PersonalBalance />}
+              {seccionActiva === "Encargos" && <Encargos />}
+              {seccionActiva === "caja" && <ModuloCaja />}
+              {seccionActiva === "productos" && <InventarioProductos />}
+              {seccionActiva === "cargar" && <CargaDeProductos />}
+              {seccionActiva === "likes" && <LikesControl />}
+              {seccionActiva === "ventasOnline" && <VentasEcommerceOnline />}
+              {seccionActiva === "ventasLocal" && <HistorialDeVentasLocal />}
+              {seccionActiva === "historialRecaudacionFinal" && (
+                <HistorialRecaudacionFinal />
+              )}
+              {seccionActiva === "facturacion" && <Facturacion />}
+              {seccionActiva === "proveedores" && <ModuloProveedores />}
+              {seccionActiva === "clientes" && <ModuloClientes />}
+              {seccionActiva === "revendedores" && <ModuloRevendedores />}
+              {seccionActiva === "envios" && <EnviosProductos />}
+              {seccionActiva === "cargarContenidoWeb" && <CargaContenidoWeb />}
+              {seccionActiva === "gastos" && <Gastos />}
+              {seccionActiva === "whatsapp" && <WhatsappQrSection />}
+              {seccionActiva === "ganancias" && <ReporteGanancias />}
+              {seccionActiva === "control" && <CierreCajaDiario />}
+              {seccionActiva === "configMayorista" && (
+                <ConfiguracionMayorista />
+              )}
+              {seccionActiva === "empleados" && <ModuloEmpleados />}
             </div>
           </motion.div>
         </AnimatePresence>

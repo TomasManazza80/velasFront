@@ -4,6 +4,7 @@ import BuySteps from "../../components/BuyStepsCard/BuySteps.jsx";
 import Footer from "../../components/Footer/Footer.jsx";
 import Hero from "../../components/Hero/Hero.jsx";
 import ProductsHome from "../Products/productsHome.jsx";
+import CombosHome from "../../components/CombosHome/CombosHome.jsx";
 
 
 
@@ -22,7 +23,6 @@ const fadeUpVariant = {
   }
 };
 
-import RepairsModule from "../../components/RepairsModule/RepairsModule.jsx";
 
 const HOME = () => {
   const [visualContent, setVisualContent] = React.useState({});
@@ -59,6 +59,7 @@ const HOME = () => {
         <Hero />
         <BuySteps />
       </motion.div>
+
 
       {/* 3. CONCEPT: VIEWPORT DETECTION (Aparece al hacer scroll) */}
       {/* <motion.div
@@ -127,11 +128,6 @@ const HOME = () => {
         </motion.section>
       )}
 
-      {/* MÓDULO DE REPARACIONES */}
-      <RepairsModule
-        bannerImage={visualContent.urls?.[3]}
-        bannerPosition={visualContent.positions?.[3]}
-      />
 
       {/* 4. CONCEPT: STAGGERED VIEWPORT DETECTION */}
       <motion.div

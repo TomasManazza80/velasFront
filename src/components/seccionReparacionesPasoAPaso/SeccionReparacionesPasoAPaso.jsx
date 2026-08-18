@@ -71,7 +71,7 @@ const PortfolioEncargos = () => {
                             <h2 className="text-3xl md:text-4xl uppercase tracking-widest font-light mb-4">
                                 Clientes & Destacados
                             </h2>
-                            <p className="font-[cursive] text-[#b07d6b] text-3xl md:text-5xl lowercase">
+                            <p className="font-['Inter'] text-[#b07d6b] text-3xl md:text-5xl lowercase">
                                 LuPetruccelli
                             </p>
                         </motion.div>

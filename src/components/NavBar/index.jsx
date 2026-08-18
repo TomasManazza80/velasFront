@@ -59,7 +59,7 @@ const LuNavbarStyles = `
 
 .lu-title { font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; }
 .lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
-.lu-script { font-family: 'Great Vibes', cursive; }
+.lu-script { font-family: 'Inter', sans-serif; }
 
 /* HEADER STATES */
 .header-transparent {
@@ -327,6 +327,20 @@ function Index() {
         </NavLink>
     );
 
+    const [velasDropdownOpen, setVelasDropdownOpen] = useState(false);
+    const dropdownTimeoutRef = useRef(null);
+
+    const handleMouseEnterVelas = () => {
+        if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+        setVelasDropdownOpen(true);
+    };
+
+    const handleMouseLeaveVelas = () => {
+        dropdownTimeoutRef.current = setTimeout(() => {
+            setVelasDropdownOpen(false);
+        }, 150);
+    };
+
     const menuItems = [
         { label: "Colecciones", path: "/", icon: faHouse },
         { label: "Velas & Aromas", path: "/products", icon: faMobileScreen },
@@ -354,11 +368,103 @@ function Index() {
                         </NavLink>
                     </div>
 
-                    {/* DESKTOP NAVIGATION */}
+                    {/* DESKTOP NAVIGATION WITH DROPDOWN FOR VELAS & AROMAS */}
                     <nav className="hidden lg:flex items-center gap-8 mx-auto">
-                        {menuItems.map((item) => (
-                            <NavItem key={item.label} to={item.path} label={item.label} />
-                        ))}
+                        {menuItems.map((item) => {
+                            if (item.label === "Velas & Aromas") {
+                                return (
+                                    <div
+                                        key={item.label}
+                                        className="relative py-2"
+                                        onMouseEnter={handleMouseEnterVelas}
+                                        onMouseLeave={handleMouseLeaveVelas}
+                                    >
+                                        <div className="flex items-center gap-1.5 cursor-pointer">
+                                            <NavItem to={item.path} label={item.label} />
+                                            <FontAwesomeIcon
+                                                icon={faChevronDown}
+                                                className={`text-[8px] text-[#b07d6b] transition-transform duration-300 ${
+                                                    velasDropdownOpen ? "rotate-180" : ""
+                                                }`}
+                                            />
+                                        </div>
+
+                                        {/* DROPDOWN DESPLEGABLE DE CATEGORÍAS */}
+                                        <AnimatePresence>
+                                            {velasDropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-64 bg-white/95 backdrop-blur-xl border border-[#cba394]/30 shadow-2xl rounded-2xl p-3 z-[1200] overflow-hidden"
+                                                >
+                                                    <div className="px-3 py-1.5 mb-1 border-b border-gray-100 flex items-center justify-between">
+                                                        <span className="font-['Montserrat'] text-[9px] font-bold tracking-[0.2em] uppercase text-[#b07d6b]">
+                                                            Categorías
+                                                        </span>
+                                                        <span className="text-[9px] text-gray-400 font-serif italic">
+                                                            {categories.length || 4} disponibles
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="max-h-64 overflow-y-auto space-y-0.5 py-1 custom-scrollbar">
+                                                        {categories.length > 0 ? (
+                                                            categories.map((cat, idx) => {
+                                                                const catName = typeof cat === "string" ? cat : cat.categoryName || cat.nombre || cat.name;
+                                                                return (
+                                                                    <Link
+                                                                        key={cat.id || idx}
+                                                                        to={`/products?category=${encodeURIComponent(catName)}`}
+                                                                        onClick={() => setVelasDropdownOpen(false)}
+                                                                        className="group flex items-center justify-between px-3 py-2 text-xs font-medium text-[#333333] hover:text-[#b07d6b] hover:bg-[#f9f3f2] rounded-xl transition-all"
+                                                                    >
+                                                                        <span className="font-['Montserrat'] tracking-wide text-[11px] uppercase">
+                                                                            {catName}
+                                                                        </span>
+                                                                        <span className="text-[10px] text-[#cba394] opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                            ⟶
+                                                                        </span>
+                                                                    </Link>
+                                                                );
+                                                            })
+                                                        ) : (
+                                                            ["Velas Aromáticas", "Home Sprays", "Difusores", "Accesorios"].map((catName, idx) => (
+                                                                <Link
+                                                                    key={idx}
+                                                                    to={`/products?category=${encodeURIComponent(catName)}`}
+                                                                    onClick={() => setVelasDropdownOpen(false)}
+                                                                    className="group flex items-center justify-between px-3 py-2 text-xs font-medium text-[#333333] hover:text-[#b07d6b] hover:bg-[#f9f3f2] rounded-xl transition-all"
+                                                                >
+                                                                    <span className="font-['Montserrat'] tracking-wide text-[11px] uppercase">
+                                                                        {catName}
+                                                                    </span>
+                                                                    <span className="text-[10px] text-[#cba394] opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        ⟶
+                                                                    </span>
+                                                                </Link>
+                                                            ))
+                                                        )}
+                                                    </div>
+
+                                                    <div className="pt-2 mt-1 border-t border-gray-100">
+                                                        <Link
+                                                            to="/products"
+                                                            onClick={() => setVelasDropdownOpen(false)}
+                                                            className="block text-center px-3 py-2 text-[9px] font-bold tracking-[0.15em] uppercase text-white bg-[#333333] hover:bg-[#b07d6b] rounded-xl transition-all"
+                                                        >
+                                                            Ver Catálogo Completo
+                                                        </Link>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                );
+                            }
+
+                            return <NavItem key={item.label} to={item.path} label={item.label} />;
+                        })}
                         {role === 'tecnico' && <NavItem to="/servicioTecnico" label="Soporte" />}
                         {(role === 'vendedor' || role === 'ventas') && <NavItem to="/empleadoVentas" label="Terminal" />}
                         {role === 'admin' && <NavItem to="/admin" label="Boutique Panel" isAdminLink />}

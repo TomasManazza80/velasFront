@@ -31,6 +31,8 @@ import AdminRoute from './AdminRoute.jsx';
 import RoleBasedRoute from './RoleBasedRoute.jsx';
 import CartWholesale from "../pages/Cart/CartWholesale.jsx";
 
+import ComboDetails from "../pages/ComboDetails/ComboDetails.jsx";
+
 function MyRoutes() {
   return (
     <>
@@ -63,6 +65,7 @@ function MyRoutes() {
           <Route path="cart" element={<Cart />} />
           <Route path="cart-wholesale" element={<CartWholesale />} />
           <Route path="producto-mayorista/:id" element={<ProductDetailsWholesale />} />
+          <Route path="combo/:id" element={<ComboDetails />} />
           <Route path="product/:id" element={<ProductDetails />}>
             <Route index element={<Fproduct />} />
           </Route>

@@ -33,7 +33,7 @@ const LuStyles = `
 
 .lu-title { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.15em; }
 .lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
-.lu-script { font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: #cba394; }
+.lu-script { font-family: 'Inter', sans-serif; font-size: 2.5rem; color: #cba394; }
 
 .lu-card {
     background-color: #f9f3f2;

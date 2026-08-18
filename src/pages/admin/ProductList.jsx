@@ -1,9 +1,13 @@
 // src/components/admin/ProductList.jsx
 
-import React from 'react';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import React from "react";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
-const ProductList = ({ todosMisProductos, setProductoAEditar, handleEliminarProducto }) => {
+const ProductList = ({
+  todosMisProductos,
+  setProductoAEditar,
+  handleEliminarProducto,
+}) => {
   return (
     <div className="bg-gray-800 shadow-lg rounded-lg border border-gray-700 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-700">
@@ -11,10 +15,15 @@ const ProductList = ({ todosMisProductos, setProductoAEditar, handleEliminarProd
       </div>
       <div className="divide-y divide-gray-700">
         {todosMisProductos.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">No hay productos registrados</div>
+          <div className="p-6 text-center text-gray-500">
+            No hay productos registrados
+          </div>
         ) : (
           todosMisProductos.map((producto) => (
-            <div key={producto.ProductId} className="p-6 flex flex-col md:flex-row md:items-center hover:bg-gray-700 transition duration-150">
+            <div
+              key={producto.ProductId}
+              className="p-6 flex flex-col md:flex-row md:items-center hover:bg-gray-700 transition duration-150"
+            >
               <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
                 {producto.imagenes?.length > 0 ? (
                   <img
@@ -30,14 +39,40 @@ const ProductList = ({ todosMisProductos, setProductoAEditar, handleEliminarProd
               </div>
 
               <div className="flex-grow">
-                <h3 className="text-lg font-medium text-white">{producto.nombre}</h3>
+                <h3 className="text-lg font-medium text-white">
+                  {producto.nombre}
+                </h3>
                 <div className="mt-1 text-sm text-gray-400 grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <div><span className="font-medium text-gray-300">Precio:</span> ${producto.precio}</div>
-                  <div><span className="font-medium text-gray-300">Descripción:</span> {producto.descripcion}</div>
-                  <div><span className="font-medium text-gray-300">Categoría:</span> {producto.categoria}</div>
-                  <div><span className="font-medium text-gray-300">Marca:</span> {producto.marca || 'N/A'}</div>
-                  <div><span className="font-medium text-gray-300">Stock:</span> {producto.cantidad}</div>
-                  <div><span className="font-medium text-gray-300">Precio por mayor:</span> {producto.talle}</div>
+                  <div>
+                    <span className="font-medium text-gray-300">Precio:</span> $
+                    {producto.precio}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-300">
+                      Descripción:
+                    </span>{" "}
+                    {producto.descripcion}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-300">
+                      Categoría:
+                    </span>{" "}
+                    {producto.categoria}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-300">Marca:</span>{" "}
+                    {producto.marca || "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-300">Stock:</span>{" "}
+                    {producto.cantidad}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-300">
+                      Precio por mayor:
+                    </span>{" "}
+                    {producto.talle}
+                  </div>
                 </div>
               </div>
 

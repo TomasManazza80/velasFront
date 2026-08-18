@@ -27,7 +27,7 @@ const LuStyles = `
 
 .lu-title { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.15em; }
 .lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
-.lu-script { font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: #cba394; }
+.lu-script { font-family: 'Inter', sans-serif; font-size: 2.5rem; color: #cba394; }
 
 .lu-card {
     background-color: #f9f3f2;
@@ -427,8 +427,14 @@ const Products = () => {
                                                                         <span className="bg-[#f9f3f2] text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">Agotado</span>
                                                                     ) : (
                                                                         <>
-                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">-50%</span>
-                                                                            <span className="bg-white/90 backdrop-blur-sm text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm hidden xs:block">Bestseller</span>
+                                                                            {Number(product.descuento) > 0 && (
+                                                                                <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">-{product.descuento}%</span>
+                                                                            )}
+                                                                            {Number(product.tendenciaStars) > 0 && (
+                                                                                <span className="bg-white/90 backdrop-blur-sm text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm hidden xs:block">
+                                                                                    Bestseller {product.tendenciaStars > 3 ? "🔥" : ""}
+                                                                                </span>
+                                                                            )}
                                                                         </>
                                                                     )}
                                                                 </div>

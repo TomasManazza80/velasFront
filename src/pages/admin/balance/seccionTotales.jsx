@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScaleIcon } from '@heroicons/react/24/solid';
+import React from "react";
+import { ScaleIcon } from "@heroicons/react/24/outline";
 
 const TotalsSection = ({ totalVentas, totalEgresos, totalFinal }) => {
   return (
@@ -12,23 +12,33 @@ const TotalsSection = ({ totalVentas, totalEgresos, totalFinal }) => {
 
         {/* Suma de Ventas */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
-          <span className="font-medium text-gray-600">Suma de todas las ventas (Ingresos):</span>
-          <span className="text-xl font-bold text-green-600">${totalVentas.toLocaleString('es-AR')}</span>
+          <span className="font-medium text-gray-600">
+            Suma de todas las ventas (Ingresos):
+          </span>
+          <span className="text-xl font-bold text-green-600">
+            ${totalVentas.toLocaleString("es-AR")}
+          </span>
         </div>
 
         {/* Suma de Egresos */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           <span className="font-medium text-gray-600">Suma de Egresos:</span>
-          <span className="text-xl font-bold text-red-600">-${totalEgresos.toLocaleString('es-AR')}</span>
+          <span className="text-xl font-bold text-red-600">
+            -${totalEgresos.toLocaleString("es-AR")}
+          </span>
         </div>
       </div>
 
       {/* Total Final */}
       <div className="mt-6 pt-4 border-t-2 border-green-200 bg-green-50 p-4 rounded-lg">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-green-800">TOTAL FINAL EN TODO EL SISTEMA:</span>
-          <span className={`text-3xl font-extrabold ${totalFinal >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-            ${totalFinal.toLocaleString('es-AR')}
+          <span className="text-lg font-bold text-green-800">
+            TOTAL FINAL EN TODO EL SISTEMA:
+          </span>
+          <span
+            className={`text-3xl font-extrabold ${totalFinal >= 0 ? "text-green-700" : "text-red-700"}`}
+          >
+            ${totalFinal.toLocaleString("es-AR")}
           </span>
         </div>
       </div>

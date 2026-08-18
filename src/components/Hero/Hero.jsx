@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faChevronLeft, faChevronRight, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useNavigate, Link } from 'react-router-dom';
+import CombosHome from "../CombosHome/CombosHome.jsx";
+
 
 // Estilo de carga para el esqueleto
 const SkeletonCard = () => (
@@ -25,7 +27,7 @@ const LuStyles = `
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400&family=Montserrat:wght@300;400;500&display=swap');
 .lu-title { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.15em; }
 .lu-body { font-family: 'Lato', sans-serif; font-weight: 300; }
-.lu-script { font-family: 'Great Vibes', cursive; font-size: clamp(2rem, 4vw, 2.5rem); color: #cba394; }
+.lu-script { font-family: 'Inter', sans-serif; font-size: clamp(2rem, 4vw, 2.5rem); color: #cba394; }
 `;
 
 const Hero = () => {
@@ -204,13 +206,6 @@ const Hero = () => {
                                     <p className="text-sm sm:text-base md:text-xl font-light text-gray-800 md:text-gray-500 italic mb-6 md:mb-10 font-medium md:font-light">
                                         {slides[index]?.subtitle}
                                     </p>
-
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        className="px-6 py-3 sm:px-10 sm:py-3.5 md:py-4 bg-[#e0d7cc] text-[#5a4d40] text-[9px] sm:text-xs md:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase font-bold hover:bg-[#d4c8ba] transition-colors shadow-md md:shadow-none"
-                                    >
-                                        SHOP NOW
-                                    </motion.button>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
@@ -251,58 +246,73 @@ const Hero = () => {
                     <button onClick={nextSlide} className="absolute right-2 md:right-6 z-40 text-gray-600 md:text-gray-300 hover:text-black md:hover:text-gray-600 transition-colors hidden md:block">
                         <FontAwesomeIcon icon={faChevronRight} size="lg" />
                     </button>
+
+                    {/* OVERLAY OSCURO SUTIL PARA CONTRASTE DEL BUSCADOR */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent z-50 pointer-events-none"></div>
                 </div>
 
                 {/* SEARCH BAR (Liberado del overflow-hidden y con z-[100] elevado) */}
-                <div className="absolute bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 w-[85%] md:w-full max-w-sm md:max-w-md px-2 md:px-6 z-[100]">
-                    <div className="relative group">
+                <div className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 w-[90%] md:w-[70%] max-w-3xl px-2 md:px-0 z-[100] flex flex-col items-center">
+                    <motion.div 
+                        initial={{ y: 80, width: "64px", height: "64px", borderRadius: "32px", opacity: 0 }}
+                        animate={{ 
+                            y: 0, 
+                            width: "100%", 
+                            height: "auto",
+                            borderRadius: (showResults && filteredProducts.length > 0) ? "16px 16px 0 0" : "16px", 
+                            opacity: 1 
+                        }}
+                        transition={{ duration: 0.8, type: "spring", bounce: 0.4, delay: 0.3 }}
+                        className={`relative group flex items-center bg-white/95 backdrop-blur-xl shadow-2xl border border-[#e0d7cc] transition-colors focus-within:border-[#8b5e3c] focus-within:ring-4 focus-within:ring-[#8b5e3c]/20 hover:bg-white overflow-hidden ${showResults && filteredProducts.length > 0 ? "border-b-0" : ""}`}
+                    >
+                        <div className="absolute left-0 top-0 bottom-0 w-[64px] flex justify-center items-center pointer-events-none z-20">
+                            <FontAwesomeIcon icon={faSearch} className="text-[#8b5e3c] text-sm md:text-lg opacity-60 group-focus-within:opacity-100 transition-opacity" />
+                        </div>
                         <input
                             type="text"
                             placeholder="BUSCAR AROMA..."
-                            className="w-full py-3 md:py-4 text-center text-[8px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase bg-white/90 backdrop-blur-md border border-[#e0d7cc] rounded-none focus:outline-none focus:border-[#8b5e3c] transition-all placeholder-gray-500 md:placeholder-gray-400 text-gray-800 md:text-gray-700 font-medium shadow-lg md:shadow-none relative z-10"
+                            className="w-full py-4 md:py-5 pl-[64px] pr-[64px] text-center text-[10px] md:text-sm tracking-[0.2em] md:tracking-[0.25em] uppercase bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-400 text-gray-800 font-medium relative z-10"
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
                                 if (e.target.value === "") setShowResults(false);
                             }}
                         />
-                        <div className="absolute inset-y-0 left-4 md:left-6 flex items-center pointer-events-none z-20">
-                            <FontAwesomeIcon icon={faSearch} className="text-gray-400 md:text-gray-300 text-[10px] md:text-xs" />
-                        </div>
+                    </motion.div>
 
-                        <AnimatePresence>
-                            {showResults && filteredProducts.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    // AQUI EL CAMBIO: max-h-72 en móviles (mucho más largo) y md:max-h-96 en escritorio
-                                    className="absolute top-full left-0 right-0 bg-white border border-[#e0d7cc] shadow-2xl max-h-72 md:max-h-96 overflow-y-auto z-[110] rounded-b-xl"
-                                >
+                    <AnimatePresence>
+                        {showResults && filteredProducts.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute top-[100%] left-0 right-0 bg-white/95 backdrop-blur-xl border border-[#e0d7cc] border-t-0 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] max-h-[50vh] md:max-h-[60vh] overflow-y-auto z-[110] rounded-b-2xl custom-scrollbar w-full"
+                            >
                                     {filteredProducts.map((prod) => {
                                         const totalStock = prod.variantes?.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0) || 0;
                                         const isAvailable = totalStock > 0;
                                         return (
-                                            <Link to={`/product/${prod.id}`} key={prod.id} className="relative flex items-center gap-3 md:gap-5 p-3 md:p-5 hover:bg-[#F9F7F2] transition-colors border-b border-gray-100 last:border-none group min-w-0 pr-12 md:pr-16">
-                                                <div className="w-10 h-10 md:w-16 md:h-16 flex-shrink-0 overflow-hidden rounded-lg md:rounded-xl bg-gray-50">
-                                                    <img src={optimizeImage(prod.imagenes?.[0] || prod.image)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <Link to={`/product/${prod.id}`} key={prod.id} className="relative flex items-center gap-4 md:gap-6 p-4 md:p-6 hover:bg-[#F9F7F2] transition-colors border-b border-gray-100/50 last:border-none group min-w-0 pr-14 md:pr-20">
+                                                <div className="w-12 h-12 md:w-20 md:h-20 flex-shrink-0 overflow-hidden rounded-lg md:rounded-2xl bg-gray-50 shadow-sm">
+                                                    <img src={optimizeImage(prod.imagenes?.[0] || prod.image)} alt={prod.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                 </div>
                                                 <div className="text-left flex-1 min-w-0">
-                                                    <h4 className="lu-title text-[9px] md:text-[11px] font-bold text-[#333333] truncate mb-0.5">{prod.nombre}</h4>
-                                                    <p className="lu-body text-[8px] md:text-[10px] text-gray-400 tracking-[0.05em] md:tracking-[0.1em] uppercase mb-1 truncate">{prod.marca || 'LU PETRUCCELLI'}</p>
+                                                    <h4 className="lu-title text-[10px] md:text-sm font-bold text-[#333333] truncate mb-1">{prod.nombre}</h4>
+                                                    <p className="lu-body text-[9px] md:text-xs text-gray-400 tracking-[0.1em] md:tracking-[0.15em] uppercase mb-1.5 truncate">{prod.marca || 'LU PETRUCCELLI'}</p>
                                                     {prod.variantes && prod.variantes.some(v => Number(v.precioAlPublico) > 0) && (
-                                                        <div className="lu-title text-[10px] md:text-[12px] text-[#b07d6b] font-bold">
+                                                        <div className="lu-title text-[11px] md:text-sm text-[#b07d6b] font-bold">
                                                             ${Math.min(...prod.variantes.map(v => Number(v.precioAlPublico) || 0).filter(p => p > 0)).toLocaleString('es-AR')}
                                                         </div>
                                                     )}
                                                 </div>
                                                 {isAvailable ? (
-                                                    <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-md hover:bg-black transition-all flex-shrink-0 z-10">
-                                                        <FontAwesomeIcon icon={faCartPlus} className="text-[10px] md:text-xs" />
+                                                    <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-[#333333] text-white rounded-full flex justify-center items-center shadow-lg hover:bg-[#b07d6b] hover:scale-110 transition-all duration-300 flex-shrink-0 z-10 cursor-pointer">
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-xs md:text-sm" />
                                                     </div>
                                                 ) : (
-                                                    <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-10 opacity-60">
-                                                        <FontAwesomeIcon icon={faCartPlus} className="text-[10px] md:text-xs" />
+                                                    <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-gray-100 text-gray-400 rounded-full flex justify-center items-center disabled z-10 opacity-60">
+                                                        <FontAwesomeIcon icon={faCartPlus} className="text-xs md:text-sm" />
                                                     </div>
                                                 )}
                                             </Link>
@@ -311,9 +321,11 @@ const Hero = () => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
                 </div>
             </div>
+
+            {/* SECTION: COMBOS & PROMOCIONES CAROUSEL */}
+            <CombosHome />
 
             {/* SECTION: PRODUCT GRID */}
             <div className="relative w-full bg-white pt-6 sm:pt-10 md:pt-24 pb-16 sm:pb-24 md:pb-32">
@@ -359,7 +371,9 @@ const Hero = () => {
                                                             <span className="bg-[#f9f3f2] text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">Agotado</span>
                                                         ) : (
                                                             <>
-                                                                <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">-50%</span>
+                                                                {Number(product.descuento) > 0 && (
+                                                                    <span className="bg-white/90 backdrop-blur-sm text-[#333333] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">-{product.descuento}%</span>
+                                                                )}
                                                                 <span className="bg-white/90 backdrop-blur-sm text-[#b07d6b] text-[6px] sm:text-[10px] md:text-xs font-semibold px-1 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm hidden xs:block">Bestseller</span>
                                                             </>
                                                         )}
